@@ -33,7 +33,6 @@
         .btn-abu {background:var(--abu-lembut); color:#374151;}
         .btn + .btn {margin-top:12px;}
         .btn-kecil {width:auto; padding:8px 14px; font-size:14px; display:inline-flex;}
-        .btn-cek {width:48%; padding:10px; font-size:15px;}
 
         .menu-baris {display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--batas); flex-wrap:wrap; gap:8px;}
         .menu-info {flex:1; min-width:180px;}
@@ -62,8 +61,6 @@
         .berhasil {background:var(--hijau-muda); border:1px solid #86efac; border-radius:8px; padding:14px; margin:12px 0; text-align:center; color:#166534; font-weight:500;}
         .sembunyi {display:none !important;}
         hr {border:none; border-top:1px solid var(--batas); margin:20px 0;}
-        .tag {display:inline-block; background:var(--biru-muda); color:#1e40af; font-size:12px; font-weight:600; padding:4px 10px; border-radius:12px; margin-right:8px; margin-bottom:8px;}
-        .cek-pilihan {display:flex; gap:10px; margin-top:10px;}
         .riwayat-kartu {background:var(--putih); border:1px solid var(--batas); border-radius:10px; padding:14px; margin-bottom:12px;}
         .riwayat-atas {display:flex; justify-content:space-between; font-weight:500; margin-bottom:8px;}
         .status {display:inline-block; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;}
@@ -307,6 +304,7 @@
     <div class="header"><h1>📋 HASIL PENGECEKAN</h1></div>
     <div class="wadah">
         <div class="kartu" id="hasil-pesanan-konten"></div>
+        <button class="btn btn-abu" onclick="bukaHalaman('halaman-pelanggan-menu')">⬅️ KEMBALI</button>
     </div>
 </div>
 
@@ -327,6 +325,7 @@
     <div class="header"><h1>🧾 RESI PESANAN</h1></div>
     <div class="wadah">
         <div class="kartu" id="resi-konten"></div>
+        <button class="btn btn-abu" onclick="bukaHalaman('halaman-pelanggan-menu')">⬅️ KEMBALI</button>
     </div>
 </div>
 
@@ -454,7 +453,7 @@ function ambilLokasiPelanggan() {
     }, () => alert('⚠️ Gagal ambil lokasi!'));
 }
 
-// === KURIR ===
+// === KURIR — FUNGSI TOMBOL LENGKAP ===
 function simpanAkunKurir() {
     let nama = document.getElementById('kurir-nama').value.trim();
     let alamat = document.getElementById('kurir-alamat').value.trim();
@@ -466,6 +465,7 @@ function simpanAkunKurir() {
     semuaKurir[id] = akunKurir;
     localStorage.setItem('akunKurir', JSON.stringify(akunKurir));
     localStorage.setItem('semuaKurir', JSON.stringify(semuaKurir));
+    alert('✅ AKUN KURIR BERHASIL DIBUAT!');
     bukaHalaman('halaman-kurir-menu');
     tampilkanKurir();
 }
@@ -488,6 +488,7 @@ function buatLinkKedai() {
     let link = window.location.origin + window.location.pathname + `?mode=kedai&kurir=${akunKurir.id}`;
     document.getElementById('link-kedai-teks').innerText = link;
     document.getElementById('link-kedai-baru').classList.remove('sembunyi');
+    alert('✅ LINK PENDAFTARAN KEDAI BERHASIL DIBUAT!');
 }
 function salinLinkPelanggan() {
     let link = window.location.origin + window.location.pathname + `?mode=pelanggan&kurir=${akunKurir.id}`;
@@ -504,6 +505,7 @@ function masukKurir() {
     } else alert('❌ ID KURIR tidak ditemukan!');
 }
 function keluarAkun() {
+    if (!confirm('Yakin ingin keluar akun?')) return;
     localStorage.removeItem('akunKurir'); localStorage.removeItem('akunKedai'); localStorage.removeItem('akunPelanggan');
     akunKurir = null; akunKedai = null; akunPelanggan = null;
     bukaHalaman('halaman-awal');
@@ -521,31 +523,33 @@ function renderKedaiKurir() {
         <div class="kedai-blok">
             <div class="kedai-nama">🏪 ${k.nama}</div>
             <p style="font-size:14px; color:var(--abu); margin-bottom:12px;">📱 WA: ${k.wa} • ${k.menu.length} menu</p>
-            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-flex;" onclick="alert('Menu: ${k.menu.map(m=>m.nama).join(', ')}')">📋 Menu</button>
-            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-flex;" onclick="alert('Fitur edit kedai')">✏️ Edit</button>
+            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-flex;" onclick="alert('📋 Menu: ${k.menu.map(m=>m.nama).join(', ') || 'Belum ada menu'}')">📋 Menu</button>
+            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-flex;" onclick="alert('✏️ Fitur edit kedai: ${k.nama}')">✏️ Edit</button>
             <button class="btn btn-merah btn-kecil" style="width:31%; display:inline-flex;" onclick="hapusKedai('${k.id}')">🗑️ Hapus</button>
         </div>
     `).join('');
 }
 function hapusKedai(id) {
-    if (!confirm('Yakin hapus kedai ini?')) return;
+    if (!confirm('Yakin hapus kedai ini? Data tidak bisa dikembalikan!')) return;
     akunKurir.kedai = akunKurir.kedai.filter(k => k.id !== id);
     semuaKurir[akunKurir.id] = akunKurir;
     localStorage.setItem('semuaKurir', JSON.stringify(semuaKurir));
     localStorage.setItem('akunKurir', JSON.stringify(akunKurir));
+    alert('✅ KEDAI BERHASIL DIHAPUS!');
     renderKedaiKurir();
 }
 
-// === KEDAI ===
+// === KEDAI — FUNGSI TOMBOL LENGKAP ===
 function simpanAkunKedai() {
     let nama = document.getElementById('kedai-nama').value.trim();
     let wa = document.getElementById('kedai-wa').value.trim();
-    if (!nama || !wa || !akunKurir) return alert('⚠️ Isi semua data!');
+    if (!nama || !wa || !akunKurir) return alert('⚠️ Isi semua data dulu!');
     let id = 'KEDAI-' + Math.random().toString(36).substr(2,6);
     akunKedai = { id, nama, wa, idKurir: akunKurir.id, menu: [] };
     semuaKedai[id] = akunKedai;
     localStorage.setItem('akunKedai', JSON.stringify(akunKedai));
     localStorage.setItem('semuaKedai', JSON.stringify(semuaKedai));
+    alert('✅ AKUN KEDAI BERHASIL DIBUAT!');
     bukaHalaman('halaman-kedai-menu');
     tampilkanKedai();
 }
@@ -565,11 +569,12 @@ function simpanMenuKedai() {
     localStorage.setItem('akunKedai', JSON.stringify(akunKedai));
     localStorage.setItem('semuaKedai', JSON.stringify(semuaKedai));
     document.getElementById('menu-nama').value=''; document.getElementById('menu-harga').value=''; document.getElementById('menu-varian').value='';
+    alert('✅ MENU BERHASIL DISIMPAN!');
     renderMenuKedai();
 }
 function renderMenuKedai() {
     let el = document.getElementById('daftar-menu-kedai');
-    if (!akunKedai.menu.length) { el.innerHTML = '<p style="color:var(--abu);">Belum ada menu.</p>'; return; }
+    if (!akunKedai.menu.length) { el.innerHTML = '<p style="color:var(--abu);">Belum ada menu, silakan tambah menu baru.</p>'; return; }
     el.innerHTML = akunKedai.menu.map(m => `
         <div class="menu-baris">
             <div class="menu-info">
@@ -589,6 +594,7 @@ function hapusMenuKedai(id) {
     semuaKedai[akunKedai.id] = akunKedai;
     localStorage.setItem('akunKedai', JSON.stringify(akunKedai));
     localStorage.setItem('semuaKedai', JSON.stringify(semuaKedai));
+    alert('✅ MENU BERHASIL DIHAPUS!');
     renderMenuKedai();
 }
 function kirimDataKeKurir() {
@@ -601,17 +607,18 @@ function kirimDataKeKurir() {
     localStorage.setItem('akunKurir', JSON.stringify(kurir));
     document.getElementById('pesan-kedai-berhasil').classList.remove('sembunyi');
     setTimeout(()=>document.getElementById('pesan-kedai-berhasil').classList.add('sembunyi'),4000);
-    alert('✅ DATA BERHASIL MASUK KE AKUN KURIR!');
+    alert('✅ DATA KEDAI BERHASIL MASUK KE AKUN KURIR!');
 }
 
-// === PELANGGAN ===
+// === PELANGGAN — FUNGSI TOMBOL LENGKAP ===
 function simpanPelanggan() {
     let nama = document.getElementById('pelanggan-nama').value.trim();
     let wa = document.getElementById('pelanggan-wa').value.trim();
     let alamat = document.getElementById('pelanggan-alamat').value.trim();
-    if (!nama || !wa || !alamat) return alert('⚠️ Isi semua data!');
+    if (!nama || !wa || !alamat) return alert('⚠️ Isi semua data dulu!');
     akunPelanggan = { nama, wa, alamat };
     localStorage.setItem('akunPelanggan', JSON.stringify(akunPelanggan));
+    alert('✅ DATA PELANGGAN TERSIMPAN!');
     bukaHalaman('halaman-pelanggan-menu');
     document.getElementById('pelanggan-nama-tampil').textContent = nama;
 }
@@ -676,12 +683,4 @@ function renderSemuaMenu() {
 }
 function ubahJumlah(idKedai, idMenu, tambah) {
     let kedai = kedaiTerpilih.find(k => k.id === idKedai);
-    let menu = kedai.menu.find(m => m.id === idMenu);
-    let item = keranjang.find(x => x.idKedai===idKedai && x.idMenu===idMenu);
-    if (!item) { item = { ...menu, idKedai, jumlah:0, varian:null }; keranjang.push(item); }
-    item.jumlah += tambah;
-    if (item.jumlah < 0) item.jumlah = 0;
-    document.getElementById(`jml-${idKedai}-${idMenu}`).textContent = item.jumlah;
-}
-function bukaHalamanRingkas() {
-    let el =
+    let menu = kedai.menu.find(m => m.id === idMenu
