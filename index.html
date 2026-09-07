@@ -7,82 +7,82 @@
     <style>
         * {margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI, Roboto, sans-serif;}
         :root {--biru:#2563eb; --hijau:#16a34a; --merah:#ef4444; --abu:#6b7280; --putih:#fff; --abu-lembut:#f3f4f6; --batas:#e5e7eb;}
-        body {background:var(--abu-lembut); color:#1f2937; min-height:100vh; padding-bottom:80px;}
+        body {background:var(--abu-lembut); color:#1f2937; min-height:100vh; padding-bottom:40px;}
         .wadah {max-width:480px; margin:0 auto; padding:16px;}
         .halaman {display:none;}
         .halaman.aktif {display:block; animation:masuk .2s ease;}
         @keyframes masuk {from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
 
         .header {text-align:center; padding:24px 16px;}
-        .header img {width:64px; height:64px; margin-bottom:8px;}
-        .header h1 {font-size:22px; color:var(--biru);}
+        .header h1 {font-size:24px; color:var(--biru); margin-bottom:4px;}
         .header p {color:var(--abu); font-size:14px;}
 
         .kartu {background:var(--putih); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,.08);}
         .kartu h3 {font-size:17px; margin-bottom:16px; color:#111827;}
-        .kartu p {font-size:14px; color:var(--abu); margin-bottom:12px;}
 
         label {display:block; font-size:14px; font-weight:500; margin-bottom:6px; color:#374151;}
-        input, textarea, select {width:100%; padding:12px 14px; border:1px solid var(--batas); border-radius:8px; font-size:15px; margin-bottom:16px; background:var(--putih);}
+        input, textarea {width:100%; padding:12px 14px; border:1px solid var(--batas); border-radius:8px; font-size:15px; margin-bottom:16px; background:var(--putih);}
         input:focus {outline:none; border-color:var(--biru); box-shadow:0 0 0 3px rgba(37,99,235,.1);}
 
-        .btn {display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; transition:transform .1s, opacity .2s;}
-        .btn:active {transform:scale(.98);}
+        .btn {display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:14px; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; transition:all .15s;}
+        .btn:active {transform:scale(.97); opacity:.9;}
         .btn-biru {background:var(--biru); color:var(--putih);}
         .btn-hijau {background:var(--hijau); color:var(--putih);}
         .btn-merah {background:var(--merah); color:var(--putih);}
         .btn-abu {background:var(--abu-lembut); color:#374151;}
-        .btn-block {margin-bottom:12px;}
+        .btn + .btn {margin-top:12px;}
 
-        .baris-menu {display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--batas); gap:8px; flex-wrap:wrap;}
+        .baris-menu {display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--batas); gap:8px; flex-wrap:wrap;}
         .info-menu {flex:1; min-width:180px;}
         .nama-menu {font-weight:500; font-size:15px;}
         .harga-menu {color:var(--biru); font-weight:600; font-size:14px; margin-left:8px;}
         .kendali-jumlah {display:flex; align-items:center; gap:10px;}
-        .btn-kurang, .btn-tambah {width:36px; height:36px; border-radius:50%; border:none; font-size:18px; font-weight:bold; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+        .btn-kurang, .btn-tambah {width:38px; height:38px; border-radius:50%; border:none; font-size:20px; font-weight:bold; display:flex; align-items:center; justify-content:center; cursor:pointer;}
         .btn-kurang {background:#fee2e2; color:var(--merah);}
         .btn-tambah {background:#dcfce7; color:var(--hijau);}
-        .nilai-jumlah {min-width:28px; text-align:center; font-weight:600; font-size:16px;}
+        .nilai-jumlah {min-width:30px; text-align:center; font-weight:600; font-size:16px;}
 
-        .pilihan-varian {display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 12px 0;}
-        .tombol-varian {padding:8px 14px; border-radius:20px; border:1px solid var(--batas); background:var(--putih); font-size:14px; cursor:pointer;}
+        .pilihan-varian {display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 14px 0;}
+        .tombol-varian {padding:8px 16px; border-radius:20px; border:1px solid var(--batas); background:var(--putih); font-size:14px; cursor:pointer;}
         .tombol-varian.terpilih {background:var(--biru); color:white; border-color:var(--biru);}
 
-        .item-pesanan {padding:10px 0; border-bottom:1px solid var(--batas);}
-        .tag-kedai {display:inline-block; background:#dbeafe; color:#1e40af; font-size:12px; font-weight:600; padding:4px 10px; border-radius:12px; margin-bottom:8px;}
-        .total-baris {display:flex; justify-content:space-between; padding:10px 0; font-weight:600; font-size:16px;}
-        .total-akhir {font-size:18px; color:var(--biru); border-top:2px solid var(--batas); padding-top:12px; margin-top:8px;}
-
-        .kotak-link {background:var(--abu-lembut); padding:12px; border-radius:8px; word-break:break-all; font-size:13px; color:#374151; margin-bottom:12px;}
+        .tag-kedai {display:inline-block; background:#dbeafe; color:#1e40af; font-size:12px; font-weight:600; padding:5px 12px; border-radius:12px; margin-bottom:10px;}
+        .total-baris {display:flex; justify-content:space-between; padding:12px 0; font-weight:600; font-size:16px;}
+        .total-akhir {font-size:18px; color:var(--biru); border-top:2px solid var(--batas); padding-top:14px; margin-top:10px;}
+        .kotak-link {background:var(--abu-lembut); padding:14px; border-radius:8px; word-break:break-all; font-size:13px; color:#374151; margin-bottom:12px;}
         .info-kecil {font-size:12px; color:var(--abu); margin-top:-8px; margin-bottom:12px;}
         .sembunyi {display:none !important;}
-        .centang-baris {display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--batas);}
-        .centang-baris input[type=checkbox] {width:20px; height:20px; margin:0;}
-        .status-badge {display:inline-block; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;}
+        .centang-baris {display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--batas);}
+        .centang-baris input[type=checkbox] {width:22px; height:22px; margin:0; cursor:pointer;}
+        .status-badge {display:inline-block; padding:5px 12px; border-radius:12px; font-size:12px; font-weight:600;}
         .status-ada {background:#dcfce7; color:#166534;}
         .status-kosong {background:#fee2e2; color:#991b1b;}
+        hr {border:none; border-top:1px solid var(--batas); margin:20px 0;}
     </style>
 </head>
 <body>
 
-<!-- ====================================== HALAMAN AWAL ====================================== -->
+<!-- ===================== HALAMAN AWAL ===================== -->
 <div id="halaman-awal" class="halaman aktif">
     <div class="header">
-        <h1 style="font-size:26px; margin-bottom:4px;">🚚 NGURIR SIMPEL</h1>
+        <h1>🚚 NGURIR SIMPEL</h1>
         <p>Jemput · Antar · Pesan — Mudah & Simpel</p>
     </div>
     <div class="wadah">
         <div class="kartu">
-            <button class="btn btn-biru btn-block" onclick="bukaHalaman('halaman-daftar-kurir')">📝 DAFTAR KURIR BARU</button>
-            <button class="btn btn-abu btn-block" onclick="masukKurir()">🔓 MASUK KURIR</button>
-            <div style="margin-top:20px; padding:12px; background:#fffbeb; border-radius:8px; border-left:3px solid #f59e0b;">
-                <p style="margin:0; font-size:13px; color:#92400e;"><strong>🏪 Untuk Kedai & 👤 Pelanggan:</strong><br>Silakan buka link yang dikirimkan oleh Kurir untuk mendaftar & memesan.</p>
+            <button class="btn btn-biru" onclick="bukaHalaman('halaman-daftar-kurir')">📝 DAFTAR KURIR BARU</button>
+            <button class="btn btn-abu" onclick="masukKurir()">🔓 MASUK KURIR</button>
+            <div style="margin-top:20px; padding:14px; background:#fffbeb; border-radius:8px; border-left:3px solid #f59e0b;">
+                <p style="margin:0; font-size:13px; color:#92400e; line-height:1.5;">
+                    <strong>🏪 Untuk Kedai & 👤 Pelanggan:</strong><br>
+                    Silakan buka link yang dikirimkan oleh Kurir untuk mendaftar & memesan.
+                </p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ====================================== DAFTAR KURIR ====================================== -->
+<!-- ===================== DAFTAR KURIR ===================== -->
 <div id="halaman-daftar-kurir" class="halaman">
     <div class="header"><h1>🚚 DAFTAR AKUN KURIR</h1></div>
     <div class="wadah">
@@ -91,13 +91,13 @@
             <input type="text" id="kurir-nama" placeholder="Masukkan nama Anda">
 
             <label>Alamat</label>
-            <input type="text" id="kurir-alamat" placeholder="Masukkan alamat">
+            <input type="text" id="kurir-alamat" placeholder="Masukkan alamat lengkap">
 
             <label>Nomor WhatsApp</label>
             <input type="tel" id="kurir-wa" placeholder="Contoh: 08123456789">
 
             <label>Lokasi Anda</label>
-            <button class="btn btn-abu btn-block" onclick="ambilLokasiKurir()">📍 BAGIKAN LOKASI</button>
+            <button class="btn btn-abu" onclick="ambilLokasiKurir()">📍 BAGIKAN LOKASI</button>
             <p id="lokasi-kurir-teks" class="info-kecil">Belum ada lokasi</p>
 
             <button class="btn btn-biru" onclick="simpanAkunKurir()">✅ SELESAI & DAFTAR</button>
@@ -105,24 +105,24 @@
     </div>
 </div>
 
-<!-- ====================================== MENU UTAMA KURIR ====================================== -->
+<!-- ===================== MENU UTAMA KURIR ===================== -->
 <div id="halaman-menu-kurir" class="halaman">
     <div class="header">
         <h1>🚚 SELAMAT DATANG</h1>
-        <p id="kurir-nama-tampil"></p>
-        <p style="color:#2563eb; font-weight:600;" id="kurir-id-tampil"></p>
+        <p id="kurir-nama-tampil" style="font-size:18px; font-weight:600; color:#1f2937;"></p>
+        <p id="kurir-id-tampil" style="color:var(--biru); font-weight:600; font-size:15px;"></p>
     </div>
     <div class="wadah">
         <div class="kartu">
-            <button class="btn btn-abu btn-block" onclick="bukaHalaman('halaman-edit-kurir')">⚙️ EDIT AKUN SAYA</button>
-            <button class="btn btn-biru btn-block" onclick="bukaHalaman('halaman-atur-kedai')">🛒 ATUR LAYANAN PESANAN</button>
-            <button class="btn btn-hijau btn-block" onclick="salinLinkPelanggan()">🔗 SALIN LINK PELANGGAN</button>
-            <button class="btn btn-abu btn-block" onclick="keluarAkun()">🚪 KELUAR AKUN</button>
+            <button class="btn btn-abu" onclick="bukaHalaman('halaman-edit-kurir')">⚙️ EDIT AKUN SAYA</button>
+            <button class="btn btn-biru" onclick="bukaHalaman('halaman-atur-kedai')">🛒 ATUR LAYANAN PESANAN</button>
+            <button class="btn btn-hijau" onclick="salinLinkPelanggan()">🔗 SALIN LINK PELANGGAN</button>
+            <button class="btn btn-abu" onclick="keluarAkun()">🚪 KELUAR AKUN</button>
         </div>
     </div>
 </div>
 
-<!-- ====================================== EDIT AKUN KURIR ====================================== -->
+<!-- ===================== EDIT AKUN KURIR ===================== -->
 <div id="halaman-edit-kurir" class="halaman">
     <div class="header"><h1>⚙️ EDIT AKUN KURIR</h1></div>
     <div class="wadah">
@@ -134,30 +134,30 @@
             <label>Nomor WhatsApp</label>
             <input type="tel" id="edit-kurir-wa">
             <button class="btn btn-biru" onclick="simpanEditKurir()">💾 SIMPAN PERUBAHAN</button>
-            <button class="btn btn-abu" style="margin-top:10px;" onclick="bukaHalaman('halaman-menu-kurir')">⬅️ KEMBALI</button>
+            <button class="btn btn-abu" onclick="bukaHalaman('halaman-menu-kurir')">⬅️ KEMBALI</button>
         </div>
     </div>
 </div>
 
-<!-- ====================================== ATUR KEDAI ====================================== -->
+<!-- ===================== ATUR KEDAI ===================== -->
 <div id="halaman-atur-kedai" class="halaman">
     <div class="header"><h1>🛒 ATUR LAYANAN PESANAN</h1></div>
     <div class="wadah">
         <div class="kartu">
-            <button class="btn btn-biru btn-block" onclick="buatLinkKedai()">🔗 BUAT LINK PENDAFTARAN KEDAI</button>
+            <button class="btn btn-biru" onclick="buatLinkKedai()">🔗 BUAT LINK PENDAFTARAN KEDAI</button>
             <div id="kotak-link-kedai" class="sembunyi">
-                <p>🔗 Link Pendaftaran Kedai:</p>
+                <p style="margin-bottom:8px; font-size:14px;">🔗 Link Pendaftaran Kedai:</p>
                 <div class="kotak-link" id="link-kedai-teks"></div>
-                <button class="btn btn-hijau btn-block" onclick="salinTeks('link-kedai-teks')">📋 SALIN LINK</button>
+                <button class="btn btn-hijau" onclick="salinTeks('link-kedai-teks')">📋 SALIN LINK</button>
             </div>
-            <hr style="margin:20px 0; border:none; border-top:1px solid var(--batas);">
-            <button class="btn btn-hijau btn-block" onclick="bukaHalaman('halaman-daftar-kedai-saya')">🏪 LIHAT KEDAI SAYA</button>
-            <button class="btn btn-abu" style="margin-top:10px;" onclick="bukaHalaman('halaman-menu-kurir')">⬅️ KEMBALI</button>
+            <hr>
+            <button class="btn btn-hijau" onclick="bukaHalaman('halaman-daftar-kedai-saya')">🏪 LIHAT KEDAI SAYA</button>
+            <button class="btn btn-abu" onclick="bukaHalaman('halaman-menu-kurir')">⬅️ KEMBALI</button>
         </div>
     </div>
 </div>
 
-<!-- ====================================== DAFTAR KEDAI MILIK KURIR ====================================== -->
+<!-- ===================== KEDAI SAYA ===================== -->
 <div id="halaman-daftar-kedai-saya" class="halaman">
     <div class="header"><h1>🏪 KEDAI SAYA</h1></div>
     <div class="wadah">
@@ -168,7 +168,7 @@
     </div>
 </div>
 
-<!-- ====================================== PENDAFTARAN KEDAI ====================================== -->
+<!-- ===================== DAFTAR KEDAI ===================== -->
 <div id="halaman-daftar-kedai" class="halaman">
     <div class="header"><h1>🏪 DAFTAR KEDAI</h1><p id="kedai-kurir-info"></p></div>
     <div class="wadah">
@@ -182,24 +182,24 @@
     </div>
 </div>
 
-<!-- ====================================== MENU UTAMA KEDAI ====================================== -->
+<!-- ===================== MENU UTAMA KEDAI ===================== -->
 <div id="halaman-menu-kedai" class="halaman">
     <div class="header">
         <h1>🏪 MENU KEDAI</h1>
-        <p id="kedai-nama-tampil"></p>
-        <p style="font-size:13px; color:var(--abu);" id="kedai-id-kurir"></p>
+        <p id="kedai-nama-tampil" style="font-size:17px; font-weight:600;"></p>
+        <p id="kedai-id-kurir" style="font-size:13px; color:var(--abu); margin-top:4px;"></p>
     </div>
     <div class="wadah">
         <div class="kartu">
-            <button class="btn btn-biru btn-block" onclick="bukaHalaman('halaman-tambah-menu')">➕ TAMBAH MENU BARU</button>
-            <h3 style="margin-top:20px;">📋 DAFTAR MENU</h3>
+            <button class="btn btn-biru" onclick="bukaHalaman('halaman-tambah-menu')">➕ TAMBAH MENU BARU</button>
+            <h3 style="margin-top:20px; margin-bottom:12px;">📋 DAFTAR MENU</h3>
             <div id="daftar-menu-kedai"></div>
-            <button class="btn btn-abu btn-block" style="margin-top:20px;" onclick="kirimDataKedai()">✅ KIRIM DATA KE KURIR</button>
+            <button class="btn btn-hijau" style="margin-top:20px;" onclick="kirimDataKedai()">✅ KIRIM DATA KE KURIR</button>
         </div>
     </div>
 </div>
 
-<!-- ====================================== TAMBAH MENU KEDAI ====================================== -->
+<!-- ===================== TAMBAH MENU KEDAI ===================== -->
 <div id="halaman-tambah-menu" class="halaman">
     <div class="header"><h1>➕ TAMBAH MENU</h1></div>
     <div class="wadah">
@@ -211,39 +211,12 @@
             <label>Varian (pisahkan dengan koma, opsional)</label>
             <input type="text" id="menu-varian" placeholder="Contoh: Pedas, Sedang, Manis">
             <button class="btn btn-biru" onclick="simpanMenuKedai()">💾 SIMPAN MENU</button>
-            <button class="btn btn-abu" style="margin-top:10px;" onclick="bukaHalaman('halaman-menu-kedai')">⬅️ KEMBALI</button>
+            <button class="btn btn-abu" onclick="bukaHalaman('halaman-menu-kedai')">⬅️ KEMBALI</button>
         </div>
     </div>
 </div>
 
-<!-- ====================================== DAFTAR KEDAI PILIHAN PELANGGAN ====================================== -->
-<div id="halaman-pilih-kedai" class="halaman">
-    <div class="header"><h1>🏪 PILIH KEDAI</h1></div>
-    <div class="wadah">
-        <div class="kartu" id="daftar-pilih-kedai"></div>
-        <button class="btn btn-biru" onclick="lanjutKeMenuPelanggan()">➡️ LANJUT PILIH MENU</button>
-    </div>
-</div>
-
-<!-- ====================================== PILIH MENU PELANGGAN ====================================== -->
-<div id="halaman-pilih-menu" class="halaman">
-    <div class="header"><h1>📋 PILIH MENU</h1></div>
-    <div class="wadah">
-        <div id="daftar-menu-pelanggan" class="kartu"></div>
-        <button class="btn btn-biru" onclick="bukaHalaman('halaman-ringkasan')">🧾 LIHAT PESANAN</button>
-    </div>
-</div>
-
-<!-- ====================================== RINGKASAN PESANAN ====================================== -->
-<div id="halaman-ringkasan" class="halaman">
-    <div class="header"><h1>🧾 RINGKASAN PESANAN</h1></div>
-    <div class="wadah">
-        <div id="isi-ringkasan" class="kartu"></div>
-        <button class="btn btn-hijau" onclick="kirimPesanan()">📤 KIRIM PESANAN</button>
-    </div>
-</div>
-
-<!-- ====================================== DATA PELANGGAN ====================================== -->
+<!-- ===================== DATA PELANGGAN ===================== -->
 <div id="halaman-daftar-pelanggan" class="halaman">
     <div class="header"><h1>👤 DATA PELANGGAN</h1></div>
     <div class="wadah">
@@ -259,22 +232,49 @@
     </div>
 </div>
 
-<!-- ====================================== MENU UTAMA PELANGGAN ====================================== -->
+<!-- ===================== MENU UTAMA PELANGGAN ===================== -->
 <div id="halaman-menu-pelanggan" class="halaman">
     <div class="header">
         <h1>👤 SELAMAT DATANG</h1>
-        <p id="pelanggan-nama-tampil"></p>
+        <p id="pelanggan-nama-tampil" style="font-size:18px; font-weight:600;"></p>
     </div>
     <div class="wadah">
         <div class="kartu">
-            <button class="btn btn-biru btn-block" onclick="mulaiPesanan()">🛒 BUAT PESANAN BARU</button>
-            <button class="btn btn-abu btn-block" onclick="bukaHalaman('halaman-riwayat')">📋 RIWAYAT PESANAN</button>
-            <button class="btn btn-abu btn-block" onclick="keluarAkun()">🚪 KELUAR AKUN</button>
+            <button class="btn btn-biru" onclick="mulaiPesanan()">🛒 BUAT PESANAN BARU</button>
+            <button class="btn btn-abu" onclick="bukaHalaman('halaman-riwayat')">📋 RIWAYAT PESANAN</button>
+            <button class="btn btn-abu" onclick="keluarAkun()">🚪 KELUAR AKUN</button>
         </div>
     </div>
 </div>
 
-<!-- ====================================== RIWAYAT PESANAN ====================================== -->
+<!-- ===================== PILIH KEDAI ===================== -->
+<div id="halaman-pilih-kedai" class="halaman">
+    <div class="header"><h1>🏪 PILIH KEDAI</h1></div>
+    <div class="wadah">
+        <div class="kartu" id="daftar-pilih-kedai"></div>
+        <button class="btn btn-biru" onclick="lanjutKeMenuPelanggan()">➡️ LANJUT PILIH MENU</button>
+    </div>
+</div>
+
+<!-- ===================== PILIH MENU ===================== -->
+<div id="halaman-pilih-menu" class="halaman">
+    <div class="header"><h1>📋 PILIH MENU</h1></div>
+    <div class="wadah">
+        <div id="daftar-menu-pelanggan" class="kartu"></div>
+        <button class="btn btn-biru" onclick="bukaHalamanRingkasan()">🧾 LIHAT PESANAN</button>
+    </div>
+</div>
+
+<!-- ===================== RINGKASAN PESANAN ===================== -->
+<div id="halaman-ringkasan" class="halaman">
+    <div class="header"><h1>🧾 RINGKASAN PESANAN</h1></div>
+    <div class="wadah">
+        <div id="isi-ringkasan" class="kartu"></div>
+        <button class="btn btn-hijau" onclick="kirimPesanan()">📤 KIRIM PESANAN</button>
+    </div>
+</div>
+
+<!-- ===================== RIWAYAT PESANAN ===================== -->
 <div id="halaman-riwayat" class="halaman">
     <div class="header"><h1>📋 RIWAYAT PESANAN</h1></div>
     <div class="wadah">
@@ -283,44 +283,7 @@
     </div>
 </div>
 
-<!-- ====================================== CEK STOK KEDAI ====================================== -->
-<div id="halaman-cek-stok" class="halaman">
-    <div class="header"><h1>🏪 CEK STOK PESANAN</h1></div>
-    <div class="wadah">
-        <div id="isi-cek-stok" class="kartu"></div>
-        <button class="btn btn-biru" onclick="kirimHasilStok()">✅ KIRIM HASIL KE PELANGGAN</button>
-    </div>
-</div>
-
-<!-- ====================================== HASIL & PROSES PESANAN ====================================== -->
-<div id="halaman-hasil-pesanan" class="halaman">
-    <div class="header"><h1>📦 HASIL PESANAN ANDA</h1></div>
-    <div class="wadah">
-        <div id="isi-hasil-pesanan" class="kartu"></div>
-    </div>
-</div>
-
-<!-- ====================================== ONGKIR KURIR ====================================== -->
-<div id="halaman-ongkir" class="halaman">
-    <div class="header"><h1>💰 MASUKKAN ONGKIR</h1></div>
-    <div class="wadah">
-        <div class="kartu">
-            <label>Nominal Ongkir (Rp)</label>
-            <input type="number" id="nilai-ongkir" placeholder="Contoh: 10000">
-            <button class="btn btn-biru" onclick="kirimOngkir()">✅ KIRIM KE PELANGGAN</button>
-        </div>
-    </div>
-</div>
-
-<!-- ====================================== RESI PELANGGAN ====================================== -->
-<div id="halaman-resi" class="halaman">
-    <div class="header"><h1>🧾 RESI PESANAN</h1></div>
-    <div class="wadah">
-        <div id="isi-resi" class="kartu"></div>
-    </div>
-</div>
-
-<!-- ====================================== SCRIPT UTAMA ====================================== -->
+<!-- ===================== SCRIPT UTAMA ===================== -->
 <script>
 // === VARIABEL UTAMA ===
 let akunKurir = null, akunKedai = null, akunPelanggan = null;
@@ -338,9 +301,11 @@ window.onload = function() {
 
 // === ARAHKAN OTOMATIS BERDASARKAN LINK ===
 function arahkanBerdasarkanLink() {
+    // Link untuk Daftar/Masuk Kedai
     if (aksiLink === 'daftar-kedai' && idKurirLink) {
-        akunKedai = localStorage.getItem('kedaiAktif') ? JSON.parse(localStorage.getItem('kedaiAktif')) : null;
-        if (akunKedai) {
+        let simpanKedai = localStorage.getItem('kedaiAktif');
+        if (simpanKedai) {
+            akunKedai = JSON.parse(simpanKedai);
             bukaHalaman('halaman-menu-kedai');
             tampilkanKedai();
         } else {
@@ -349,9 +314,12 @@ function arahkanBerdasarkanLink() {
         }
         return;
     }
+
+    // Link untuk Daftar/Masuk Pelanggan
     if (aksiLink === 'pesan' && idKurirLink) {
-        akunPelanggan = localStorage.getItem('pelangganAktif') ? JSON.parse(localStorage.getItem('pelangganAktif')) : null;
-        if (akunPelanggan) {
+        let simpanPelanggan = localStorage.getItem('pelangganAktif');
+        if (simpanPelanggan) {
+            akunPelanggan = JSON.parse(simpanPelanggan);
             bukaHalaman('halaman-menu-pelanggan');
             document.getElementById('pelanggan-nama-tampil').textContent = akunPelanggan.nama;
         } else {
@@ -359,10 +327,15 @@ function arahkanBerdasarkanLink() {
         }
         return;
     }
-    akunKurir = localStorage.getItem('kurirAktif') ? JSON.parse(localStorage.getItem('kurirAktif')) : null;
-    if (akunKurir) {
+
+    // Cek apakah Kurir sudah pernah masuk
+    let simpanKurir = localStorage.getItem('kurirAktif');
+    if (simpanKurir) {
+        akunKurir = JSON.parse(simpanKurir);
         bukaHalaman('halaman-menu-kurir');
         tampilkanKurir();
+    } else {
+        bukaHalaman('halaman-awal');
     }
 }
 
@@ -380,24 +353,40 @@ function simpanData() {
 
 // === FUNGSI UMUM ===
 function bukaHalaman(idHalaman) {
-    document.querySelectorAll('.halaman').forEach(h => h.classList.remove('aktif'));
+    document.querySelectorAll('.halaman').forEach(function(h) {
+        h.classList.remove('aktif');
+    });
     document.getElementById(idHalaman).classList.add('aktif');
 }
 function salinTeks(idEl) {
-    navigator.clipboard.writeText(document.getElementById(idEl).textContent);
-    alert('✅ Link berhasil disalin!');
+    let teks = document.getElementById(idEl).textContent;
+    navigator.clipboard.writeText(teks).then(function() {
+        alert('✅ Link berhasil disalin!');
+    }, function() {
+        alert('❌ Gagal menyalin!');
+    });
 }
 function formatRupiah(angka) {
     return 'Rp' + parseInt(angka).toLocaleString('id-ID');
 }
 
-// === FUNGSI KURIR ===
+// ==================================================
+// FUNGSI KURIR — SEMUA TOMBOL SUDAH DIPERBAIKI
+// ==================================================
 function ambilLokasiKurir() {
-    if (!navigator.geolocation) return alert('❌ HP tidak mendukung lokasi');
-    navigator.geolocation.getCurrentPosition(pos => {
-        document.getElementById('lokasi-kurir-teks').textContent = 
-            '✅ Lokasi: ' + pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5);
-    }, () => alert('❌ Gagal mengambil lokasi'));
+    if (!navigator.geolocation) {
+        alert('❌ HP tidak mendukung lokasi');
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            document.getElementById('lokasi-kurir-teks').textContent = 
+                '✅ Lokasi: ' + pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5);
+        },
+        function() {
+            alert('❌ Gagal mengambil lokasi');
+        }
+    );
 }
 
 function buatIdKurir() {
@@ -408,12 +397,24 @@ function simpanAkunKurir() {
     let nama = document.getElementById('kurir-nama').value.trim();
     let alamat = document.getElementById('kurir-alamat').value.trim();
     let wa = document.getElementById('kurir-wa').value.trim();
-    if (!nama || !wa) return alert('⚠️ Isi nama & nomor WA!');
     
-    akunKurir = {id: buatIdKurir(), nama, alamat, wa, kedai:[]};
+    if (!nama || !wa) {
+        alert('⚠️ Silakan isi nama & nomor WhatsApp!');
+        return;
+    }
+    
+    akunKurir = {
+        id: buatIdKurir(),
+        nama: nama,
+        alamat: alamat,
+        wa: wa,
+        kedai: []
+    };
+    
     daftarKurir.push(akunKurir);
     localStorage.setItem('kurirAktif', JSON.stringify(akunKurir));
     simpanData();
+    
     bukaHalaman('halaman-menu-kurir');
     tampilkanKurir();
 }
@@ -421,22 +422,47 @@ function simpanAkunKurir() {
 function tampilkanKurir() {
     document.getElementById('kurir-nama-tampil').textContent = akunKurir.nama;
     document.getElementById('kurir-id-tampil').textContent = 'ID: ' + akunKurir.id;
+    muatDaftarKedaiKurir();
+}
+
+function muatDaftarKedaiKurir() {
+    let kedaiKurir = daftarKedai.filter(function(k) {
+        return k.idKurir === akunKurir.id;
+    });
+    let el = document.getElementById('daftar-kedai-kurir');
+    if (kedaiKurir.length === 0) {
+        el.innerHTML = '<p>Belum ada kedai yang terhubung.</p>';
+        return;
+    }
+    el.innerHTML = kedaiKurir.map(function(k) {
+        return '<div style="padding:12px 0; border-bottom:1px solid var(--batas);">' +
+            '<div style="font-weight:600; font-size:15px;">🏪 ' + k.nama + '</div>' +
+            '<div style="font-size:13px; color:var(--abu);">WA: ' + k.wa + '</div>' +
+            '<div style="font-size:12px; color:var(--abu); margin-top:4px;">Jumlah Menu: ' + k.menu.length + '</div>' +
+        '</div>';
+    }).join('');
 }
 
 function masukKurir() {
-    if (!akunKurir) return alert('⚠️ Belum ada akun, silakan daftar dulu');
+    if (!akunKurir) {
+        alert('⚠️ Belum ada akun, silakan daftar dulu!');
+        return;
+    }
     bukaHalaman('halaman-menu-kurir');
     tampilkanKurir();
 }
 
 function salinLinkPelanggan() {
-    let link = window.location.href.split('?')[0] + '?kurir=' + akunKurir.id + '&aksi=pesan';
-    navigator.clipboard.writeText(link);
-    alert('✅ Link Pelanggan berhasil disalin:\n' + link);
+    let linkDasar = window.location.href.split('?')[0];
+    let link = linkDasar + '?kurir=' + akunKurir.id + '&aksi=pesan';
+    navigator.clipboard.writeText(link).then(function() {
+        alert('✅ Link Pelanggan berhasil disalin:\n\n' + link);
+    });
 }
 
 function buatLinkKedai() {
-    let link = window.location.href.split('?')[0] + '?kurir=' + akunKurir.id + '&aksi=daftar-kedai';
+    let linkDasar = window.location.href.split('?')[0];
+    let link = linkDasar + '?kurir=' + akunKurir.id + '&aksi=daftar-kedai';
     document.getElementById('link-kedai-teks').textContent = link;
     document.getElementById('kotak-link-kedai').classList.remove('sembunyi');
 }
@@ -445,9 +471,11 @@ function simpanEditKurir() {
     akunKurir.nama = document.getElementById('edit-kurir-nama').value.trim();
     akunKurir.alamat = document.getElementById('edit-kurir-alamat').value.trim();
     akunKurir.wa = document.getElementById('edit-kurir-wa').value.trim();
+    
     localStorage.setItem('kurirAktif', JSON.stringify(akunKurir));
     simpanData();
-    alert('✅ Tersimpan!');
+    alert('✅ Perubahan berhasil disimpan!');
+    
     bukaHalaman('halaman-menu-kurir');
     tampilkanKurir();
 }
@@ -456,27 +484,43 @@ function keluarAkun() {
     localStorage.removeItem('kurirAktif');
     localStorage.removeItem('kedaiAktif');
     localStorage.removeItem('pelangganAktif');
-    akunKurir = akunKedai = akunPelanggan = null;
+    akunKurir = null;
+    akunKedai = null;
+    akunPelanggan = null;
     bukaHalaman('halaman-awal');
 }
 
-// === FUNGSI KEDAI ===
+// ==================================================
+// FUNGSI KEDAI — SEMUA TOMBOL SUDAH DIPERBAIKI
+// ==================================================
 function simpanAkunKedai() {
     let nama = document.getElementById('kedai-nama').value.trim();
     let wa = document.getElementById('kedai-wa').value.trim();
-    if (!nama || !wa || !idKurirLink) return alert('⚠️ Lengkapi data!');
     
-    akunKedai = {id:'KEDAI-'+Date.now(), nama, wa, idKurir:idKurirLink, menu:[]};
+    if (!nama || !wa || !idKurirLink) {
+        alert('⚠️ Lengkapi semua data!');
+        return;
+    }
+    
+    akunKedai = {
+        id: 'KEDAI-' + Date.now(),
+        nama: nama,
+        wa: wa,
+        idKurir: idKurirLink,
+        menu: []
+    };
+    
     daftarKedai.push(akunKedai);
     localStorage.setItem('kedaiAktif', JSON.stringify(akunKedai));
     simpanData();
+    
     bukaHalaman('halaman-menu-kedai');
     tampilkanKedai();
 }
 
 function tampilkanKedai() {
     document.getElementById('kedai-nama-tampil').textContent = akunKedai.nama;
-    document.getElementById('kedai-id-kurir').textContent = 'Terhubung ke: ' + akunKedai.idKurir;
+    document.getElementById('kedai-id-kurir').textContent = 'Terhubung ke Kurir: ' + akunKedai.idKurir;
     renderMenuKedai();
 }
 
@@ -484,177 +528,301 @@ function simpanMenuKedai() {
     let nama = document.getElementById('menu-nama').value.trim();
     let harga = parseInt(document.getElementById('menu-harga').value);
     let varianTxt = document.getElementById('menu-varian').value.trim();
-    if (!nama || !harga) return alert('⚠️ Isi nama & harga!');
-    let varian = varianTxt ? varianTxt.split(',').map(v=>v.trim()).filter(v=>v) : [];
-    akunKedai.menu.push({id:'MENU-'+Date.now(), nama, harga, varian});
+    
+    if (!nama || !harga) {
+        alert('⚠️ Isi nama & harga menu!');
+        return;
+    }
+    
+    let varian = [];
+    if (varianTxt) {
+        varian = varianTxt.split(',').map(function(v) {
+            return v.trim();
+        }).filter(function(v) {
+            return v.length > 0;
+        });
+    }
+    
+    akunKedai.menu.push({
+        id: 'MENU-' + Date.now(),
+        nama: nama,
+        harga: harga,
+        varian: varian
+    });
+    
     simpanData();
     renderMenuKedai();
-    document.getElementById('menu-nama').value='';
-    document.getElementById('menu-harga').value='';
-    document.getElementById('menu-varian').value='';
+    
+    document.getElementById('menu-nama').value = '';
+    document.getElementById('menu-harga').value = '';
+    document.getElementById('menu-varian').value = '';
+    
     bukaHalaman('halaman-menu-kedai');
 }
 
 function renderMenuKedai() {
     let el = document.getElementById('daftar-menu-kedai');
-    if (!akunKedai.menu.length) {el.innerHTML='<p>Belum ada menu.</p>';return;}
-    el.innerHTML = akunKedai.menu.map(m=>`
-        <div class="baris-menu" style="flex-wrap:wrap;">
-            <div class="info-menu">
-                <div class="nama-menu">${m.nama}</div>
-                <div class="harga-menu">${formatRupiah(m.harga)}</div>
-                ${m.varian.length?`<div style="font-size:12px; color:var(--abu); margin-top:4px;">Varian: ${m.varian.join(', ')}</div>`:''}
-            </div>
-            <button class="btn btn-merah" style="padding:6px 10px; font-size:13px; width:auto;" onclick="hapusMenu('${m.id}')">🗑️ Hapus</button>
-        </div>
-    `).join('');
+    if (akunKedai.menu.length === 0) {
+        el.innerHTML = '<p>Belum ada menu yang ditambahkan.</p>';
+        return;
+    }
+    
+    el.innerHTML = akunKedai.menu.map(function(m) {
+        let html = '<div class="baris-menu">' +
+            '<div class="info-menu">' +
+                '<div class="nama-menu">' + m.nama + '</div>' +
+                '<div class="harga-menu">' + formatRupiah(m.harga) + '</div>';
+        if (m.varian.length > 0) {
+            html += '<div style="font-size:12px; color:var(--abu); margin-top:4px;">Varian: ' + m.varian.join(', ') + '</div>';
+        }
+        html += '</div>' +
+            '<button class="btn btn-merah" style="padding:8px 12px; font-size:14px; width:auto;" onclick="hapusMenu(\'' + m.id + '\')">🗑️ Hapus</button>' +
+        '</div>';
+        return html;
+    }).join('');
 }
 
 function hapusMenu(idMenu) {
-    if(!confirm('Hapus menu ini?'))return;
-    akunKedai.menu = akunKedai.menu.filter(m=>m.id!==idMenu);
+    if (!confirm('Yakin ingin menghapus menu ini?')) return;
+    akunKedai.menu = akunKedai.menu.filter(function(m) {
+        return m.id !== idMenu;
+    });
     simpanData();
     renderMenuKedai();
 }
 
 function kirimDataKedai() {
-    let idx = daftarKedai.findIndex(k=>k.id===akunKedai.id);
-    if(~idx) {daftarKedai[idx]=akunKedai; simpanData();}
+    let idx = daftarKedai.findIndex(function(k) {
+        return k.id === akunKedai.id;
+    });
+    if (idx !== -1) {
+        daftarKedai[idx] = akunKedai;
+        simpanData();
+    }
     alert('✅ Data kedai & menu sudah dikirim ke Kurir!');
 }
 
-// === FUNGSI PELANGGAN ===
+// ==================================================
+// FUNGSI PELANGGAN — SEMUA TOMBOL SUDAH DIPERBAIKI
+// ==================================================
 function simpanPelanggan() {
     let nama = document.getElementById('pelanggan-nama').value.trim();
     let wa = document.getElementById('pelanggan-wa').value.trim();
     let alamat = document.getElementById('pelanggan-alamat').value.trim();
-    if (!nama||!wa) return alert('⚠️ Isi nama & WA!');
-    akunPelanggan = {id:'PEL-'+Date.now(), nama, wa, alamat, idKurir:idKurirLink, riwayat:[]};
+    
+    if (!nama || !wa) {
+        alert('⚠️ Isi nama & nomor WhatsApp!');
+        return;
+    }
+    
+    akunPelanggan = {
+        id: 'PEL-' + Date.now(),
+        nama: nama,
+        wa: wa,
+        alamat: alamat,
+        idKurir: idKurirLink,
+        riwayat: []
+    };
+    
     daftarPelanggan.push(akunPelanggan);
     localStorage.setItem('pelangganAktif', JSON.stringify(akunPelanggan));
     simpanData();
+    
     bukaHalaman('halaman-menu-pelanggan');
     document.getElementById('pelanggan-nama-tampil').textContent = akunPelanggan.nama;
 }
 
 function mulaiPesanan() {
     pesananSementara = {kedaiTerpilih:[], item:[], lokasi:null, total:0};
-    let kedaiKurir = daftarKedai.filter(k=>k.idKurir === akunPelanggan.idKurir);
-    if (!kedaiKurir.length) return alert('⚠️ Belum ada kedai terhubung ke kurir ini!');
+    let kedaiKurir = daftarKedai.filter(function(k) {
+        return k.idKurir === akunPelanggan.idKurir;
+    });
+    
+    if (kedaiKurir.length === 0) {
+        alert('⚠️ Belum ada kedai yang terhubung ke kurir ini!');
+        return;
+    }
+    
     let el = document.getElementById('daftar-pilih-kedai');
-    el.innerHTML = kedaiKurir.map(k=>`
-        <label class="centang-baris">
-            <input type="checkbox" value="${k.id}" onchange="ubahPilihKedai(this)">
-            <span style="font-weight:500;">🏪 ${k.nama}</span>
-        </label>
-    `).join('');
+    el.innerHTML = kedaiKurir.map(function(k) {
+        return '<label class="centang-baris">' +
+            '<input type="checkbox" value="' + k.id + '" onchange="ubahPilihKedai(this)">' +
+            '<span style="font-weight:500;">🏪 ' + k.nama + '</span>' +
+        '</label>';
+    }).join('');
+    
     bukaHalaman('halaman-pilih-kedai');
 }
 
 function ubahPilihKedai(cb) {
-    if(cb.checked) {
-        if(!pesananSementara.kedaiTerpilih.includes(cb.value)) pesananSementara.kedaiTerpilih.push(cb.value);
+    if (cb.checked) {
+        if (!pesananSementara.kedaiTerpilih.includes(cb.value)) {
+            pesananSementara.kedaiTerpilih.push(cb.value);
+        }
     } else {
-        pesananSementara.kedaiTerpilih = pesananSementara.kedaiTerpilih.filter(k=>k!==cb.value);
+        pesananSementara.kedaiTerpilih = pesananSementara.kedaiTerpilih.filter(function(id) {
+            return id !== cb.value;
+        });
     }
 }
 
 function lanjutKeMenuPelanggan() {
-    if (!pesananSementara.kedaiTerpilih.length) return alert('⚠️ Pilih minimal 1 kedai!');
-    let html='';
-    pesananSementara.kedaiTerpilih.forEach(idKedai=>{
-        let kedai = daftarKedai.find(k=>k.id===idKedai);
-        if(!kedai) return;
-        html += `<div style="margin-bottom:20px;"><span class="tag-kedai">🏪 ${kedai.nama}</span>`;
-        kedai.menu.forEach(m=>{
-            html += `
-                <div class="baris-menu">
-                    <div class="info-menu">
-                        <div class="nama-menu">${m.nama}<span class="harga-menu">${formatRupiah(m.harga)}</span></div>
-                    </div>
-                    <div class="kendali-jumlah">
-                        <button class="btn-kurang" onclick="ubahJumlah('${m.id}','${idKedai}',-1)">−</button>
-                        <span class="nilai-jumlah" id="jml-${m.id}-${idKedai}">0</span>
-                        <button class="btn-tambah" onclick="ubahJumlah('${m.id}','${idKedai}',1)">+</button>
-                    </div>
-                </div>
-            `;
-            if(m.varian.length) {
-                html += `<div class="pilihan-varian">${m.varian.map((v,i)=>`<span class="tombol-varian" id="var-${m.id}-${idKedai}-${i}" onclick="pilihVarian('${m.id}','${idKedai}',${i},'${v}')">${v}</span>`).join('')}</div>`;
+    if (pesananSementara.kedaiTerpilih.length === 0) {
+        alert('⚠️ Pilih minimal 1 kedai terlebih dahulu!');
+        return;
+    }
+    
+    let html = '';
+    pesananSementara.kedaiTerpilih.forEach(function(idKedai) {
+        let kedai = daftarKedai.find(function(k) { return k.id === idKedai; });
+        if (!kedai) return;
+        
+        html += '<div style="margin-bottom:24px;"><span class="tag-kedai">🏪 ' + kedai.nama + '</span>';
+        
+        kedai.menu.forEach(function(m) {
+            html += '<div class="baris-menu">' +
+                '<div class="info-menu">' +
+                    '<div class="nama-menu">' + m.nama + '<span class="harga-menu">' + formatRupiah(m.harga) + '</span></div>' +
+                '</div>' +
+                '<div class="kendali-jumlah">' +
+                    '<button class="btn-kurang" onclick="ubahJumlah(\'' + m.id + '\',\'' + idKedai + '\', -1)">−</button>' +
+                    '<span class="nilai-jumlah" id="jml-' + m.id + '-' + idKedai + '">0</span>' +
+                    '<button class="btn-tambah" onclick="ubahJumlah(\'' + m.id + '\',\'' + idKedai + '\', 1)">+</button>' +
+                '</div>' +
+            '</div>';
+            
+            if (m.varian.length > 0) {
+                html += '<div class="pilihan-varian">' +
+                    m.varian.map(function(v, i) {
+                        return '<span class="tombol-varian" id="var-' + m.id + '-' + idKedai + '-' + i + 
+                            '" onclick="pilihVarian(\'' + m.id + '\',\'' + idKedai + '\',' + i + ',\'' + v + '\')">' + v + '</span>';
+                    }).join('') +
+                '</div>';
             }
         });
-        html += `</div>`;
+        
+        html += '</div>';
     });
+    
     document.getElementById('daftar-menu-pelanggan').innerHTML = html;
     bukaHalaman('halaman-pilih-menu');
 }
 
 function cariItem(idMenu, idKedai) {
-    return pesananSementara.item.find(x=>x.idMenu===idMenu && x.idKedai===idKedai);
+    return pesananSementara.item.find(function(x) {
+        return x.idMenu === idMenu && x.idKedai === idKedai;
+    });
 }
 
 function ubahJumlah(idMenu, idKedai, selisih) {
     let itm = cariItem(idMenu, idKedai);
-    if(!itm) {
-        itm = {idMenu, idKedai, jumlah:0, varian:null};
+    if (!itm) {
+        itm = {idMenu:idMenu, idKedai:idKedai, jumlah:0, varian:null};
         pesananSementara.item.push(itm);
     }
     itm.jumlah = Math.max(0, itm.jumlah + selisih);
-    document.getElementById(`jml-${idMenu}-${idKedai}`).textContent = itm.jumlah;
+    document.getElementById('jml-' + idMenu + '-' + idKedai).textContent = itm.jumlah;
 }
 
 function pilihVarian(idMenu, idKedai, idx, namaVar) {
-    document.querySelectorAll(`[id^="var-${idMenu}-${idKedai}-"]`).forEach(e=>e.classList.remove('terpilih'));
-    document.getElementById(`var-${idMenu}-${idKedai}-${idx}`).classList.add('terpilih');
+    document.querySelectorAll('[id^="var-' + idMenu + '-' + idKedai + '-"]').forEach(function(e) {
+        e.classList.remove('terpilih');
+    });
+    document.getElementById('var-' + idMenu + '-' + idKedai + '-' + idx).classList.add('terpilih');
+    
     let itm = cariItem(idMenu, idKedai);
-    if(!itm) { itm={idMenu,idKedai,jumlah:0,varian:namaVar}; pesananSementara.item.push(itm); }
-    else itm.varian = namaVar;
+    if (!itm) {
+        itm = {idMenu:idMenu, idKedai:idKedai, jumlah:0, varian:namaVar};
+        pesananSementara.item.push(itm);
+    } else {
+        itm.varian = namaVar;
+    }
 }
 
 function bukaHalamanRingkasan() {
-    let total=0, html='';
-    pesananSementara.kedaiTerpilih.forEach(idKedai=>{
-        let kedai = daftarKedai.find(k=>k.id===idKedai);
-        if(!kedai) return;
-        let sub=0;
-        html += `<span class="tag-kedai">🏪 ${kedai.nama}</span>`;
-        pesananSementara.item.filter(i=>i.idKedai===idKedai && i.jumlah>0).forEach(itm=>{
-            let menu = kedai.menu.find(m=>m.id===itm.idMenu);
-            if(!menu) return;
-            let namaTampil = menu.nama + (itm.varian?` - ${itm.varian}`:'');
+    let total = 0;
+    let html = '';
+    
+    pesananSementara.kedaiTerpilih.forEach(function(idKedai) {
+        let kedai = daftarKedai.find(function(k) { return k.id === idKedai; });
+        if (!kedai) return;
+        
+        let subtotalKedai = 0;
+        html += '<span class="tag-kedai">🏪 ' + kedai.nama + '</span>';
+        
+        pesananSementara.item.filter(function(i) {
+            return i.idKedai === idKedai && i.jumlah > 0;
+        }).forEach(function(itm) {
+            let menu = kedai.menu.find(function(m) { return m.id === itm.idMenu; });
+            if (!menu) return;
+            
+            let namaTampil = menu.nama;
+            if (itm.varian) namaTampil += ' - ' + itm.varian;
             let subtotal = menu.harga * itm.jumlah;
-            sub += subtotal;
-            html += `<div class="item-pesanan"><div>${namaTampil} × ${itm.jumlah} = ${formatRupiah(subtotal)}</div></div>`;
+            subtotalKedai += subtotal;
+            
+            html += '<div class="item-pesanan" style="padding:8px 0; border-bottom:1px solid var(--batas);">' +
+                '<div>' + namaTampil + ' × ' + itm.jumlah + ' = ' + formatRupiah(subtotal) + '</div>' +
+            '</div>';
         });
-        html += `<div style="text-align:right; font-size:14px; color:var(--abu); padding:4px 0 8px 0;">Subtotal: ${formatRupiah(sub)}</div>`;
-        total += sub;
+        
+        html += '<div style="text-align:right; font-size:14px; color:var(--abu); padding:6px 0 10px 0;">Subtotal: ' + formatRupiah(subtotalKedai) + '</div>';
+        total += subtotalKedai;
     });
-    html += `<div class="total-baris total-akhir"><span>TOTAL</span><span>${formatRupiah(total)}</span></div>`;
+    
+    html += '<div class="total-baris total-akhir"><span>TOTAL SEMUA</span><span>' + formatRupiah(total) + '</span></div>';
     pesananSementara.total = total;
+    
     document.getElementById('isi-ringkasan').innerHTML = html;
     bukaHalaman('halaman-ringkasan');
 }
 
 function kirimPesanan() {
-    let pesananId = 'PSN-'+Date.now();
-    let teksWA = `📦 PESANAN BARU — ${pesananId}\n👤 Pelanggan: ${akunPelanggan.nama}\n📍 Alamat: ${akunPelanggan.alamat}\n📱 WA: ${akunPelanggan.wa}\n\n`;
-    pesananSementara.kedaiTerpilih.forEach(idKedai=>{
-        let kedai = daftarKedai.find(k=>k.id===idKedai);
-        if(!kedai) return;
-        teksWA += `🏪 ${kedai.nama}:\n`;
-        pesananSementara.item.filter(i=>i.idKedai===idKedai && i.jumlah>0).forEach(itm=>{
-            let menu = kedai.menu.find(m=>m.id===itm.idMenu);
-            if(!menu) return;
-            let namaTampil = menu.nama + (itm.varian?` - ${itm.varian}`:'');
-            teksWA += `- ${namaTampil} × ${itm.jumlah} = ${formatRupiah(menu.harga * itm.jumlah)}\n`;
+    if (pesananSementara.total === 0) {
+        alert('⚠️ Belum ada menu yang dipesan!');
+        return;
+    }
+    
+    let pesananId = 'PSN-' + Date.now();
+    let teksWA = '📦 PESANAN BARU — ' + pesananId + '\n' +
+        '👤 Pelanggan: ' + akunPelanggan.nama + '\n' +
+        '📍 Alamat: ' + akunPelanggan.alamat + '\n' +
+        '📱 WA: ' + akunPelanggan.wa + '\n\n';
+    
+    pesananSementara.kedaiTerpilih.forEach(function(idKedai) {
+        let kedai = daftarKedai.find(function(k) { return k.id === idKedai; });
+        if (!kedai) return;
+        
+        teksWA += '🏪 ' + kedai.nama + ':\n';
+        pesananSementara.item.filter(function(i) {
+            return i.idKedai === idKedai && i.jumlah > 0;
+        }).forEach(function(itm) {
+            let menu = kedai.menu.find(function(m) { return m.id === itm.idMenu; });
+            if (!menu) return;
+            
+            let namaTampil = menu.nama;
+            if (itm.varian) namaTampil += ' - ' + itm.varian;
+            teksWA += '- ' + namaTampil + ' × ' + itm.jumlah + ' = ' + formatRupiah(menu.harga * itm.jumlah) + '\n';
         });
-        teksWA += `\n🔗 Cek stok: ${window.location.href.split('?')[0]}?aksi=cekstok&pesanan=${pesananId}&kedai=${idKedai}\n\n`;
+        teksWA += '\n';
     });
-    akunPelanggan.riwayat.push({id:pesananId, pesanan:JSON.parse(JSON.stringify(pesananSementara)), waktu:new Date().toLocaleString('id-ID')});
+    
+    // Simpan ke riwayat pelanggan
+    akunPelanggan.riwayat.unshift({
+        id: pesananId,
+        pesanan: JSON.parse(JSON.stringify(pesananSementara)),
+        waktu: new Date().toLocaleString('id-ID')
+    });
     simpanData();
-    let waKedai = daftarKedai.find(k=>k.id===pesananSementara.kedaiTerpilih[0])?.wa;
-    window.open(`https://wa.me/${(waKedai||'').replace(/\D/g,'')}?text=${encodeURIComponent(teksWA)}`, '_blank');
-    alert('✅ Pesanan dikirim! Tunggu kedai cek stok.');
+    
+    // Kirim ke WhatsApp kedai pertama
+    let kedaiPertama = daftarKedai.find(function(k) { return k.id === pesananSementara.kedaiTerpilih[0]; });
+    if (kedaiPertama && kedaiPertama.wa) {
+        let nomorWA = kedaiPertama.wa.replace(/\D/g, '');
+        window.open('https://wa.me/' + nomorWA + '?text=' + encodeURIComponent(teksWA), '_blank');
+    }
+    
+    alert('✅ Pesanan berhasil dikirim ke Kedai!');
     bukaHalaman('halaman-menu-pelanggan');
 }
 
