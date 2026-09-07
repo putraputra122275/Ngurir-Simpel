@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NGURIR SIMPEL</title>
+    <title>KURIR SIMPEL</title>
     <style>
         * {margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI, Roboto, sans-serif;}
         :root {--biru:#2563eb; --hijau:#16a34a; --merah:#ef4444; --abu:#6b7280; --putih:#fff; --abu-lembut:#f3f4f6; --batas:#e5e7eb; --kuning:#fef3c7; --hijau-muda:#f0fdf4; --biru-muda:#eff6ff;}
@@ -11,7 +11,7 @@
         .wadah {max-width:480px; margin:0 auto; padding:16px;}
         .halaman {display:none;}
         .halaman.aktif {display:block; animation:masuk .2s ease;}
-        @keyframes masuk {from{opacity:0; transform:translateY(8px)} to{opacity:1}}
+        @keyframes masuk {from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
 
         .header {text-align:center; padding:24px 16px 16px;}
         .header h1 {font-size:24px; color:var(--biru); margin-bottom:4px;}
@@ -25,14 +25,14 @@
         input, textarea {width:100%; padding:12px 14px; border:1px solid var(--batas); border-radius:8px; font-size:15px; margin-bottom:16px; background:var(--putih);}
         input:focus, textarea:focus {outline:none; border-color:var(--biru); box-shadow:0 0 0 3px rgba(37,99,235,.1);}
 
-        .btn {display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:14px; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; transition:all .15s;}
+        .btn {display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:14px; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; transition:all .15s; user-select:none; -webkit-tap-highlight-color:transparent;}
         .btn:active {transform:scale(.97); opacity:.9;}
         .btn-biru {background:var(--biru); color:var(--putih);}
         .btn-hijau {background:var(--hijau); color:var(--putih);}
         .btn-merah {background:var(--merah); color:var(--putih);}
         .btn-abu {background:var(--abu-lembut); color:#374151;}
         .btn + .btn {margin-top:12px;}
-        .btn-kecil {width:auto; padding:8px 14px; font-size:14px;}
+        .btn-kecil {width:auto; padding:8px 14px; font-size:14px; display:inline-flex;}
         .btn-cek {width:48%; padding:10px; font-size:15px;}
 
         .menu-baris {display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--batas); flex-wrap:wrap; gap:8px;}
@@ -40,7 +40,7 @@
         .menu-nama {font-weight:500; font-size:15px;}
         .menu-harga {color:var(--biru); font-weight:600; font-size:14px; margin-left:8px;}
         .menu-kendali {display:flex; align-items:center; gap:10px;}
-        .btn-kurang, .btn-tambah {width:36px; height:36px; border-radius:50%; border:none; font-size:20px; font-weight:bold; display:flex; align-items:center; justify-content:center; cursor:pointer;}
+        .btn-kurang, .btn-tambah {width:36px; height:36px; border-radius:50%; border:none; font-size:20px; font-weight:bold; display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;}
         .btn-kurang {background:#fee2e2; color:var(--merah);}
         .btn-tambah {background:#dcfce7; color:var(--hijau);}
         .nilai-jumlah {min-width:28px; text-align:center; font-weight:600; font-size:16px;}
@@ -77,7 +77,7 @@
 <!-- HALAMAN AWAL -->
 <div id="halaman-awal" class="halaman aktif">
     <div class="header">
-        <h1>🚚 NGURIR SIMPEL</h1>
+        <h1>🚚 KURIR SIMPEL</h1>
         <p>Jemput · Antar · Pesan — Simpel & Cepat</p>
     </div>
     <div class="wadah">
@@ -146,7 +146,7 @@
     </div>
 </div>
 
-<!-- ✅ HALAMAN ATUR LAYANAN — DIPERBAIKI: BUAT LINK + LIHAT SEMUA KEDAI DI 1 HALAMAN -->
+<!-- HALAMAN ATUR LAYANAN -->
 <div id="halaman-atur-layanan" class="halaman">
     <div class="header"><h1>🛒 ATUR LAYANAN PESANAN</h1></div>
     <div class="wadah">
@@ -431,10 +431,14 @@ function bukaHalaman(id) {
     document.getElementById(id).classList.add('aktif');
     window.scrollTo(0,0);
     if (id === 'halaman-atur-layanan') renderKedaiKurir();
+    if (id === 'halaman-pesanan-baru') bukaHalamanPilihKedai();
 }
 function buatIdKurir(urutan) { return `KURIR-${String(urutan).padStart(3,'0')}`; }
 function formatRupiah(angka) { return 'Rp' + parseInt(angka||0).toLocaleString('id-ID'); }
-function salinTeks(id) { navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => alert('✅ BERHASIL DISALIN!')); }
+function salinTeks(id) { 
+    let teks = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(teks).then(() => alert('✅ BERHASIL DISALIN!')).catch(() => alert('⚠️ Gagal menyalin!')); 
+}
 function ambilLokasiKurir() {
     if (!navigator.geolocation) return alert('⚠️ HP tidak mendukung lokasi!');
     navigator.geolocation.getCurrentPosition(pos => {
@@ -455,7 +459,7 @@ function simpanAkunKurir() {
     let nama = document.getElementById('kurir-nama').value.trim();
     let alamat = document.getElementById('kurir-alamat').value.trim();
     let wa = document.getElementById('kurir-wa').value.trim();
-    if (!nama || !alamat || !wa || !lokasiKurir) return alert('⚠️ Isi semua data + bagikan lokasi!');
+    if (!nama || !alamat || !wa || !lokasiKurir) return alert('⚠️ Isi semua data + bagikan lokasi dulu!');
     let urutan = Object.keys(semuaKurir).length + 1;
     let id = buatIdKurir(urutan);
     akunKurir = { id, nama, alamat, wa, lokasi: lokasiKurir, kedai: [] };
@@ -487,7 +491,7 @@ function buatLinkKedai() {
 }
 function salinLinkPelanggan() {
     let link = window.location.origin + window.location.pathname + `?mode=pelanggan&kurir=${akunKurir.id}`;
-    navigator.clipboard.writeText(link).then(() => alert('✅ LINK PELANGGAN BERHASIL DISALIN!'));
+    navigator.clipboard.writeText(link).then(() => alert('✅ LINK PELANGGAN BERHASIL DISALIN!')).catch(() => alert('⚠️ Gagal menyalin link!'));
 }
 function masukKurir() {
     let id = prompt('Masukkan ID KURIR (contoh: KURIR-001):');
@@ -505,7 +509,7 @@ function keluarAkun() {
     bukaHalaman('halaman-awal');
 }
 
-// === ✅ RENDER KEDAI DI HALAMAN ATUR LAYANAN ===
+// === RENDER KEDAI DI HALAMAN ATUR LAYANAN ===
 function renderKedaiKurir() {
     let el = document.getElementById('daftar-kedai-kurir');
     document.getElementById('jumlah-kedai').textContent = akunKurir?.kedai?.length || 0;
@@ -517,14 +521,12 @@ function renderKedaiKurir() {
         <div class="kedai-blok">
             <div class="kedai-nama">🏪 ${k.nama}</div>
             <p style="font-size:14px; color:var(--abu); margin-bottom:12px;">📱 WA: ${k.wa} • ${k.menu.length} menu</p>
-            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-block;" onclick="lihatMenuKedai('${k.id}')">📋 Menu</button>
-            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-block;" onclick="editKedai('${k.id}')">✏️ Edit</button>
-            <button class="btn btn-merah btn-kecil" style="width:31%; display:inline-block;" onclick="hapusKedai('${k.id}')">🗑️ Hapus</button>
+            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-flex;" onclick="alert('Menu: ${k.menu.map(m=>m.nama).join(', ')}')">📋 Menu</button>
+            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-flex;" onclick="alert('Fitur edit kedai')">✏️ Edit</button>
+            <button class="btn btn-merah btn-kecil" style="width:31%; display:inline-flex;" onclick="hapusKedai('${k.id}')">🗑️ Hapus</button>
         </div>
     `).join('');
 }
-function lihatMenuKedai(id) { alert('Fitur lihat & kelola menu kedai siap dikembangkan!'); }
-function editKedai(id) { alert('Fitur edit kedai siap dikembangkan!'); }
 function hapusKedai(id) {
     if (!confirm('Yakin hapus kedai ini?')) return;
     akunKurir.kedai = akunKurir.kedai.filter(k => k.id !== id);
@@ -633,7 +635,6 @@ function bukaHalamanPilihKedai() {
         </label>
     `).join('');
 }
-bukaHalamanPilihKedai();
 
 function lanjutKeMenu() {
     if (!lokasiPelanggan) return alert('⚠️ Bagikan lokasi dulu!');
@@ -680,4 +681,7 @@ function ubahJumlah(idKedai, idMenu, tambah) {
     if (!item) { item = { ...menu, idKedai, jumlah:0, varian:null }; keranjang.push(item); }
     item.jumlah += tambah;
     if (item.jumlah < 0) item.jumlah = 0;
-    document.getElementById(`jml-${idKedai}-${idMenu}`).
+    document.getElementById(`jml-${idKedai}-${idMenu}`).textContent = item.jumlah;
+}
+function bukaHalamanRingkas() {
+    let el =
