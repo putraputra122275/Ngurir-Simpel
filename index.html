@@ -35,7 +35,6 @@
         .btn-kecil {width:auto; padding:8px 14px; font-size:14px;}
         .btn-cek {width:48%; padding:10px; font-size:15px;}
 
-        /* ✅ MENU 1 BARIS — SESUAI ATURAN: Nama + Harga + [-] Jumlah [+] */
         .menu-baris {display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--batas); flex-wrap:wrap; gap:8px;}
         .menu-info {flex:1; min-width:180px;}
         .menu-nama {font-weight:500; font-size:15px;}
@@ -75,9 +74,7 @@
 </head>
 <body>
 
-<!-- ======================================
-    ✅ HALAMAN AWAL — HANYA KURIR
-====================================== -->
+<!-- HALAMAN AWAL -->
 <div id="halaman-awal" class="halaman aktif">
     <div class="header">
         <h1>🚚 NGURIR SIMPEL</h1>
@@ -95,9 +92,7 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ DAFTAR KURIR — Nama + Alamat + WA + Lokasi
-====================================== -->
+<!-- DAFTAR KURIR -->
 <div id="halaman-kurir-daftar" class="halaman">
     <div class="header"><h1>📝 DAFTAR AKUN KURIR</h1></div>
     <div class="wadah">
@@ -117,9 +112,7 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ MENU UTAMA KURIR — ID OTOMATIS + Edit + Atur Layanan + Link Pelanggan
-====================================== -->
+<!-- MENU UTAMA KURIR -->
 <div id="halaman-kurir-menu" class="halaman">
     <div class="header">
         <h1>🚚 SELAMAT DATANG</h1>
@@ -136,9 +129,7 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ EDIT AKUN KURIR
-====================================== -->
+<!-- EDIT AKUN KURIR -->
 <div id="halaman-kurir-edit" class="halaman">
     <div class="header"><h1>⚙️ EDIT AKUN KURIR</h1></div>
     <div class="wadah">
@@ -155,42 +146,29 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ ATUR LAYANAN PESANAN — Buat Link Kedai + Lihat Kedai Saya
-====================================== -->
+<!-- ✅ HALAMAN ATUR LAYANAN — DIPERBAIKI: BUAT LINK + LIHAT SEMUA KEDAI DI 1 HALAMAN -->
 <div id="halaman-atur-layanan" class="halaman">
     <div class="header"><h1>🛒 ATUR LAYANAN PESANAN</h1></div>
     <div class="wadah">
         <div class="kartu">
-            <button class="btn btn-biru" onclick="buatLinkKedai()">🔗 BUAT LINK PENDAFTARAN KEDAI</button>
+            <h3>🔗 PENDAFTARAN KEDAI</h3>
+            <button class="btn btn-biru" onclick="buatLinkKedai()">🔗 BUAT LINK PENDAFTARAN KEDAI BARU</button>
             <div id="link-kedai-baru" class="sembunyi">
                 <p style="margin:12px 0 8px; font-size:14px;">Salin link di bawah & kirim ke Kedai:</p>
                 <div class="link-kotak" id="link-kedai-teks"></div>
                 <button class="btn btn-hijau btn-kecil" onclick="salinTeks('link-kedai-teks')">📋 SALIN LINK KEDAI</button>
             </div>
-            <hr>
-            <button class="btn btn-abu" onclick="bukaHalaman('halaman-kedai-saya')">🏪 LIHAT KEDAI SAYA</button>
-            <button class="btn btn-abu" onclick="bukaHalaman('halaman-kurir-menu')" style="margin-top:12px;">⬅️ KEMBALI</button>
+            <hr style="margin:24px 0;">
+            <h3>🏪 KEDAI SAYA (<span id="jumlah-kedai">0</span>)</h3>
+            <div id="daftar-kedai-kurir">
+                <p style="text-align:center; color:var(--abu); padding:20px 0;">Belum ada kedai terhubung.<br>Buat link pendaftaran di atas & bagikan ke kedai!</p>
+            </div>
+            <button class="btn btn-abu" onclick="bukaHalaman('halaman-kurir-menu')" style="margin-top:20px;">⬅️ KEMBALI KE MENU UTAMA</button>
         </div>
     </div>
 </div>
 
-<!-- ======================================
-    ✅ KEDAI SAYA — Kurir lihat semua kedai + menu + bisa edit/hapus
-====================================== -->
-<div id="halaman-kedai-saya" class="halaman">
-    <div class="header"><h1>🏪 KEDAI SAYA</h1></div>
-    <div class="wadah">
-        <div class="kartu" id="daftar-kedai-kurir">
-            <p style="text-align:center; color:var(--abu); padding:30px 0;">Belum ada kedai terhubung.<br>Buat link pendaftaran & bagikan ke kedai!</p>
-        </div>
-        <button class="btn btn-abu" onclick="bukaHalaman('halaman-atur-layanan')">⬅️ KEMBALI</button>
-    </div>
-</div>
-
-<!-- ======================================
-    ✅ HALAMAN KEDAI — Daftar via Link Kurir → Baca ID Otomatis
-====================================== -->
+<!-- HALAMAN KEDAI DAFTAR -->
 <div id="halaman-kedai-daftar" class="halaman">
     <div class="header"><h1>🏪 DAFTAR KEDAI</h1></div>
     <div class="wadah">
@@ -205,9 +183,7 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ MENU UTAMA KEDAI — Tambah Menu + Varian + Kirim Data ke Kurir
-====================================== -->
+<!-- MENU UTAMA KEDAI -->
 <div id="halaman-kedai-menu" class="halaman">
     <div class="header">
         <h1>🏪 MENU KEDAI: <span id="kedai-nama-tampil"></span></h1>
@@ -242,9 +218,7 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ HALAMAN PELANGGAN — Daftar 1x + Pilih Kedai + Menu 1 Baris + Varian
-====================================== -->
+<!-- PELANGGAN DAFTAR -->
 <div id="halaman-pelanggan-daftar" class="halaman">
     <div class="header"><h1>👤 DATA PELANGGAN</h1></div>
     <div class="wadah">
@@ -289,9 +263,6 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ BUAT PESANAN — Lokasi Terbaru + Pilih 1/Beberapa Kedai + Semua Menu 1 Halaman
-====================================== -->
 <div id="halaman-pesanan-baru" class="halaman">
     <div class="header"><h1>🛒 BUAT PESANAN BARU</h1></div>
     <div class="wadah">
@@ -299,7 +270,6 @@
             <h3>📍 LOKASI PESANAN</h3>
             <button class="btn btn-abu" onclick="ambilLokasiPelanggan()">📍 BAGIKAN LOKASI</button>
             <p id="lokasi-pelanggan-tampil" style="font-size:13px; color:var(--abu); margin:8px 0 20px;"></p>
-
             <h3>🏪 PILIH KEDAI</h3>
             <div id="daftar-pilih-kedai"></div>
             <button class="btn btn-biru" onclick="lanjutKeMenu()" style="margin-top:16px;">✅ LANJUT</button>
@@ -307,21 +277,15 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ SEMUA MENU DALAM 1 HALAMAN — 1 Baris: Nama + Harga + [-] Jumlah [+]
-====================================== -->
 <div id="halaman-pesanan-menu" class="halaman">
     <div class="header"><h1>📋 PILIH MENU</h1></div>
     <div class="wadah">
         <div class="kartu" id="semua-menu-terpilih"></div>
-        <button class="btn btn-biru" onclick="bukaHalaman('halaman-ringkas')">🧾 LIHAT PESANAN</button>
+        <button class="btn btn-biru" onclick="bukaHalamanRingkas()">🧾 LIHAT PESANAN</button>
         <button class="btn btn-abu" onclick="bukaHalaman('halaman-pesanan-baru')" style="margin-top:12px;">⬅️ KEMBALI PILIH KEDAI</button>
     </div>
 </div>
 
-<!-- ======================================
-    ✅ RINGKASAN PESANAN — Dipisah per Kedai
-====================================== -->
 <div id="halaman-ringkas" class="halaman">
     <div class="header"><h1>🧾 RINGKASAN PESANAN</h1></div>
     <div class="wadah">
@@ -331,9 +295,6 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ CEK STOK KEDAI — Link Khusus per Kedai → Hanya lihat pesanannya sendiri
-====================================== -->
 <div id="halaman-cek-stok" class="halaman">
     <div class="header"><h1>🏪 CEK STOK PESANAN</h1></div>
     <div class="wadah">
@@ -342,9 +303,6 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ HASIL PELANGGAN — Proses / Batal per Kedai
-====================================== -->
 <div id="halaman-hasil-pesanan" class="halaman">
     <div class="header"><h1>📋 HASIL PENGECEKAN</h1></div>
     <div class="wadah">
@@ -352,9 +310,6 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ KURIR TERIMA INFO GABUNGAN — Hanya lihat Nama + Lokasi + Kedai (TIDAK lihat menu)
-====================================== -->
 <div id="halaman-kurir-pesanan" class="halaman">
     <div class="header"><h1>📦 INFORMASI PESANAN BARU</h1></div>
     <div class="wadah">
@@ -368,9 +323,6 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ RESI PELANGGAN — Rincian Lengkap + Ongkir + Total
-====================================== -->
 <div id="halaman-resi" class="halaman">
     <div class="header"><h1>🧾 RESI PESANAN</h1></div>
     <div class="wadah">
@@ -378,9 +330,6 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ RIWAYAT PESANAN PELANGGAN
-====================================== -->
 <div id="halaman-riwayat" class="halaman">
     <div class="header"><h1>📋 RIWAYAT PESANAN</h1></div>
     <div class="wadah">
@@ -391,9 +340,6 @@
     </div>
 </div>
 
-<!-- ======================================
-    ✅ SISTEM & FUNGSI LENGKAP
-====================================== -->
 <script>
 // === DATA UTAMA ===
 let akunKurir = null, akunKedai = null, akunPelanggan = null;
@@ -463,7 +409,6 @@ window.onload = function() {
         return;
     }
 
-    // === NORMAL — CEK AKUN SUDAH ADA ===
     if (localStorage.getItem('akunKurir')) {
         akunKurir = JSON.parse(localStorage.getItem('akunKurir'));
         bukaHalaman('halaman-kurir-menu');
@@ -485,13 +430,11 @@ function bukaHalaman(id) {
     document.querySelectorAll('.halaman').forEach(h => h.classList.remove('aktif'));
     document.getElementById(id).classList.add('aktif');
     window.scrollTo(0,0);
+    if (id === 'halaman-atur-layanan') renderKedaiKurir();
 }
 function buatIdKurir(urutan) { return `KURIR-${String(urutan).padStart(3,'0')}`; }
 function formatRupiah(angka) { return 'Rp' + parseInt(angka||0).toLocaleString('id-ID'); }
-function salinTeks(id) {
-    navigator.clipboard.writeText(document.getElementById(id).innerText)
-        .then(() => alert('✅ BERHASIL DISALIN!'));
-}
+function salinTeks(id) { navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => alert('✅ BERHASIL DISALIN!')); }
 function ambilLokasiKurir() {
     if (!navigator.geolocation) return alert('⚠️ HP tidak mendukung lokasi!');
     navigator.geolocation.getCurrentPosition(pos => {
@@ -513,14 +456,12 @@ function simpanAkunKurir() {
     let alamat = document.getElementById('kurir-alamat').value.trim();
     let wa = document.getElementById('kurir-wa').value.trim();
     if (!nama || !alamat || !wa || !lokasiKurir) return alert('⚠️ Isi semua data + bagikan lokasi!');
-
     let urutan = Object.keys(semuaKurir).length + 1;
     let id = buatIdKurir(urutan);
     akunKurir = { id, nama, alamat, wa, lokasi: lokasiKurir, kedai: [] };
     semuaKurir[id] = akunKurir;
     localStorage.setItem('akunKurir', JSON.stringify(akunKurir));
     localStorage.setItem('semuaKurir', JSON.stringify(semuaKurir));
-
     bukaHalaman('halaman-kurir-menu');
     tampilkanKurir();
 }
@@ -550,8 +491,7 @@ function salinLinkPelanggan() {
 }
 function masukKurir() {
     let id = prompt('Masukkan ID KURIR (contoh: KURIR-001):');
-    if (!id) return;
-    id = id.trim().toUpperCase();
+    if (!id) return; id = id.trim().toUpperCase();
     if (semuaKurir[id]) {
         akunKurir = semuaKurir[id];
         localStorage.setItem('akunKurir', JSON.stringify(akunKurir));
@@ -559,19 +499,51 @@ function masukKurir() {
         tampilkanKurir();
     } else alert('❌ ID KURIR tidak ditemukan!');
 }
+function keluarAkun() {
+    localStorage.removeItem('akunKurir'); localStorage.removeItem('akunKedai'); localStorage.removeItem('akunPelanggan');
+    akunKurir = null; akunKedai = null; akunPelanggan = null;
+    bukaHalaman('halaman-awal');
+}
+
+// === ✅ RENDER KEDAI DI HALAMAN ATUR LAYANAN ===
+function renderKedaiKurir() {
+    let el = document.getElementById('daftar-kedai-kurir');
+    document.getElementById('jumlah-kedai').textContent = akunKurir?.kedai?.length || 0;
+    if (!akunKurir || !akunKurir.kedai || akunKurir.kedai.length === 0) {
+        el.innerHTML = '<p style="text-align:center; color:var(--abu); padding:20px 0;">Belum ada kedai terhubung.<br>Buat link pendaftaran di atas & bagikan ke kedai!</p>';
+        return;
+    }
+    el.innerHTML = akunKurir.kedai.map(k => `
+        <div class="kedai-blok">
+            <div class="kedai-nama">🏪 ${k.nama}</div>
+            <p style="font-size:14px; color:var(--abu); margin-bottom:12px;">📱 WA: ${k.wa} • ${k.menu.length} menu</p>
+            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-block;" onclick="lihatMenuKedai('${k.id}')">📋 Menu</button>
+            <button class="btn btn-abu btn-kecil" style="width:31%; display:inline-block;" onclick="editKedai('${k.id}')">✏️ Edit</button>
+            <button class="btn btn-merah btn-kecil" style="width:31%; display:inline-block;" onclick="hapusKedai('${k.id}')">🗑️ Hapus</button>
+        </div>
+    `).join('');
+}
+function lihatMenuKedai(id) { alert('Fitur lihat & kelola menu kedai siap dikembangkan!'); }
+function editKedai(id) { alert('Fitur edit kedai siap dikembangkan!'); }
+function hapusKedai(id) {
+    if (!confirm('Yakin hapus kedai ini?')) return;
+    akunKurir.kedai = akunKurir.kedai.filter(k => k.id !== id);
+    semuaKurir[akunKurir.id] = akunKurir;
+    localStorage.setItem('semuaKurir', JSON.stringify(semuaKurir));
+    localStorage.setItem('akunKurir', JSON.stringify(akunKurir));
+    renderKedaiKurir();
+}
 
 // === KEDAI ===
 function simpanAkunKedai() {
     let nama = document.getElementById('kedai-nama').value.trim();
     let wa = document.getElementById('kedai-wa').value.trim();
     if (!nama || !wa || !akunKurir) return alert('⚠️ Isi semua data!');
-
     let id = 'KEDAI-' + Math.random().toString(36).substr(2,6);
     akunKedai = { id, nama, wa, idKurir: akunKurir.id, menu: [] };
     semuaKedai[id] = akunKedai;
     localStorage.setItem('akunKedai', JSON.stringify(akunKedai));
     localStorage.setItem('semuaKedai', JSON.stringify(semuaKedai));
-
     bukaHalaman('halaman-kedai-menu');
     tampilkanKedai();
 }
@@ -649,6 +621,20 @@ function simpanEditPelanggan() {
     alert('✅ PERUBAHAN TERSIMPAN!');
     bukaHalaman('halaman-pelanggan-menu');
 }
+function bukaHalamanPilihKedai() {
+    let el = document.getElementById('daftar-pilih-kedai');
+    let semua = [];
+    Object.values(semuaKurir).forEach(k => k.kedai?.forEach(d => semua.push(d)));
+    if (!semua.length) { el.innerHTML = '<p style="color:var(--abu);">Belum ada kedai terdaftar.</p>'; return; }
+    el.innerHTML = semua.map(k => `
+        <label class="kedai-pilih">
+            <input type="checkbox" value="${k.id}">
+            <span>🏪 ${k.nama} (${k.menu.length} menu)</span>
+        </label>
+    `).join('');
+}
+bukaHalamanPilihKedai();
+
 function lanjutKeMenu() {
     if (!lokasiPelanggan) return alert('⚠️ Bagikan lokasi dulu!');
     let terpilih = Array.from(document.querySelectorAll('.kedai-pilih input:checked')).map(cb => cb.value);
@@ -694,25 +680,4 @@ function ubahJumlah(idKedai, idMenu, tambah) {
     if (!item) { item = { ...menu, idKedai, jumlah:0, varian:null }; keranjang.push(item); }
     item.jumlah += tambah;
     if (item.jumlah < 0) item.jumlah = 0;
-    document.getElementById(`jml-${idKedai}-${idMenu}`).textContent = item.jumlah;
-}
-function bukaHalamanPilihKedai() {
-    let el = document.getElementById('daftar-pilih-kedai');
-    let semua = [];
-    Object.values(semuaKurir).forEach(k => k.kedai?.forEach(d => semua.push(d)));
-    if (!semua.length) { el.innerHTML = '<p style="color:var(--abu);">Belum ada kedai terdaftar.</p>'; return; }
-    el.innerHTML = semua.map(k => `
-        <label class="kedai-pilih">
-            <input type="checkbox" value="${k.id}">
-            <span>🏪 ${k.nama} (${k.menu.length} menu)</span>
-        </label>
-    `).join('');
-}
-bukaHalamanPilihKedai();
-
-function bukaHalamanRingkas() {
-    keranjang = keranjang.filter(x => x.jumlah > 0);
-    if (!keranjang.length) return alert('⚠️ Pilih menu dulu!');
-    let el = document.getElementById('ringkas-konten');
-    let perKedai = {};
-    keranjang.forEach(x => {
+    document.getElementById(`jml-${idKedai}-${idMenu}`).
