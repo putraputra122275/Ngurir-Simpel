@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 *{
     box-sizing:border-box;
 }
@@ -54,7 +55,9 @@ header{
     box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-input,textarea,select{
+input,
+textarea,
+select{
     width:100%;
     padding:12px;
     margin-top:6px;
@@ -77,7 +80,6 @@ button{
 
 button:disabled{
     opacity:.6;
-    cursor:not-allowed;
 }
 
 .btn-primary{
@@ -95,13 +97,13 @@ button:disabled{
     color:white;
 }
 
-.btn-gray{
-    background:#777;
+.btn-warning{
+    background:#f9a825;
     color:white;
 }
 
-.btn-warning{
-    background:#f9a825;
+.btn-gray{
+    background:#777;
     color:white;
 }
 
@@ -152,10 +154,39 @@ button:disabled{
     color:#666;
 }
 
+.location-box{
+    background:#e3f2fd;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:12px;
+}
+
+.variant-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:8px;
+}
+
+.variant-row input{
+    margin:0;
+}
+
+.variant-row button{
+    width:90px;
+    margin:0;
+}
+
+.draft-menu{
+    border:1px solid #ddd;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:15px;
+}
+
 .status{
     padding:12px;
     border-radius:8px;
-    margin-top:15px;
+    margin-top:10px;
     font-weight:bold;
 }
 
@@ -175,118 +206,124 @@ button:disabled{
     background:#d4edda;
 }
 
-.location-box{
-    background:#e3f2fd;
-    padding:12px;
-    border-radius:8px;
-    margin-bottom:12px;
-}
-
-.variant-box{
-    border:1px solid #ddd;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:10px;
-}
-
-.variant-row{
-    display:flex;
-    gap:8px;
-    margin-bottom:8px;
-}
-
-.variant-row input{
-    margin:0;
-}
-
-.variant-row button{
-    width:80px;
-    margin:0;
-    padding:8px;
-}
-
-.menu-owner-item{
-    border:1px solid #ddd;
-    padding:12px;
-    border-radius:8px;
-    margin-bottom:10px;
-}
-
-.menu-owner-item button{
-    margin-top:8px;
-}
 </style>
 </head>
 
 <body>
 
-<header>🚚 NGURIR SIMPEL</header>
+<header>
+🚚 NGURIR SIMPEL
+</header>
 
 <div class="container">
 
+
+<!-- ================================================= -->
 <!-- HOME -->
+<!-- ================================================= -->
 
 <div id="home" class="page active">
+
 <div class="card">
 
 <h2>NGURIR SIMPEL</h2>
 
-<p>Aplikasi pesanan untuk kurir, kedai dan pelanggan.</p>
+<p>
+Aplikasi pesanan untuk Kurir, Kedai dan Pelanggan.
+</p>
 
-<button class="btn-primary" onclick="openRegisterCourier()">
+<button
+class="btn-primary"
+onclick="openRegisterCourier()">
+
 DAFTAR AKUN KURIR
+
 </button>
 
-<button class="btn-success" onclick="openDashboard()">
+<button
+class="btn-success"
+onclick="openDashboard()">
+
 MASUK DASHBOARD KURIR
+
 </button>
 
 </div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- REGISTER COURIER -->
+<!-- ================================================= -->
 
 <div id="registerCourier" class="page">
+
 <div class="card">
 
 <h2>DAFTAR AKUN KURIR</h2>
 
 <label>Nama Kurir</label>
-<input id="courierName">
+
+<input
+id="courierName"
+placeholder="Masukkan nama">
 
 <label>Nomor WhatsApp</label>
-<input id="courierPhone">
+
+<input
+id="courierPhone"
+placeholder="Contoh: 08123456789">
 
 <div class="location-box">
 
-<b>📍 Serlok Kurir</b>
+<b>📍 SERLOK KURIR</b>
 
-<p id="courierLocationText" class="small">
+<p
+id="courierLocationText"
+class="small">
+
 Lokasi belum diambil.
+
 </p>
 
-<button class="btn-primary" onclick="getCourierLocation()">
+<button
+class="btn-primary"
+onclick="getCourierLocation()">
+
 📍 AMBIL SERLOK SAYA
+
 </button>
 
 </div>
 
-<button class="btn-success" onclick="registerCourier()">
+<button
+class="btn-success"
+onclick="registerCourier()">
+
 SELESAI
+
 </button>
 
-<button class="btn-gray" onclick="showPage('home')">
+<button
+class="btn-gray"
+onclick="showPage('home')">
+
 KEMBALI
+
 </button>
 
 </div>
+
 </div>
 
 
-<!-- DASHBOARD -->
+<!-- ================================================= -->
+<!-- DASHBOARD COURIER -->
+<!-- ================================================= -->
 
 <div id="dashboard" class="page">
+
 <div class="card">
 
 <h2>APLIKASI KURIR</h2>
@@ -295,135 +332,150 @@ KEMBALI
 Memuat...
 </div>
 
-<button class="btn-primary" onclick="editCourier()">
+<button
+class="btn-primary"
+onclick="editCourier()">
+
 EDIT AKUN
+
 </button>
 
-<button class="btn-success" onclick="openShopManagement()">
+<button
+class="btn-success"
+onclick="openShopManagement()">
+
 ATUR LAYANAN PESANAN
+
 </button>
 
-<button class="btn-gray" onclick="logout()">
+<button
+class="btn-gray"
+onclick="logout()">
+
 KELUAR
+
 </button>
 
 </div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- EDIT COURIER -->
+<!-- ================================================= -->
 
 <div id="editCourier" class="page">
+
 <div class="card">
 
-<h2>EDIT AKUN</h2>
+<h2>EDIT AKUN KURIR</h2>
 
 <label>Nama</label>
+
 <input id="editName">
 
 <label>WhatsApp</label>
+
 <input id="editPhone">
 
 <div class="location-box">
 
-<b>📍 Serlok Kurir</b>
+<b>📍 SERLOK KURIR</b>
 
-<p id="editCourierLocationText" class="small">
-Lokasi belum diambil.
+<p
+id="editCourierLocationText"
+class="small">
+
+Lokasi belum tersedia.
+
 </p>
 
-<button class="btn-primary" onclick="getEditCourierLocation()">
+<button
+class="btn-primary"
+onclick="getEditCourierLocation()">
+
 📍 PERBARUI SERLOK
+
 </button>
 
 </div>
 
-<button class="btn-success" onclick="saveCourierEdit()">
+<button
+class="btn-success"
+onclick="saveCourierEdit()">
+
 SIMPAN PERUBAHAN
+
 </button>
 
-<button class="btn-gray" onclick="openDashboard()">
+<button
+class="btn-gray"
+onclick="openDashboard()">
+
 KEMBALI
+
 </button>
 
 </div>
+
 </div>
 
 
-<!-- SHOP MANAGEMENT COURIER -->
+<!-- ================================================= -->
+<!-- SHOP MANAGEMENT -->
+<!-- ================================================= -->
 
 <div id="shops" class="page">
+
 <div class="card">
 
 <h2>ATUR LAYANAN PESANAN</h2>
 
 <div id="shopList"></div>
 
-<button class="btn-success" onclick="openAddShop()">
-+ TAMBAH KEDAI
-</button>
+<button
+class="btn-primary"
+onclick="copyCustomerLink()">
 
-<button class="btn-primary" onclick="copyCustomerLink()">
 SALIN LINK PELANGGAN
+
 </button>
 
-<button class="btn-warning" onclick="copyShopLink()">
-SALIN LINK DAFTAR KEDAI
+<button
+class="btn-warning"
+onclick="copyShopLink()">
+
+SALIN LINK PENDAFTARAN KEDAI
+
 </button>
 
-<button class="btn-gray" onclick="openDashboard()">
+<button
+class="btn-gray"
+onclick="openDashboard()">
+
 KEMBALI
-</button>
 
-</div>
-</div>
-
-
-<!-- ADD SHOP COURIER -->
-
-<div id="addShop" class="page">
-<div class="card">
-
-<h2>TAMBAH KEDAI</h2>
-
-<label>Nama Kedai</label>
-<input id="shopName">
-
-<label>Nomor WhatsApp</label>
-<input id="shopPhone">
-
-<div class="location-box">
-
-<b>📍 Serlok Kedai</b>
-
-<p id="shopLocationText" class="small">
-Lokasi belum diambil.
-</p>
-
-<button class="btn-primary" onclick="getShopLocation()">
-📍 AMBIL SERLOK KEDAI
 </button>
 
 </div>
 
-<button class="btn-success" onclick="saveShop()">
-SIMPAN KEDAI
-</button>
-
-<button class="btn-gray" onclick="openShopManagement()">
-KEMBALI
-</button>
-
-</div>
 </div>
 
 
-<!-- SHOP DETAIL COURIER -->
+<!-- ================================================= -->
+<!-- SHOP DETAIL -->
+<!-- ================================================= -->
 
 <div id="shopDetail" class="page">
+
 <div class="card">
 
-<h2 id="detailShopName">DETAIL KEDAI</h2>
+<h2 id="detailShopName">
+
+DETAIL KEDAI
+
+</h2>
 
 <div id="detailShopInfo"></div>
 
@@ -431,200 +483,267 @@ KEMBALI
 
 <div id="menuList"></div>
 
-<button class="btn-success" onclick="openAddMenu()">
+<button
+class="btn-success"
+onclick="openAddMenu()">
+
 + TAMBAH MENU
+
 </button>
 
-<button class="btn-gray" onclick="openShopManagement()">
+<button
+class="btn-gray"
+onclick="openShopManagement()">
+
 KEMBALI
+
 </button>
 
 </div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- ADD MENU COURIER -->
+<!-- ================================================= -->
 
 <div id="addMenu" class="page">
+
 <div class="card">
 
 <h2>TAMBAH MENU</h2>
 
 <label>Nama Menu</label>
+
 <input id="menuName">
 
-<label>Harga</label>
-<input type="number" id="menuPrice">
+<label>Harga Menu</label>
+
+<input
+type="number"
+id="menuPrice">
 
 <label>Varian</label>
 
 <div id="courierVariantContainer"></div>
 
-<button class="btn-warning" onclick="addCourierVariantInput()">
+<button
+class="btn-warning"
+onclick="addCourierVariantInput()">
+
 + TAMBAH VARIAN
+
 </button>
 
 <p class="small">
-Tidak perlu menambahkan varian jika menu tidak memiliki varian.
+
+Tidak perlu menambahkan varian
+jika menu tidak memiliki varian.
+
 </p>
 
-<button class="btn-success" onclick="saveMenu()">
+<button
+class="btn-success"
+onclick="saveMenu()">
+
 SIMPAN MENU
+
 </button>
 
-<button class="btn-gray" onclick="openShopDetail(currentShopId)">
+<button
+class="btn-gray"
+onclick="openShopDetail(currentShopId)">
+
 KEMBALI
+
 </button>
 
 </div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- REGISTER SHOP -->
+<!-- ================================================= -->
 
 <div id="shopRegister" class="page">
+
 <div class="card">
 
 <h2>DAFTAR KEDAI</h2>
 
-<p>Isi informasi kedai Anda.</p>
+<p>
+Isi data kedai Anda terlebih dahulu.
+</p>
 
 <label>Nama Kedai</label>
-<input id="registerShopName">
 
-<label>WhatsApp Kedai</label>
-<input id="registerShopPhone">
+<input
+id="registerShopName">
+
+<label>Nomor WhatsApp Kedai</label>
+
+<input
+id="registerShopPhone">
 
 <div class="location-box">
 
-<b>📍 Serlok Kedai</b>
+<b>📍 SERLOK KEDAI</b>
 
-<p id="registerShopLocationText" class="small">
+<p
+id="registerShopLocationText"
+class="small">
+
 Lokasi belum diambil.
+
 </p>
 
-<button class="btn-primary" onclick="getRegisterShopLocation()">
+<button
+class="btn-primary"
+onclick="getRegisterShopLocation()">
+
 📍 AMBIL SERLOK SAYA
+
 </button>
 
 </div>
 
-<button class="btn-success" onclick="registerShopFromLink()">
-KIRIM
+<!-- DATA BELUM MASUK DATABASE -->
+
+<button
+class="btn-success"
+onclick="continueShopRegistration()">
+
+LANJUT
+
 </button>
 
 </div>
+
 </div>
 
 
-<!-- SHOP OWNER DASHBOARD -->
+<!-- ================================================= -->
+<!-- SHOP REGISTRATION MENU -->
+<!-- ================================================= -->
 
-<div id="shopOwnerDashboard" class="page">
+<div id="shopRegistrationMenus" class="page">
+
 <div class="card">
 
-<h2 id="shopOwnerTitle">
-KEDAI SAYA
-</h2>
-
-<div id="shopOwnerInfo"></div>
-
-<button class="btn-success" onclick="openShopOwnerMenus()">
-ATUR MENU KEDAI
-</button>
-
-<button class="btn-gray" onclick="showPage('home')">
-SELESAI
-</button>
-
-</div>
-</div>
-
-
-<!-- SHOP OWNER MENUS -->
-
-<div id="shopOwnerMenus" class="page">
-<div class="card">
-
-<h2>MENU KEDAI SAYA</h2>
-
-<div id="shopOwnerMenuList"></div>
-
-<button class="btn-success" onclick="openAddShopOwnerMenu()">
-+ TAMBAH MENU
-</button>
-
-<button class="btn-gray" onclick="openShopOwnerDashboard()">
-KEMBALI
-</button>
-
-</div>
-</div>
-
-
-<!-- ADD SHOP OWNER MENU -->
-
-<div id="addShopOwnerMenu" class="page">
-<div class="card">
-
-<h2>TAMBAH MENU</h2>
-
-<label>Nama Menu</label>
-<input id="ownerMenuName">
-
-<label>Harga</label>
-<input type="number" id="ownerMenuPrice">
-
-<label>Varian Menu</label>
-
-<div id="ownerVariantContainer"></div>
-
-<button class="btn-warning" onclick="addOwnerVariantInput()">
-+ TAMBAH VARIAN
-</button>
+<h2>ISI MENU KEDAI</h2>
 
 <p class="small">
-Varian boleh kosong jika menu tidak memiliki varian.
+
+Tambahkan semua menu, harga dan varian.
+Data baru dikirim setelah Anda menekan
+KIRIM INFORMASI KEDAI.
+
 </p>
 
-<button class="btn-success" onclick="saveShopOwnerMenu()">
-SIMPAN MENU
+<div id="draftMenuList"></div>
+
+<button
+class="btn-success"
+onclick="addDraftMenu()">
+
++ TAMBAH MENU
+
 </button>
 
-<button class="btn-gray" onclick="openShopOwnerMenus()">
+<button
+class="btn-primary"
+onclick="sendCompleteShopRegistration()">
+
+KIRIM INFORMASI KEDAI
+
+</button>
+
+<button
+class="btn-gray"
+onclick="showPage('shopRegister')">
+
 KEMBALI
+
 </button>
 
 </div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- CUSTOMER -->
+<!-- ================================================= -->
 
 <div id="customer" class="page">
+
 <div class="card">
 
 <h2>BUAT PESANAN</h2>
 
 <label>Nama</label>
+
 <input id="customerName">
 
 <label>Nomor WhatsApp</label>
+
 <input id="customerPhone">
 
 <label>Alamat Lengkap</label>
+
 <textarea id="customerAddress"></textarea>
 
-<button class="btn-primary" onclick="openCustomerShops()">
-PILIH KEDAI
+<div class="location-box">
+
+<b>📍 SERLOK PESANAN</b>
+
+<p
+id="customerLocationText"
+class="small">
+
+Silakan ambil serlok untuk pesanan ini.
+
+</p>
+
+<button
+class="btn-primary"
+onclick="getCustomerLocation()">
+
+📍 AMBIL SERLOK SAYA
+
 </button>
 
 </div>
+
+<p class="small">
+
+Setiap membuat pesanan baru,
+pelanggan wajib mengambil serlok lagi.
+
+</p>
+
+<button
+class="btn-success"
+onclick="openCustomerShops()">
+
+PILIH KEDAI
+
+</button>
+
+</div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- CUSTOMER SHOPS -->
+<!-- ================================================= -->
 
 <div id="customerShops" class="page">
+
 <div class="card">
 
 <h2>PILIH KEDAI</h2>
@@ -636,38 +755,62 @@ oninput="searchShops()">
 
 <div id="customerShopList"></div>
 
-<button class="btn-success" onclick="openCart()">
+<button
+class="btn-success"
+onclick="openCart()">
+
 LIHAT PESANAN
+
 </button>
 
-<button class="btn-gray" onclick="showPage('customer')">
+<button
+class="btn-gray"
+onclick="showPage('customer')">
+
 KEMBALI
+
 </button>
 
 </div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- CUSTOMER MENU -->
+<!-- ================================================= -->
 
 <div id="customerMenu" class="page">
+
 <div class="card">
 
-<h2 id="customerMenuTitle">MENU</h2>
+<h2 id="customerMenuTitle">
+
+MENU
+
+</h2>
 
 <div id="customerMenuList"></div>
 
-<button class="btn-success" onclick="openCustomerShops()">
+<button
+class="btn-success"
+onclick="openCustomerShops()">
+
 SELESAI PILIH MENU
+
 </button>
 
 </div>
+
 </div>
 
 
+<!-- ================================================= -->
 <!-- CART -->
+<!-- ================================================= -->
 
 <div id="cart" class="page">
+
 <div class="card">
 
 <h2>PESANAN SAYA</h2>
@@ -676,48 +819,68 @@ SELESAI PILIH MENU
 
 <div id="cartTotal"></div>
 
-<button id="sendOrderButton"
+<button
+id="sendOrderButton"
 class="btn-success"
 onclick="sendOrder()">
+
 KIRIM PESANAN
+
 </button>
 
-<button class="btn-gray"
+<button
+class="btn-gray"
 onclick="openCustomerShops()">
+
 TAMBAH PESANAN
+
 </button>
 
 </div>
+
 </div>
 
 
-<!-- STATUS -->
+<!-- ================================================= -->
+<!-- ORDER STATUS -->
+<!-- ================================================= -->
 
 <div id="orderStatus" class="page">
+
 <div class="card">
 
 <h2>STATUS PESANAN</h2>
 
 <div id="statusContent"></div>
 
-<button id="cancelButton"
+<button
+id="cancelButton"
 class="btn-danger"
 onclick="cancelOrder()">
+
 BATALKAN PESANAN
+
 </button>
 
-<button class="btn-primary"
+<button
+class="btn-primary"
 onclick="showPage('home')">
+
 SELESAI
+
 </button>
 
 </div>
+
 </div>
 
 
-<!-- STOCK -->
+<!-- ================================================= -->
+<!-- STOCK CHECK -->
+<!-- ================================================= -->
 
 <div id="stockCheck" class="page">
+
 <div class="card">
 
 <h2>CEK STOK PESANAN</h2>
@@ -726,29 +889,36 @@ SELESAI
 
 <div id="stockList"></div>
 
-<button id="processShopButton"
+<button
+id="processShopButton"
 class="btn-success"
 onclick="processShopOrder()">
-PROSES PESANAN SAYA
+
+KIRIM HASIL CEK STOK
+
 </button>
 
 </div>
+
 </div>
+
 
 </div>
 
 
 <script>
 
-/* =====================================
+
+/* =================================================
 SUPABASE
-===================================== */
+================================================= */
 
 const SUPABASE_URL =
 "https://xkysusfemehvdaqkyzhg.supabase.co";
 
 const SUPABASE_KEY =
 "sb_publishable_JDmN5TndzBue7Rsmeiphtw_K2MzPcbA";
+
 
 const db =
 supabase.createClient(
@@ -757,12 +927,14 @@ SUPABASE_KEY
 );
 
 
-/* =====================================
+/* =================================================
 VARIABLES
-===================================== */
+================================================= */
 
 let currentCourierId =
-localStorage.getItem("ngurirCourierId");
+localStorage.getItem(
+"ngurirCourierId"
+);
 
 let currentShopId = null;
 
@@ -770,12 +942,8 @@ let currentOrderId = null;
 
 let currentShopOrderId = null;
 
-let currentOwnerShopId =
-localStorage.getItem("ngurirOwnerShopId");
 
-let customerShopsData = [];
-
-let cartData = {};
+/* LOCATION */
 
 let courierLatitude = null;
 let courierLongitude = null;
@@ -783,1820 +951,2746 @@ let courierLongitude = null;
 let editCourierLatitude = null;
 let editCourierLongitude = null;
 
-let shopLatitude = null;
-let shopLongitude = null;
-
 let registerShopLatitude = null;
 let registerShopLongitude = null;
 
+let customerLatitude = null;
+let customerLongitude = null;
 
-/* =====================================
+
+/* SHOP */
+
+let pendingShopData = null;
+
+let draftMenus = [];
+
+
+/* CUSTOMER */
+
+let customerShopsData = [];
+
+let cartData = {};
+
+
+/* =================================================
 PAGE
-===================================== */
+================================================= */
 
 function showPage(id){
 
-document.querySelectorAll(".page")
-.forEach(page=>{
-page.classList.remove("active");
-});
+    document
+    .querySelectorAll(".page")
+    .forEach(page=>{
 
-const page =
-document.getElementById(id);
+        page.classList
+        .remove("active");
 
-if(page){
-page.classList.add("active");
+    });
+
+
+    const page =
+    document.getElementById(id);
+
+
+    if(page){
+
+        page.classList
+        .add("active");
+
+    }
+
+
+    window.scrollTo(0,0);
+
 }
 
-window.scrollTo(0,0);
 
-}
-
-
-/* =====================================
+/* =================================================
 RUPIAH
-===================================== */
+================================================= */
 
 function rupiah(value){
 
-return new Intl.NumberFormat(
-"id-ID",
-{
-style:"currency",
-currency:"IDR",
-maximumFractionDigits:0
-}
-).format(value || 0);
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style:"currency",
+            currency:"IDR",
+            maximumFractionDigits:0
+        }
+    ).format(value || 0);
 
 }
 
 
-/* =====================================
+/* =================================================
 PHONE
-===================================== */
+================================================= */
 
 function phoneNumber(phone){
 
-if(!phone) return "";
+    if(!phone) return "";
 
-phone =
-phone.replace(/\D/g,"");
+    phone =
+    String(phone)
+    .replace(/\D/g,"");
 
-if(phone.startsWith("0")){
-phone =
-"62" + phone.substring(1);
+
+    if(phone.startsWith("0")){
+
+        phone =
+        "62" +
+        phone.substring(1);
+
+    }
+
+    return phone;
+
 }
 
-return phone;
 
-}
-
-
-/* =====================================
+/* =================================================
 BASE URL
-===================================== */
+================================================= */
 
 function baseURL(){
 
-return (
-window.location.origin +
-window.location.pathname
-);
+    return
+    window.location.origin +
+    window.location.pathname;
 
 }
 
 
-/* =====================================
+/* =================================================
+GENERATE TOKEN
+PERBAIKAN
+================================================= */
+
+function generateToken(){
+
+    return (
+
+        Date.now()
+        .toString(36)
+
+        +
+
+        Math.random()
+        .toString(36)
+        .substring(2,15)
+
+    );
+
+}
+
+
+/* =================================================
 GET LOCATION
-===================================== */
+================================================= */
 
 function getLocation(success){
 
-if(!navigator.geolocation){
+    if(!navigator.geolocation){
 
-alert(
-"HP atau browser tidak mendukung lokasi."
-);
+        alert(
+        "Browser tidak mendukung GPS."
+        );
 
-return;
+        return;
+
+    }
+
+
+    navigator
+    .geolocation
+    .getCurrentPosition(
+
+        position=>{
+
+            success(
+
+                position.coords.latitude,
+
+                position.coords.longitude
+
+            );
+
+        },
+
+
+        error=>{
+
+            alert(
+            "Gagal mengambil lokasi. Aktifkan GPS dan izinkan lokasi."
+            );
+
+        },
+
+
+        {
+
+            enableHighAccuracy:true,
+
+            timeout:20000,
+
+            maximumAge:0
+
+        }
+
+    );
 
 }
 
-navigator.geolocation.getCurrentPosition(
 
-position=>{
-
-success(
-position.coords.latitude,
-position.coords.longitude
-);
-
-},
-
-error=>{
-
-alert(
-"Gagal mengambil lokasi. Pastikan GPS aktif dan izin lokasi diberikan."
-);
-
-},
-
-{
-enableHighAccuracy:true,
-timeout:15000,
-maximumAge:0
-}
-
-);
-
-}
-
-
-/* =====================================
+/* =================================================
 COURIER LOCATION
-===================================== */
+================================================= */
 
 function getCourierLocation(){
 
-document.getElementById(
-"courierLocationText"
-).innerText =
-"Mengambil lokasi...";
+    document
+    .getElementById(
+    "courierLocationText"
+    )
+    .innerText =
+    "Mengambil lokasi...";
 
-getLocation((lat,lng)=>{
 
-courierLatitude = lat;
-courierLongitude = lng;
+    getLocation((lat,lng)=>{
 
-document.getElementById(
-"courierLocationText"
-).innerHTML =
+        courierLatitude = lat;
 
-"✓ Serlok berhasil diambil.<br>" +
-"Latitude: " + lat +
-"<br>Longitude: " + lng;
+        courierLongitude = lng;
 
-});
+
+        document
+        .getElementById(
+        "courierLocationText"
+        )
+        .innerHTML =
+
+        "✓ Serlok berhasil diambil.<br>" +
+
+        lat.toFixed(6) +
+
+        ", " +
+
+        lng.toFixed(6);
+
+    });
 
 }
 
+
+/* =================================================
+EDIT COURIER LOCATION
+================================================= */
 
 function getEditCourierLocation(){
 
-document.getElementById(
-"editCourierLocationText"
-).innerText =
-"Mengambil lokasi...";
-
-getLocation((lat,lng)=>{
-
-editCourierLatitude = lat;
-editCourierLongitude = lng;
-
-document.getElementById(
-"editCourierLocationText"
-).innerHTML =
-"✓ Serlok berhasil diperbarui.";
-
-});
-
-}
+    document
+    .getElementById(
+    "editCourierLocationText"
+    )
+    .innerText =
+    "Mengambil lokasi...";
 
 
-/* =====================================
-SHOP LOCATION
-===================================== */
+    getLocation((lat,lng)=>{
 
-function getShopLocation(){
+        editCourierLatitude = lat;
 
-document.getElementById(
-"shopLocationText"
-).innerText =
-"Mengambil lokasi...";
+        editCourierLongitude = lng;
 
-getLocation((lat,lng)=>{
 
-shopLatitude = lat;
-shopLongitude = lng;
+        document
+        .getElementById(
+        "editCourierLocationText"
+        )
+        .innerHTML =
 
-document.getElementById(
-"shopLocationText"
-).innerHTML =
-"✓ Serlok kedai berhasil diambil.";
+        "✓ Serlok berhasil diperbarui.";
 
-});
+    });
 
 }
 
 
-function getRegisterShopLocation(){
+/* =================================================
+CUSTOMER LOCATION
 
-document.getElementById(
-"registerShopLocationText"
-).innerText =
-"Mengambil lokasi...";
+WAJIB SETIAP PESANAN
+================================================= */
 
-getLocation((lat,lng)=>{
+function getCustomerLocation(){
 
-registerShopLatitude = lat;
-registerShopLongitude = lng;
+    document
+    .getElementById(
+    "customerLocationText"
+    )
+    .innerText =
+    "Mengambil lokasi...";
 
-document.getElementById(
-"registerShopLocationText"
-).innerHTML =
-"✓ Serlok kedai berhasil diambil.";
 
-});
+    getLocation((lat,lng)=>{
+
+        customerLatitude = lat;
+
+        customerLongitude = lng;
+
+
+        document
+        .getElementById(
+        "customerLocationText"
+        )
+        .innerHTML =
+
+        "✓ Serlok berhasil diambil untuk pesanan ini.";
+
+    });
 
 }
 
 
-/* =====================================
+/* =================================================
 REGISTER COURIER
-===================================== */
+================================================= */
 
 function openRegisterCourier(){
 
-document.getElementById("courierName").value="";
-document.getElementById("courierPhone").value="";
+    document
+    .getElementById(
+    "courierName"
+    )
+    .value = "";
 
-courierLatitude=null;
-courierLongitude=null;
 
-document.getElementById(
-"courierLocationText"
-).innerText =
-"Lokasi belum diambil.";
+    document
+    .getElementById(
+    "courierPhone"
+    )
+    .value = "";
 
-showPage("registerCourier");
+
+    courierLatitude = null;
+
+    courierLongitude = null;
+
+
+    document
+    .getElementById(
+    "courierLocationText"
+    )
+    .innerText =
+    "Lokasi belum diambil.";
+
+
+    showPage(
+    "registerCourier"
+    );
 
 }
 
+
+/* =================================================
+SAVE COURIER
+================================================= */
 
 async function registerCourier(){
 
-const name =
-document.getElementById("courierName")
-.value.trim();
+    const name =
+    document
+    .getElementById(
+    "courierName"
+    )
+    .value
+    .trim();
 
-const phone =
-phoneNumber(
-document.getElementById("courierPhone")
-.value
-);
 
-if(!name){
+    const phone =
+    phoneNumber(
 
-alert("Nama kurir harus diisi");
-return;
+        document
+        .getElementById(
+        "courierPhone"
+        )
+        .value
+
+    );
+
+
+    if(!name){
+
+        alert(
+        "Nama kurir harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(!phone){
+
+        alert(
+        "Nomor WhatsApp harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(
+
+        courierLatitude === null ||
+
+        courierLongitude === null
+
+    ){
+
+        alert(
+        "Kurir wajib mengambil serlok."
+        );
+
+        return;
+
+    }
+
+
+    const result =
+
+    await db
+
+    .from("couriers")
+
+    .insert({
+
+        name:name,
+
+        phone:phone,
+
+        latitude:courierLatitude,
+
+        longitude:courierLongitude
+
+    })
+
+    .select()
+
+    .single();
+
+
+    if(result.error){
+
+        alert(
+        result.error.message
+        );
+
+        return;
+
+    }
+
+
+    currentCourierId =
+    result.data.id;
+
+
+    localStorage
+    .setItem(
+
+        "ngurirCourierId",
+
+        currentCourierId
+
+    );
+
+
+    alert(
+    "Akun kurir berhasil dibuat."
+    );
+
+
+    openDashboard();
 
 }
 
-if(!phone){
 
-alert("Nomor WhatsApp harus diisi");
-return;
-
-}
-
-if(
-courierLatitude === null ||
-courierLongitude === null
-){
-
-alert(
-"Silakan ambil serlok kurir terlebih dahulu."
-);
-
-return;
-
-}
-
-const result =
-await db
-.from("couriers")
-.insert({
-name:name,
-phone:phone,
-latitude:courierLatitude,
-longitude:courierLongitude
-})
-.select()
-.single();
-
-if(result.error){
-
-alert(
-"Terjadi kesalahan: " +
-result.error.message
-);
-
-return;
-
-}
-
-currentCourierId =
-result.data.id;
-
-localStorage.setItem(
-"ngurirCourierId",
-currentCourierId
-);
-
-alert(
-"Akun kurir berhasil dibuat"
-);
-
-openDashboard();
-
-}
-
-
-/* =====================================
+/* =================================================
 DASHBOARD
-===================================== */
+================================================= */
 
 async function openDashboard(){
 
-if(!currentCourierId){
+    if(!currentCourierId){
 
-showPage("home");
+        showPage("home");
 
-return;
+        return;
+
+    }
+
+
+    showPage(
+    "dashboard"
+    );
+
+
+    const result =
+
+    await db
+
+    .from("couriers")
+
+    .select("*")
+
+    .eq(
+
+        "id",
+
+        currentCourierId
+
+    )
+
+    .single();
+
+
+    if(result.error){
+
+        document
+        .getElementById(
+        "courierInfo"
+        )
+        .innerHTML =
+
+        "Data kurir tidak ditemukan.";
+
+        return;
+
+    }
+
+
+    const courier =
+    result.data;
+
+
+    document
+    .getElementById(
+    "courierInfo"
+    )
+    .innerHTML =
+
+    "<b>Nama:</b> " +
+
+    courier.name +
+
+    "<br><br>" +
+
+    "<b>WhatsApp:</b> " +
+
+    courier.phone +
+
+    "<br><br>" +
+
+    "<b>Serlok:</b><br>" +
+
+    "✓ Lokasi tersimpan";
 
 }
 
-showPage("dashboard");
 
-const result =
-await db
-.from("couriers")
-.select("*")
-.eq("id",currentCourierId)
-.single();
-
-if(result.error){
-
-document.getElementById(
-"courierInfo"
-).innerHTML =
-"Data kurir tidak ditemukan.";
-
-return;
-
-}
-
-const courier =
-result.data;
-
-document.getElementById(
-"courierInfo"
-).innerHTML =
-
-"<b>Nama:</b> " +
-courier.name +
-
-"<br><br><b>WhatsApp:</b> " +
-(courier.phone || "-") +
-
-"<br><br><b>Serlok:</b><br>" +
-
-(courier.latitude
-?
-"✓ Lokasi sudah tersimpan"
-:
-"Lokasi belum tersedia"
-);
-
-}
-
-
-/* =====================================
+/* =================================================
 EDIT COURIER
-===================================== */
+================================================= */
 
 async function editCourier(){
 
-const result =
-await db
-.from("couriers")
-.select("*")
-.eq("id",currentCourierId)
-.single();
+    const result =
 
-if(result.error){
+    await db
 
-alert(result.error.message);
-return;
+    .from("couriers")
+
+    .select("*")
+
+    .eq(
+        "id",
+        currentCourierId
+    )
+
+    .single();
+
+
+    if(result.error){
+
+        alert(
+        result.error.message
+        );
+
+        return;
+
+    }
+
+
+    const courier =
+    result.data;
+
+
+    document
+    .getElementById(
+    "editName"
+    )
+    .value =
+    courier.name || "";
+
+
+    document
+    .getElementById(
+    "editPhone"
+    )
+    .value =
+    courier.phone || "";
+
+
+    editCourierLatitude =
+    courier.latitude;
+
+
+    editCourierLongitude =
+    courier.longitude;
+
+
+    showPage(
+    "editCourier"
+    );
 
 }
 
-document.getElementById(
-"editName"
-).value =
-result.data.name || "";
 
-document.getElementById(
-"editPhone"
-).value =
-result.data.phone || "";
-
-editCourierLatitude =
-result.data.latitude;
-
-editCourierLongitude =
-result.data.longitude;
-
-document.getElementById(
-"editCourierLocationText"
-).innerText =
-result.data.latitude
-?
-"✓ Serlok sudah tersimpan."
-:
-"Lokasi belum diambil.";
-
-showPage("editCourier");
-
-}
-
+/* =================================================
+SAVE COURIER EDIT
+================================================= */
 
 async function saveCourierEdit(){
 
-const name =
-document.getElementById("editName")
-.value.trim();
+    const name =
+    document
+    .getElementById(
+    "editName"
+    )
+    .value
+    .trim();
 
-const phone =
-phoneNumber(
-document.getElementById("editPhone")
-.value
-);
 
-const result =
-await db
-.from("couriers")
-.update({
-name:name,
-phone:phone,
-latitude:editCourierLatitude,
-longitude:editCourierLongitude
-})
-.eq("id",currentCourierId);
+    const phone =
+    phoneNumber(
 
-if(result.error){
+        document
+        .getElementById(
+        "editPhone"
+        )
+        .value
 
-alert(result.error.message);
-return;
+    );
+
+
+    if(!name || !phone){
+
+        alert(
+        "Nama dan WhatsApp harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    const result =
+
+    await db
+
+    .from("couriers")
+
+    .update({
+
+        name:name,
+
+        phone:phone,
+
+        latitude:editCourierLatitude,
+
+        longitude:editCourierLongitude
+
+    })
+
+    .eq(
+
+        "id",
+
+        currentCourierId
+
+    );
+
+
+    if(result.error){
+
+        alert(
+        result.error.message
+        );
+
+        return;
+
+    }
+
+
+    alert(
+    "Data kurir berhasil diperbarui."
+    );
+
+
+    openDashboard();
 
 }
 
-alert(
-"Data kurir berhasil diperbarui"
-);
 
-openDashboard();
-
-}
-
-
-/* =====================================
+/* =================================================
 LOGOUT
-===================================== */
+================================================= */
 
 function logout(){
 
-localStorage.removeItem(
-"ngurirCourierId"
-);
+    localStorage
+    .removeItem(
+    "ngurirCourierId"
+    );
 
-currentCourierId = null;
 
-showPage("home");
+    currentCourierId = null;
+
+
+    showPage(
+    "home"
+    );
 
 }
 
 
-/* =====================================
+/* =================================================
 SHOP MANAGEMENT
-===================================== */
+================================================= */
 
 async function openShopManagement(){
 
-showPage("shops");
+    showPage(
+    "shops"
+    );
 
-loadShops();
+
+    loadShops();
 
 }
 
+
+/* =================================================
+LOAD SHOPS
+================================================= */
 
 async function loadShops(){
 
-const list =
-document.getElementById("shopList");
-
-list.innerHTML =
-"Memuat kedai...";
-
-const result =
-await db
-.from("shops")
-.select("*")
-.eq(
-"courier_id",
-currentCourierId
-)
-.order(
-"created_at",
-{ascending:false}
-);
-
-if(result.error){
-
-list.innerHTML =
-result.error.message;
-
-return;
-
-}
-
-if(!result.data.length){
-
-list.innerHTML =
-"<p>Belum ada kedai.</p>";
-
-return;
-
-}
-
-list.innerHTML="";
-
-result.data.forEach(shop=>{
-
-const div =
-document.createElement("div");
-
-div.className =
-"shop-item";
-
-div.innerHTML =
-
-"<b>" +
-shop.name +
-"</b>" +
-
-"<span style='float:right'>›</span>";
-
-div.onclick =
-function(){
-
-openShopDetail(shop.id);
-
-};
-
-list.appendChild(div);
-
-});
-
-}
+    const list =
+    document
+    .getElementById(
+    "shopList"
+    );
 
 
-/* =====================================
-ADD SHOP COURIER
-===================================== */
-
-function openAddShop(){
-
-document.getElementById("shopName").value="";
-document.getElementById("shopPhone").value="";
-
-shopLatitude=null;
-shopLongitude=null;
-
-document.getElementById(
-"shopLocationText"
-).innerText =
-"Lokasi belum diambil.";
-
-showPage("addShop");
-
-}
+    list.innerHTML =
+    "Memuat kedai...";
 
 
-async function saveShop(){
+    const result =
 
-const name =
-document.getElementById("shopName")
-.value.trim();
+    await db
 
-const phone =
-phoneNumber(
-document.getElementById("shopPhone")
-.value
-);
+    .from("shops")
 
-if(!name){
+    .select("*")
 
-alert("Nama kedai harus diisi");
-return;
+    .eq(
 
-}
+        "courier_id",
 
-if(
-shopLatitude === null ||
-shopLongitude === null
-){
+        currentCourierId
 
-alert(
-"Silakan ambil serlok kedai terlebih dahulu."
-);
+    )
 
-return;
+    .order(
 
-}
+        "created_at",
 
-const result =
-await db
-.from("shops")
-.insert({
-courier_id:currentCourierId,
-name:name,
-phone:phone,
-latitude:shopLatitude,
-longitude:shopLongitude,
-status:"aktif"
-});
+        {
+            ascending:false
+        }
 
-if(result.error){
+    );
 
-alert(result.error.message);
-return;
 
-}
+    if(result.error){
 
-alert(
-"Kedai berhasil ditambahkan"
-);
+        list.innerHTML =
+        result.error.message;
 
-openShopManagement();
+        return;
+
+    }
+
+
+    if(!result.data.length){
+
+        list.innerHTML =
+        "<p>Belum ada kedai.</p>";
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    result.data.forEach(shop=>{
+
+        const div =
+        document
+        .createElement("div");
+
+
+        div.className =
+        "shop-item";
+
+
+        div.innerHTML =
+
+        "<b>" +
+
+        shop.name +
+
+        "</b>" +
+
+        "<span style='float:right'>›</span>";
+
+
+        div.onclick = function(){
+
+            openShopDetail(
+            shop.id
+            );
+
+        };
+
+
+        list.appendChild(div);
+
+    });
 
 }
 
 
-/* =====================================
-SHOP DETAIL COURIER
-===================================== */
+/* =================================================
+SHOP DETAIL
+================================================= */
 
 async function openShopDetail(shopId){
 
-currentShopId = shopId;
-
-showPage("shopDetail");
-
-const result =
-await db
-.from("shops")
-.select("*")
-.eq("id",shopId)
-.single();
-
-if(!result.error){
-
-document.getElementById(
-"detailShopName"
-).innerText =
-result.data.name;
-
-document.getElementById(
-"detailShopInfo"
-).innerHTML =
-
-"<b>WhatsApp:</b> " +
-(result.data.phone || "-") +
-
-"<br><br><b>Serlok:</b> " +
-(result.data.latitude
-?
-"✓ Lokasi tersedia"
-:
-"-");
-
-}
-
-loadMenus(shopId);
-
-}
+    currentShopId =
+    shopId;
 
 
-/* =====================================
-LOAD MENUS
-===================================== */
+    showPage(
+    "shopDetail"
+    );
 
-async function loadMenus(shopId){
 
-const list =
-document.getElementById("menuList");
+    const result =
 
-list.innerHTML =
-"Memuat menu...";
+    await db
 
-const result =
-await db
-.from("menus")
-.select("*")
-.eq("shop_id",shopId)
-.order("name");
+    .from("shops")
 
-if(result.error){
+    .select("*")
 
-list.innerHTML =
-result.error.message;
+    .eq(
+        "id",
+        shopId
+    )
 
-return;
+    .single();
 
-}
 
-if(!result.data.length){
+    if(!result.error){
 
-list.innerHTML =
-"<p>Belum ada menu.</p>";
+        document
+        .getElementById(
+        "detailShopName"
+        )
+        .innerText =
+        result.data.name;
 
-return;
 
-}
+        document
+        .getElementById(
+        "detailShopInfo"
+        )
+        .innerHTML =
 
-list.innerHTML="";
+        "<b>WhatsApp:</b> " +
 
-result.data.forEach(menu=>{
+        result.data.phone +
 
-const div =
-document.createElement("div");
+        "<br><br>" +
 
-div.className =
-"menu-item";
+        "<b>Serlok:</b> " +
 
-let variants =
-getVariants(menu.variant);
+        "✓ Lokasi tersedia";
 
-div.innerHTML =
+    }
 
-"<b>" +
-menu.name +
-"</b>" +
 
-"<br>" +
-rupiah(menu.price);
-
-if(variants.length){
-
-div.innerHTML +=
-
-"<br><span class='small'>" +
-"Varian: " +
-variants.join(", ") +
-"</span>";
-
-}
-
-list.appendChild(div);
-
-});
+    loadMenus(shopId);
 
 }
 
 
-/* =====================================
-VARIANT HELPERS
-===================================== */
+/* =================================================
+VARIANT FIXED
+================================================= */
 
 function getVariants(value){
 
-if(!value) return [];
+    if(!value){
 
-try{
+        return [];
 
-const data =
-JSON.parse(value);
-
-if(Array.isArray(data)){
-return data;
-}
-
-}catch(e){}
-
-return value
-.split(",")
-.map(v=>v.trim())
-.filter(v=>v);
-
-}
+    }
 
 
-function getVariantValue(containerId){
+    try{
 
-const inputs =
-document
-.getElementById(containerId)
-.querySelectorAll("input");
+        const data =
+        JSON.parse(value);
 
-let variants=[];
 
-inputs.forEach(input=>{
+        if(Array.isArray(data)){
 
-const value =
-input.value.trim();
+            return data;
 
-if(value){
-variants.push(value);
-}
+        }
 
-});
+    }catch(e){}
 
-return variants.length
-?
-JSON.stringify(variants)
-:
-null;
+
+    return String(value)
+
+    .split(",")
+
+    .map(v=>v.trim())
+
+    .filter(v=>v);
 
 }
 
 
-function createVariantInput(
-containerId
-){
+/* =================================================
+LOAD MENU
+================================================= */
 
-const container =
-document.getElementById(
-containerId
-);
+async function loadMenus(shopId){
 
-const row =
-document.createElement("div");
+    const list =
+    document
+    .getElementById(
+    "menuList"
+    );
 
-row.className =
-"variant-row";
 
-const input =
-document.createElement("input");
+    list.innerHTML =
+    "Memuat menu...";
 
-input.placeholder =
-"Contoh: Pedas";
 
-const button =
-document.createElement("button");
+    const result =
 
-button.className =
-"btn-danger";
+    await db
 
-button.innerText =
-"HAPUS";
+    .from("menus")
 
-button.onclick =
-function(){
+    .select("*")
 
-row.remove();
+    .eq(
+        "shop_id",
+        shopId
+    )
 
-};
+    .order("name");
 
-row.appendChild(input);
-row.appendChild(button);
 
-container.appendChild(row);
+    if(result.error){
+
+        list.innerHTML =
+        result.error.message;
+
+        return;
+
+    }
+
+
+    if(!result.data.length){
+
+        list.innerHTML =
+        "<p>Belum ada menu.</p>";
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    result.data.forEach(menu=>{
+
+        const variants =
+        getVariants(
+        menu.variant
+        );
+
+
+        let html =
+
+        "<div class='menu-item'>" +
+
+        "<b>" +
+
+        menu.name +
+
+        "</b>" +
+
+        "<br>" +
+
+        rupiah(menu.price);
+
+
+        if(variants.length){
+
+            html +=
+
+            "<br>" +
+
+            "<span class='small'>" +
+
+            "Varian: " +
+
+            variants.join(", ") +
+
+            "</span>";
+
+        }
+
+
+        html +=
+        "</div>";
+
+
+        list.innerHTML +=
+        html;
+
+    });
+
+}
+
+
+/* =================================================
+ADD MENU COURIER
+================================================= */
+
+function openAddMenu(){
+
+    document
+    .getElementById(
+    "menuName"
+    )
+    .value = "";
+
+
+    document
+    .getElementById(
+    "menuPrice"
+    )
+    .value = "";
+
+
+    document
+    .getElementById(
+    "courierVariantContainer"
+    )
+    .innerHTML = "";
+
+
+    showPage(
+    "addMenu"
+    );
+
+}
+
+
+function createVariantInput(containerId){
+
+    const container =
+    document
+    .getElementById(
+    containerId
+    );
+
+
+    const row =
+    document
+    .createElement("div");
+
+
+    row.className =
+    "variant-row";
+
+
+    const input =
+    document
+    .createElement("input");
+
+
+    input.placeholder =
+    "Contoh: Pedas";
+
+
+    const button =
+    document
+    .createElement("button");
+
+
+    button.className =
+    "btn-danger";
+
+
+    button.innerText =
+    "HAPUS";
+
+
+    button.onclick =
+    function(){
+
+        row.remove();
+
+    };
+
+
+    row.appendChild(input);
+
+    row.appendChild(button);
+
+    container.appendChild(row);
 
 }
 
 
 function addCourierVariantInput(){
 
-createVariantInput(
-"courierVariantContainer"
-);
+    createVariantInput(
+    "courierVariantContainer"
+    );
 
 }
 
 
-function addOwnerVariantInput(){
+function getVariantValue(containerId){
 
-createVariantInput(
-"ownerVariantContainer"
-);
+    const inputs =
+
+    document
+    .getElementById(
+    containerId
+    )
+    .querySelectorAll(
+    "input"
+    );
+
+
+    let variants = [];
+
+
+    inputs.forEach(input=>{
+
+        if(input.value.trim()){
+
+            variants.push(
+            input.value.trim()
+            );
+
+        }
+
+    });
+
+
+    return variants.length
+
+    ?
+
+    JSON.stringify(variants)
+
+    :
+
+    null;
 
 }
 
 
-/* =====================================
-ADD MENU COURIER
-===================================== */
-
-function openAddMenu(){
-
-document.getElementById(
-"menuName"
-).value="";
-
-document.getElementById(
-"menuPrice"
-).value="";
-
-document.getElementById(
-"courierVariantContainer"
-).innerHTML="";
-
-showPage("addMenu");
-
-}
-
+/* =================================================
+SAVE MENU
+================================================= */
 
 async function saveMenu(){
 
-const name =
-document.getElementById(
-"menuName"
-).value.trim();
+    const name =
 
-const price =
-Number(
-document.getElementById(
-"menuPrice"
-).value
-);
+    document
+    .getElementById(
+    "menuName"
+    )
+    .value
+    .trim();
 
-const variant =
-getVariantValue(
-"courierVariantContainer"
-);
 
-if(!name || price<=0){
+    const price =
 
-alert(
-"Nama dan harga harus diisi"
-);
+    Number(
 
-return;
+        document
+        .getElementById(
+        "menuPrice"
+        )
+        .value
+
+    );
+
+
+    const variant =
+    getVariantValue(
+    "courierVariantContainer"
+    );
+
+
+    if(!name || price <= 0){
+
+        alert(
+        "Nama dan harga harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    const result =
+
+    await db
+
+    .from("menus")
+
+    .insert({
+
+        shop_id:
+        currentShopId,
+
+        name:name,
+
+        price:price,
+
+        variant:variant
+
+    });
+
+
+    if(result.error){
+
+        alert(
+        result.error.message
+        );
+
+        return;
+
+    }
+
+
+    alert(
+    "Menu berhasil ditambahkan."
+    );
+
+
+    openShopDetail(
+    currentShopId
+    );
 
 }
 
-const result =
-await db
-.from("menus")
-.insert({
-shop_id:currentShopId,
-name:name,
-price:price,
-variant:variant
-});
 
-if(result.error){
-
-alert(result.error.message);
-return;
-
-}
-
-alert(
-"Menu berhasil ditambahkan"
-);
-
-openShopDetail(currentShopId);
-
-}
-
-
-/* =====================================
-COPY LINKS
-===================================== */
+/* =================================================
+COPY LINK
+================================================= */
 
 function copyCustomerLink(){
 
-const url =
-baseURL() +
-"?page=customer&courier=" +
-currentCourierId;
+    const url =
 
-copyText(url);
+    baseURL() +
+
+    "?page=customer&courier=" +
+
+    currentCourierId;
+
+
+    copyText(url);
 
 }
 
 
 function copyShopLink(){
 
-const url =
-baseURL() +
-"?page=shop-register&courier=" +
-currentCourierId;
+    const url =
 
-copyText(url);
+    baseURL() +
+
+    "?page=shop-register&courier=" +
+
+    currentCourierId;
+
+
+    copyText(url);
 
 }
 
 
 function copyText(text){
 
-navigator.clipboard
-.writeText(text)
-.then(()=>{
+    navigator
+    .clipboard
+    .writeText(text)
 
-alert(
-"Link berhasil disalin"
-);
+    .then(()=>{
 
-})
-.catch(()=>{
+        alert(
+        "Link berhasil disalin."
+        );
 
-prompt(
-"Salin link berikut:",
-text
-);
+    })
 
-});
+    .catch(()=>{
+
+        prompt(
+        "Salin link berikut:",
+        text
+        );
+
+    });
+
+}
+
+
+/* =================================================
+SHOP LOCATION
+================================================= */
+
+function getRegisterShopLocation(){
+
+    document
+    .getElementById(
+    "registerShopLocationText"
+    )
+    .innerText =
+    "Mengambil lokasi...";
+
+
+    getLocation((lat,lng)=>{
+
+        registerShopLatitude =
+        lat;
+
+        registerShopLongitude =
+        lng;
+
+
+        document
+        .getElementById(
+        "registerShopLocationText"
+        )
+        .innerHTML =
+
+        "✓ Serlok kedai berhasil diambil.";
+
+    });
 
 }
 
 
-/* =====================================
-REGISTER SHOP FROM LINK
-===================================== */
+/* =================================================
+SHOP CONTINUE
 
-async function registerShopFromLink(){
+BELUM MASUK DATABASE
+================================================= */
 
-const params =
-new URLSearchParams(
-window.location.search
-);
+function continueShopRegistration(){
 
-const courierId =
-params.get("courier");
+    const params =
 
-if(!courierId){
+    new URLSearchParams(
+    window.location.search
+    );
 
-alert(
-"Link kurir tidak valid"
-);
 
-return;
+    const courierId =
+    params.get(
+    "courier"
+    );
+
+
+    const name =
+
+    document
+    .getElementById(
+    "registerShopName"
+    )
+    .value
+    .trim();
+
+
+    const phone =
+    phoneNumber(
+
+        document
+        .getElementById(
+        "registerShopPhone"
+        )
+        .value
+
+    );
+
+
+    if(!courierId){
+
+        alert(
+        "Link kurir tidak valid."
+        );
+
+        return;
+
+    }
+
+
+    if(!name){
+
+        alert(
+        "Nama kedai harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(!phone){
+
+        alert(
+        "WhatsApp kedai harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(
+
+        registerShopLatitude === null ||
+
+        registerShopLongitude === null
+
+    ){
+
+        alert(
+        "Kedai wajib mengambil serlok."
+        );
+
+        return;
+
+    }
+
+
+    /* DATA MASIH SEMENTARA */
+
+    pendingShopData = {
+
+        courierId:courierId,
+
+        name:name,
+
+        phone:phone,
+
+        latitude:
+        registerShopLatitude,
+
+        longitude:
+        registerShopLongitude
+
+    };
+
+
+    /* BELUM DATABASE */
+
+    draftMenus = [];
+
+
+    addDraftMenu();
+
+
+    showPage(
+    "shopRegistrationMenus"
+    );
 
 }
 
-const name =
-document.getElementById(
-"registerShopName"
-).value.trim();
 
-const phone =
-phoneNumber(
-document.getElementById(
-"registerShopPhone"
-).value
-);
+/* =================================================
+ADD DRAFT MENU
 
-if(!name){
+BISA BANYAK
+================================================= */
 
-alert(
-"Nama kedai harus diisi"
-);
+function addDraftMenu(){
 
-return;
+    const menuId =
+
+    "draft_" +
+
+    Date.now() +
+
+    "_" +
+
+    Math.random()
+    .toString(36)
+    .substring(2,8);
+
+
+    draftMenus.push({
+
+        id:menuId,
+
+        variants:[]
+
+    });
+
+
+    renderDraftMenus();
 
 }
 
-if(!phone){
 
-alert(
-"Nomor WhatsApp harus diisi"
-);
+/* =================================================
+RENDER DRAFT MENU
+================================================= */
 
-return;
+function renderDraftMenus(){
+
+    const container =
+
+    document
+    .getElementById(
+    "draftMenuList"
+    );
+
+
+    container.innerHTML = "";
+
+
+    draftMenus.forEach(
+    (menu,index)=>{
+
+
+        const div =
+        document
+        .createElement("div");
+
+
+        div.className =
+        "draft-menu";
+
+
+        div.innerHTML =
+
+        "<h3>MENU " +
+
+        (index+1) +
+
+        "</h3>" +
+
+
+        "<label>Nama Menu</label>" +
+
+
+        "<input " +
+
+        "id='name_" +
+
+        menu.id +
+
+        "' " +
+
+        "placeholder='Nama menu'>" +
+
+
+        "<label>Harga Menu</label>" +
+
+
+        "<input " +
+
+        "type='number' " +
+
+        "id='price_" +
+
+        menu.id +
+
+        "' " +
+
+        "placeholder='Harga'>" +
+
+
+        "<label>Varian</label>" +
+
+
+        "<div " +
+
+        "id='variants_" +
+
+        menu.id +
+
+        "'></div>" +
+
+
+        "<button " +
+
+        "class='btn-warning' " +
+
+        "onclick=\"addDraftVariant('" +
+
+        menu.id +
+
+        "')\">" +
+
+        "+ TAMBAH VARIAN" +
+
+        "</button>" +
+
+
+        "<p class='small'>" +
+
+        "Varian boleh kosong jika menu tidak memiliki varian." +
+
+        "</p>" +
+
+
+        "<button " +
+
+        "class='btn-danger' " +
+
+        "onclick=\"removeDraftMenu('" +
+
+        menu.id +
+
+        "')\">" +
+
+        "HAPUS MENU" +
+
+        "</button>";
+
+
+        container.appendChild(div);
+
+
+        menu.variants
+        .forEach(
+        (variant,variantIndex)=>{
+
+            createDraftVariantInput(
+
+                menu.id,
+
+                variant,
+
+                variantIndex
+
+            );
+
+        });
+
+    });
 
 }
 
-if(
-registerShopLatitude === null ||
-registerShopLongitude === null
+
+/* =================================================
+ADD DRAFT VARIANT
+================================================= */
+
+function addDraftVariant(menuId){
+
+    const menu =
+
+    draftMenus.find(
+    m=>m.id === menuId
+    );
+
+
+    if(menu){
+
+        menu.variants.push("");
+
+        renderDraftMenus();
+
+    }
+
+}
+
+
+/* =================================================
+CREATE DRAFT VARIANT
+================================================= */
+
+function createDraftVariantInput(
+menuId,
+value,
+index
 ){
 
-alert(
-"Silakan ambil serlok kedai terlebih dahulu."
-);
+    const container =
 
-return;
-
-}
-
-const result =
-await db
-.from("shops")
-.insert({
-courier_id:courierId,
-name:name,
-phone:phone,
-latitude:registerShopLatitude,
-longitude:registerShopLongitude,
-status:"aktif"
-})
-.select()
-.single();
-
-if(result.error){
-
-alert(
-result.error.message
-);
-
-return;
-
-}
+    document
+    .getElementById(
+    "variants_" +
+    menuId
+    );
 
 
-/* SIMPAN KEDAI YANG BARU MENDAFTAR */
-
-currentOwnerShopId =
-result.data.id;
-
-localStorage.setItem(
-"ngurirOwnerShopId",
-currentOwnerShopId
-);
+    const row =
+    document
+    .createElement("div");
 
 
-alert(
-"Data kedai berhasil dikirim ke akun kurir."
-);
+    row.className =
+    "variant-row";
 
 
-/* AMBIL DATA KURIR */
-
-const courierResult =
-await db
-.from("couriers")
-.select("*")
-.eq("id",courierId)
-.single();
+    const input =
+    document
+    .createElement("input");
 
 
-/* BUKA WHATSAPP */
-
-if(
-courierResult.data &&
-courierResult.data.phone
-){
-
-const message =
-
-"Hallo, saya sudah mendaftar kedai di NGURIR SIMPEL.\n\n" +
-
-"Nama Kedai: " +
-name +
-
-"\nWhatsApp: " +
-phone +
-
-"\nSerlok: Sudah diisi.";
-
-window.open(
-
-"https://wa.me/" +
-phoneNumber(
-courierResult.data.phone
-) +
-"?text=" +
-encodeURIComponent(message),
-
-"_blank"
-
-);
-
-}
+    input.value =
+    value;
 
 
-/* LANGSUNG KE HALAMAN MENU KEDAI */
+    input.placeholder =
+    "Contoh: Pedas";
 
-openShopOwnerDashboard();
+
+    input.oninput =
+    function(){
+
+        const menu =
+
+        draftMenus.find(
+        m=>m.id === menuId
+        );
+
+
+        if(menu){
+
+            menu.variants[index] =
+            input.value;
+
+        }
+
+    };
+
+
+    const button =
+    document
+    .createElement("button");
+
+
+    button.className =
+    "btn-danger";
+
+
+    button.innerText =
+    "HAPUS";
+
+
+    button.onclick =
+    function(){
+
+        const menu =
+
+        draftMenus.find(
+        m=>m.id === menuId
+        );
+
+
+        if(menu){
+
+            menu.variants.splice(
+            index,
+            1
+            );
+
+        }
+
+
+        renderDraftMenus();
+
+    };
+
+
+    row.appendChild(input);
+
+    row.appendChild(button);
+
+    container.appendChild(row);
 
 }
 
 
-/* =====================================
-SHOP OWNER DASHBOARD
-===================================== */
+/* =================================================
+REMOVE DRAFT MENU
+================================================= */
 
-async function openShopOwnerDashboard(){
+function removeDraftMenu(menuId){
 
-if(!currentOwnerShopId){
+    draftMenus =
 
-alert(
-"Data kedai tidak ditemukan."
-);
+    draftMenus.filter(
+    menu=>menu.id !== menuId
+    );
 
-showPage("home");
 
-return;
-
-}
-
-const result =
-await db
-.from("shops")
-.select("*")
-.eq(
-"id",
-currentOwnerShopId
-)
-.single();
-
-if(result.error){
-
-alert(
-"Data kedai tidak ditemukan."
-);
-
-return;
-
-}
-
-document.getElementById(
-"shopOwnerTitle"
-).innerText =
-result.data.name;
-
-document.getElementById(
-"shopOwnerInfo"
-).innerHTML =
-
-"<b>WhatsApp:</b><br>" +
-(result.data.phone || "-") +
-
-"<br><br>" +
-
-"<b>Serlok:</b><br>" +
-(result.data.latitude
-?
-"✓ Sudah tersimpan"
-:
-"-");
-
-showPage(
-"shopOwnerDashboard"
-);
+    renderDraftMenus();
 
 }
 
 
-/* =====================================
-SHOP OWNER MENU LIST
-===================================== */
+/* =================================================
+SEND COMPLETE SHOP
 
-async function openShopOwnerMenus(){
+BARU MASUK DATABASE
+================================================= */
 
-showPage("shopOwnerMenus");
+async function sendCompleteShopRegistration(){
 
-const list =
-document.getElementById(
-"shopOwnerMenuList"
-);
+    if(!pendingShopData){
 
-list.innerHTML =
-"Memuat menu...";
+        alert(
+        "Data kedai tidak ditemukan."
+        );
 
-const result =
-await db
-.from("menus")
-.select("*")
-.eq(
-"shop_id",
-currentOwnerShopId
-)
-.order("created_at");
+        return;
 
-if(result.error){
+    }
 
-list.innerHTML =
-result.error.message;
 
-return;
+    if(!draftMenus.length){
+
+        alert(
+        "Tambahkan minimal satu menu."
+        );
+
+        return;
+
+    }
+
+
+    let finalMenus = [];
+
+
+    for(const menu of draftMenus){
+
+        const name =
+
+        document
+        .getElementById(
+        "name_" +
+        menu.id
+        )
+        .value
+        .trim();
+
+
+        const price =
+
+        Number(
+
+            document
+            .getElementById(
+            "price_" +
+            menu.id
+            )
+            .value
+
+        );
+
+
+        const variants =
+
+        menu.variants
+
+        .map(
+        v=>v.trim()
+        )
+
+        .filter(v=>v);
+
+
+        if(!name){
+
+            alert(
+            "Semua nama menu harus diisi."
+            );
+
+            return;
+
+        }
+
+
+        if(price <= 0){
+
+            alert(
+            "Semua harga menu harus diisi."
+            );
+
+            return;
+
+        }
+
+
+        finalMenus.push({
+
+            name:name,
+
+            price:price,
+
+            variant:
+
+            variants.length
+
+            ?
+
+            JSON.stringify(variants)
+
+            :
+
+            null
+
+        });
+
+    }
+
+
+    /* SIMPAN KEDAI */
+
+    const shopResult =
+
+    await db
+
+    .from("shops")
+
+    .insert({
+
+        courier_id:
+        pendingShopData.courierId,
+
+        name:
+        pendingShopData.name,
+
+        phone:
+        pendingShopData.phone,
+
+        latitude:
+        pendingShopData.latitude,
+
+        longitude:
+        pendingShopData.longitude,
+
+        status:"aktif"
+
+    })
+
+    .select()
+
+    .single();
+
+
+    if(shopResult.error){
+
+        alert(
+        shopResult.error.message
+        );
+
+        return;
+
+    }
+
+
+    /* SIMPAN SEMUA MENU */
+
+    const menusToInsert =
+
+    finalMenus.map(menu=>({
+
+        shop_id:
+        shopResult.data.id,
+
+        name:
+        menu.name,
+
+        price:
+        menu.price,
+
+        variant:
+        menu.variant
+
+    }));
+
+
+    const menuResult =
+
+    await db
+
+    .from("menus")
+
+    .insert(
+    menusToInsert
+    );
+
+
+    if(menuResult.error){
+
+        alert(
+        "Kedai tersimpan tetapi menu gagal: " +
+        menuResult.error.message
+        );
+
+        return;
+
+    }
+
+
+    /* INFORMASI KE KURIR */
+
+    const courierResult =
+
+    await db
+
+    .from("couriers")
+
+    .select("*")
+
+    .eq(
+        "id",
+        pendingShopData.courierId
+    )
+
+    .single();
+
+
+    alert(
+    "Semua informasi kedai berhasil dikirim."
+    );
+
+
+    if(
+
+        courierResult.data &&
+
+        courierResult.data.phone
+
+    ){
+
+        let message =
+
+        "🏪 PENDAFTARAN KEDAI BARU\n\n" +
+
+        "Nama Kedai: " +
+
+        pendingShopData.name +
+
+        "\n\nWhatsApp: " +
+
+        pendingShopData.phone +
+
+        "\n\n📍 Serlok Kedai:\n" +
+
+        "https://www.google.com/maps?q=" +
+
+        pendingShopData.latitude +
+
+        "," +
+
+        pendingShopData.longitude +
+
+        "\n\nMENU:\n";
+
+
+        finalMenus.forEach(menu=>{
+
+            message +=
+
+            "\n- " +
+
+            menu.name +
+
+            "\nHarga: " +
+
+            rupiah(menu.price);
+
+
+            const variants =
+            getVariants(
+            menu.variant
+            );
+
+
+            if(variants.length){
+
+                message +=
+
+                "\nVarian: " +
+
+                variants.join(", ");
+
+            }
+
+
+            message += "\n";
+
+        });
+
+
+        window.open(
+
+            "https://wa.me/" +
+
+            phoneNumber(
+            courierResult.data.phone
+            )
+
+            +
+
+            "?text=" +
+
+            encodeURIComponent(
+            message
+            ),
+
+            "_blank"
+
+        );
+
+    }
+
+
+    pendingShopData = null;
+
+    draftMenus = [];
+
+
+    showPage(
+    "home"
+    );
 
 }
 
-if(!result.data.length){
 
-list.innerHTML =
-"<p>Belum ada menu. Silakan tambahkan menu.</p>";
+/* =================================================
+OPEN CUSTOMER
 
-return;
-
-}
-
-list.innerHTML="";
-
-result.data.forEach(menu=>{
-
-const div =
-document.createElement("div");
-
-div.className =
-"menu-owner-item";
-
-const variants =
-getVariants(menu.variant);
-
-let html =
-
-"<b>" +
-menu.name +
-"</b>" +
-
-"<br>" +
-rupiah(menu.price);
-
-if(variants.length){
-
-html +=
-
-"<br><span class='small'>" +
-"Varian: " +
-variants.join(", ") +
-"</span>";
-
-}else{
-
-html +=
-
-"<br><span class='small'>" +
-"Tanpa varian" +
-"</span>";
-
-}
-
-div.innerHTML = html;
-
-list.appendChild(div);
-
-});
-
-}
-
-
-/* =====================================
-ADD SHOP OWNER MENU
-===================================== */
-
-function openAddShopOwnerMenu(){
-
-document.getElementById(
-"ownerMenuName"
-).value="";
-
-document.getElementById(
-"ownerMenuPrice"
-).value="";
-
-document.getElementById(
-"ownerVariantContainer"
-).innerHTML="";
-
-showPage(
-"addShopOwnerMenu"
-);
-
-}
-
-
-async function saveShopOwnerMenu(){
-
-const name =
-document.getElementById(
-"ownerMenuName"
-).value.trim();
-
-const price =
-Number(
-document.getElementById(
-"ownerMenuPrice"
-).value
-);
-
-const variant =
-getVariantValue(
-"ownerVariantContainer"
-);
-
-if(!name){
-
-alert(
-"Nama menu harus diisi."
-);
-
-return;
-
-}
-
-if(price<=0){
-
-alert(
-"Harga menu harus diisi."
-);
-
-return;
-
-}
-
-const result =
-await db
-.from("menus")
-.insert({
-shop_id:currentOwnerShopId,
-name:name,
-price:price,
-variant:variant
-});
-
-if(result.error){
-
-alert(
-"Terjadi kesalahan: " +
-result.error.message
-);
-
-return;
-
-}
-
-alert(
-"Menu berhasil ditambahkan."
-);
-
-openShopOwnerMenus();
-
-}
-
-
-/* =====================================
-CUSTOMER
-===================================== */
+RESET SERLOK SETIAP PESANAN BARU
+================================================= */
 
 function openCustomer(){
 
-cartData={};
+    cartData = {};
 
-showPage("customer");
+
+    customerLatitude = null;
+
+    customerLongitude = null;
+
+
+    document
+    .getElementById(
+    "customerLocationText"
+    )
+    .innerText =
+
+    "Silakan ambil serlok untuk pesanan ini.";
+
+
+    showPage(
+    "customer"
+    );
 
 }
 
 
-/* =====================================
+/* =================================================
 CUSTOMER SHOPS
-===================================== */
+================================================= */
 
 async function openCustomerShops(){
 
-showPage("customerShops");
+    if(
 
-const params =
-new URLSearchParams(
-window.location.search
-);
+        customerLatitude === null ||
 
-const courierId =
-params.get("courier");
+        customerLongitude === null
 
-const list =
-document.getElementById(
-"customerShopList"
-);
+    ){
 
-list.innerHTML =
-"Memuat kedai...";
+        alert(
+        "Pelanggan wajib mengambil serlok untuk pesanan ini."
+        );
 
-let query =
-db
-.from("shops")
-.select("*")
-.eq("status","aktif");
+        showPage(
+        "customer"
+        );
 
-if(courierId){
+        return;
 
-query =
-query.eq(
-"courier_id",
-courierId
-);
+    }
+
+
+    showPage(
+    "customerShops"
+    );
+
+
+    const params =
+
+    new URLSearchParams(
+    window.location.search
+    );
+
+
+    const courierId =
+    params.get(
+    "courier"
+    );
+
+
+    const list =
+
+    document
+    .getElementById(
+    "customerShopList"
+    );
+
+
+    list.innerHTML =
+    "Memuat kedai...";
+
+
+    let query =
+
+    db
+
+    .from("shops")
+
+    .select("*")
+
+    .eq(
+        "status",
+        "aktif"
+    );
+
+
+    if(courierId){
+
+        query =
+
+        query.eq(
+            "courier_id",
+            courierId
+        );
+
+    }
+
+
+    const result =
+
+    await query.order(
+    "name"
+    );
+
+
+    if(result.error){
+
+        list.innerHTML =
+        result.error.message;
+
+        return;
+
+    }
+
+
+    customerShopsData =
+    result.data;
+
+
+    renderCustomerShops(
+    result.data
+    );
 
 }
 
-const result =
-await query.order("name");
 
-if(result.error){
-
-list.innerHTML =
-result.error.message;
-
-return;
-
-}
-
-customerShopsData =
-result.data;
-
-renderCustomerShops(
-result.data
-);
-
-}
-
+/* =================================================
+RENDER CUSTOMER SHOPS
+================================================= */
 
 function renderCustomerShops(data){
 
-const list =
-document.getElementById(
-"customerShopList"
-);
+    const list =
 
-if(!data.length){
+    document
+    .getElementById(
+    "customerShopList"
+    );
 
-list.innerHTML =
-"<p>Belum ada kedai.</p>";
 
-return;
+    if(!data.length){
+
+        list.innerHTML =
+        "<p>Belum ada kedai.</p>";
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    data.forEach(shop=>{
+
+        const div =
+        document
+        .createElement("div");
+
+
+        div.className =
+        "shop-item";
+
+
+        div.innerHTML =
+
+        "<b>" +
+
+        shop.name +
+
+        "</b>" +
+
+        "<br>" +
+
+        "<span class='small'>" +
+
+        "Lihat Menu" +
+
+        "</span>" +
+
+        "<span style='float:right'>›</span>";
+
+
+        div.onclick =
+        function(){
+
+            openCustomerMenu(
+
+                shop.id,
+
+                shop.name
+
+            );
+
+        };
+
+
+        list.appendChild(div);
+
+    });
 
 }
 
-list.innerHTML="";
 
-data.forEach(shop=>{
-
-const div =
-document.createElement("div");
-
-div.className =
-"shop-item";
-
-div.innerHTML =
-
-"<b>" +
-shop.name +
-"</b>" +
-
-"<br><span class='small'>" +
-"Lihat Menu" +
-"</span>" +
-
-"<span style='float:right'>›</span>";
-
-div.onclick =
-function(){
-
-openCustomerMenu(
-shop.id,
-shop.name
-);
-
-};
-
-list.appendChild(div);
-
-});
-
-}
-
-
-/* =====================================
-SEARCH SHOP
-===================================== */
+/* =================================================
+SEARCH SHOPS
+================================================= */
 
 function searchShops(){
 
-const keyword =
-document.getElementById(
-"searchShop"
-).value
-.toLowerCase();
+    const keyword =
 
-const data =
-customerShopsData.filter(shop=>
+    document
+    .getElementById(
+    "searchShop"
+    )
+    .value
+    .toLowerCase();
 
-shop.name
-.toLowerCase()
-.includes(keyword)
 
-);
+    const data =
 
-renderCustomerShops(data);
+    customerShopsData.filter(shop=>
+
+        shop.name
+        .toLowerCase()
+        .includes(keyword)
+
+    );
+
+
+    renderCustomerShops(data);
 
 }
 
 
-/* =====================================
+/* =================================================
 CUSTOMER MENU
-===================================== */
+================================================= */
 
 async function openCustomerMenu(
 shopId,
 shopName
 ){
 
-currentShopId=shopId;
+    currentShopId =
+    shopId;
 
-showPage("customerMenu");
 
-document.getElementById(
-"customerMenuTitle"
-).innerText =
-shopName;
+    showPage(
+    "customerMenu"
+    );
 
-const list =
-document.getElementById(
-"customerMenuList"
-);
 
-list.innerHTML =
-"Memuat menu...";
+    document
+    .getElementById(
+    "customerMenuTitle"
+    )
+    .innerText =
+    shopName;
 
-const result =
-await db
-.from("menus")
-.select("*")
-.eq("shop_id",shopId)
-.order("name");
 
-if(result.error){
+    const list =
 
-list.innerHTML =
-result.error.message;
+    document
+    .getElementById(
+    "customerMenuList"
+    );
 
-return;
+
+    list.innerHTML =
+    "Memuat menu...";
+
+
+    const result =
+
+    await db
+
+    .from("menus")
+
+    .select("*")
+
+    .eq(
+        "shop_id",
+        shopId
+    )
+
+    .order("name");
+
+
+    if(result.error){
+
+        list.innerHTML =
+        result.error.message;
+
+        return;
+
+    }
+
+
+    if(!cartData[shopId]){
+
+        cartData[shopId] = {
+
+            shopName:
+            shopName,
+
+            items:{}
+
+        };
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    result.data.forEach(menu=>{
+
+        const div =
+        document
+        .createElement("div");
+
+
+        div.className =
+        "menu-item";
+
+
+        div.innerHTML =
+
+        "<b>" +
+
+        menu.name +
+
+        "</b>" +
+
+        "<br>" +
+
+        rupiah(menu.price);
+
+
+        const variants =
+        getVariants(
+        menu.variant
+        );
+
+
+        let variantSelect =
+        null;
+
+
+        if(variants.length){
+
+            variantSelect =
+
+            document
+            .createElement("select");
+
+
+            variants.forEach(v=>{
+
+                const option =
+
+                document
+                .createElement("option");
+
+
+                option.value =
+                v;
+
+
+                option.text =
+                v;
+
+
+                variantSelect
+                .appendChild(option);
+
+            });
+
+
+            div.appendChild(
+            variantSelect
+            );
+
+        }
+
+
+        const quantity =
+
+        document
+        .createElement("div");
+
+
+        quantity.className =
+        "quantity";
+
+
+        const minus =
+
+        document
+        .createElement("button");
+
+
+        minus.className =
+        "btn-danger";
+
+
+        minus.innerText =
+        "-";
+
+
+        const number =
+
+        document
+        .createElement("span");
+
+
+        number.className =
+        "qty";
+
+
+        number.id =
+
+        "qty-" +
+
+        menu.id;
+
+
+        number.innerText =
+
+        getMenuTotalQty(
+
+            shopId,
+
+            menu.id
+
+        );
+
+
+        const plus =
+
+        document
+        .createElement("button");
+
+
+        plus.className =
+        "btn-success";
+
+
+        plus.innerText =
+        "+";
+
+
+        minus.onclick =
+        function(){
+
+            changeQuantity(
+
+                shopId,
+
+                menu,
+
+                -1,
+
+                variantSelect
+
+            );
+
+        };
+
+
+        plus.onclick =
+        function(){
+
+            changeQuantity(
+
+                shopId,
+
+                menu,
+
+                1,
+
+                variantSelect
+
+            );
+
+        };
+
+
+        quantity.appendChild(minus);
+
+        quantity.appendChild(number);
+
+        quantity.appendChild(plus);
+
+
+        div.appendChild(quantity);
+
+
+        list.appendChild(div);
+
+    });
 
 }
 
-if(!cartData[shopId]){
 
-cartData[shopId] = {
-shopName:shopName,
-items:{}
-};
-
-}
-
-list.innerHTML="";
-
-result.data.forEach(menu=>{
-
-const div =
-document.createElement("div");
-
-div.className =
-"menu-item";
-
-div.innerHTML =
-
-"<b>" +
-menu.name +
-"</b>" +
-
-"<br>" +
-rupiah(menu.price);
-
-
-const variants =
-getVariants(menu.variant);
-
-let variantSelect = null;
-
-if(variants.length){
-
-variantSelect =
-document.createElement("select");
-
-variants.forEach(v=>{
-
-const option =
-document.createElement("option");
-
-option.value=v;
-option.text=v;
-
-variantSelect.appendChild(option);
-
-});
-
-div.appendChild(
-variantSelect
-);
-
-}
-
-
-const quantity =
-document.createElement("div");
-
-quantity.className =
-"quantity";
-
-const minus =
-document.createElement("button");
-
-minus.className =
-"btn-danger";
-
-minus.innerText="-";
-
-
-const number =
-document.createElement("span");
-
-number.className="qty";
-
-number.id =
-"qty-" + menu.id;
-
-number.innerText =
-getMenuTotalQty(
-shopId,
-menu.id
-);
-
-
-const plus =
-document.createElement("button");
-
-plus.className =
-"btn-success";
-
-plus.innerText="+";
-
-
-minus.onclick =
-function(){
-
-changeQuantity(
-shopId,
-menu,
--1,
-variantSelect
-);
-
-};
-
-
-plus.onclick =
-function(){
-
-changeQuantity(
-shopId,
-menu,
-1,
-variantSelect
-);
-
-};
-
-
-quantity.appendChild(minus);
-quantity.appendChild(number);
-quantity.appendChild(plus);
-
-div.appendChild(quantity);
-
-list.appendChild(div);
-
-});
-
-}
-
-
-/* =====================================
-GET QTY
-===================================== */
+/* =================================================
+GET TOTAL QTY
+================================================= */
 
 function getMenuTotalQty(
 shopId,
 menuId
 ){
 
-if(!cartData[shopId]) return 0;
+    if(!cartData[shopId]){
 
-let total=0;
+        return 0;
 
-Object.values(
-cartData[shopId].items
-)
-.forEach(item=>{
+    }
 
-if(item.menuId===menuId){
 
-total += item.quantity;
+    let total = 0;
+
+
+    Object
+    .values(
+    cartData[shopId].items
+    )
+
+    .forEach(item=>{
+
+        if(item.menuId === menuId){
+
+            total +=
+            item.quantity;
+
+        }
+
+    });
+
+
+    return total;
 
 }
 
-});
 
-return total;
-
-}
-
-
-/* =====================================
-CHANGE QTY
-===================================== */
+/* =================================================
+CHANGE QUANTITY
+================================================= */
 
 function changeQuantity(
 shopId,
@@ -2605,1488 +3699,1816 @@ change,
 variantSelect
 ){
 
-const variant =
-variantSelect
-?
-variantSelect.value
-:
-null;
+    const variant =
 
-const key =
-menu.id +
-"_" +
-(variant || "normal");
+    variantSelect
 
-if(!cartData[shopId].items[key]){
+    ?
 
-cartData[shopId].items[key] = {
+    variantSelect.value
 
-menuId:menu.id,
-name:menu.name,
-price:Number(menu.price),
-variant:variant,
-quantity:0
+    :
 
-};
+    null;
+
+
+    const key =
+
+    menu.id +
+
+    "_" +
+
+    (variant || "normal");
+
+
+    if(
+
+        !cartData[shopId]
+        .items[key]
+
+    ){
+
+        cartData[shopId]
+        .items[key] = {
+
+            menuId:
+            menu.id,
+
+            name:
+            menu.name,
+
+            price:
+            Number(menu.price),
+
+            variant:
+            variant,
+
+            quantity:0
+
+        };
+
+    }
+
+
+    const item =
+
+    cartData[shopId]
+    .items[key];
+
+
+    item.quantity +=
+    change;
+
+
+    if(item.quantity <= 0){
+
+        delete
+        cartData[shopId]
+        .items[key];
+
+    }
+
+
+    const qty =
+
+    getMenuTotalQty(
+
+        shopId,
+
+        menu.id
+
+    );
+
+
+    const element =
+
+    document
+    .getElementById(
+
+        "qty-" +
+
+        menu.id
+
+    );
+
+
+    if(element){
+
+        element.innerText =
+        qty;
+
+    }
 
 }
 
-const item =
-cartData[shopId].items[key];
 
-item.quantity += change;
-
-if(item.quantity<=0){
-
-delete cartData[shopId].items[key];
-
-}
-
-const qty =
-getMenuTotalQty(
-shopId,
-menu.id
-);
-
-const element =
-document.getElementById(
-"qty-" + menu.id
-);
-
-if(element){
-
-element.innerText=qty;
-
-}
-
-}
-
-
-/* =====================================
-CART
-===================================== */
+/* =================================================
+OPEN CART
+================================================= */
 
 function openCart(){
 
-showPage("cart");
+    showPage(
+    "cart"
+    );
 
-renderCart();
+
+    renderCart();
 
 }
 
+
+/* =================================================
+RENDER CART
+================================================= */
 
 function renderCart(){
 
-const list =
-document.getElementById("cartList");
+    const list =
 
-let html="";
-let total=0;
+    document
+    .getElementById(
+    "cartList"
+    );
 
-Object.keys(cartData)
-.forEach(shopId=>{
 
-const shop =
-cartData[shopId];
+    let html = "";
 
-const items =
-Object.values(shop.items);
+    let total = 0;
 
-if(!items.length) return;
 
-html +=
+    Object
+    .keys(cartData)
 
-"<div class='card'>" +
+    .forEach(shopId=>{
 
-"<h3>" +
-shop.shopName +
-"</h3>";
+        const shop =
+        cartData[shopId];
 
-items.forEach(item=>{
 
-const subtotal =
-item.price *
-item.quantity;
+        const items =
 
-total += subtotal;
+        Object
+        .values(
+        shop.items
+        );
 
-html +=
 
-"<div class='menu-item'>" +
+        if(!items.length){
 
-"<b>" +
-item.name +
-"</b>" +
+            return;
 
-(item.variant
-?
-"<br>" + item.variant
-:
-""
-) +
+        }
 
-"<br>" +
 
-item.quantity +
-" x " +
-rupiah(item.price) +
+        html +=
 
-"<br><b>" +
-rupiah(subtotal) +
-"</b>" +
+        "<div class='card'>" +
 
-"</div>";
+        "<h3>" +
 
-});
+        shop.shopName +
 
-html += "</div>";
+        "</h3>";
 
-});
 
-if(!html){
+        items.forEach(item=>{
 
-html =
-"<p>Belum ada pesanan.</p>";
+            const subtotal =
+
+            item.price *
+
+            item.quantity;
+
+
+            total +=
+            subtotal;
+
+
+            html +=
+
+            "<div class='menu-item'>" +
+
+            "<b>" +
+
+            item.name +
+
+            "</b>" +
+
+
+            (
+
+                item.variant
+
+                ?
+
+                "<br>Varian: " +
+
+                item.variant
+
+                :
+
+                ""
+
+            ) +
+
+
+            "<br>" +
+
+            item.quantity +
+
+            " x " +
+
+            rupiah(item.price) +
+
+
+            "<br><b>" +
+
+            rupiah(subtotal) +
+
+            "</b>" +
+
+
+            "</div>";
+
+        });
+
+
+        html +=
+        "</div>";
+
+    });
+
+
+    if(!html){
+
+        html =
+        "<p>Belum ada pesanan.</p>";
+
+    }
+
+
+    list.innerHTML =
+    html;
+
+
+    document
+    .getElementById(
+    "cartTotal"
+    )
+    .innerHTML =
+
+    "<div class='card'>" +
+
+    "<h3>TOTAL SEMENTARA</h3>" +
+
+    "<h2>" +
+
+    rupiah(total) +
+
+    "</h2>" +
+
+    "<p class='small'>" +
+
+    "Total dapat berubah setelah kedai mengecek stok." +
+
+    "</p>" +
+
+    "</div>";
 
 }
 
-list.innerHTML=html;
 
-document.getElementById(
-"cartTotal"
-).innerHTML =
-
-"<div class='card'>" +
-
-"<h3>TOTAL SEMENTARA</h3>" +
-
-"<h2>" +
-rupiah(total) +
-"</h2>" +
-
-"<p class='small'>" +
-"Total akhir diperbarui setelah kedai mengecek stok." +
-"</p>" +
-
-"</div>";
-
-}
-
-
-/* =====================================
+/* =================================================
 SEND ORDER
-===================================== */
+================================================= */
 
 async function sendOrder(){
 
-const button =
-document.getElementById(
-"sendOrderButton"
-);
+    const name =
 
-if(button.disabled) return;
-
-button.disabled=true;
-
-button.innerText =
-"MENGIRIM...";
+    document
+    .getElementById(
+    "customerName"
+    )
+    .value
+    .trim();
 
 
-try{
+    const phone =
+    phoneNumber(
 
-const name =
-document.getElementById(
-"customerName"
-).value.trim();
+        document
+        .getElementById(
+        "customerPhone"
+        )
+        .value
 
-const phone =
-phoneNumber(
-document.getElementById(
-"customerPhone"
-).value
-);
-
-const address =
-document.getElementById(
-"customerAddress"
-).value.trim();
+    );
 
 
-let allItems=[];
+    const address =
 
-Object.keys(cartData)
-.forEach(shopId=>{
+    document
+    .getElementById(
+    "customerAddress"
+    )
+    .value
+    .trim();
 
-Object.values(
-cartData[shopId].items
-)
-.forEach(item=>{
 
-if(item.quantity>0){
+    if(!name){
 
-allItems.push({
-shopId:shopId,
-...item
-});
+        alert(
+        "Nama harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(!phone){
+
+        alert(
+        "WhatsApp harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(!address){
+
+        alert(
+        "Alamat harus diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(
+
+        customerLatitude === null ||
+
+        customerLongitude === null
+
+    ){
+
+        alert(
+        "Pelanggan wajib mengambil serlok."
+        );
+
+        return;
+
+    }
+
+
+    let allItems = [];
+
+
+    Object
+    .keys(cartData)
+
+    .forEach(shopId=>{
+
+        Object
+        .values(
+        cartData[shopId].items
+        )
+
+        .forEach(item=>{
+
+            if(item.quantity > 0){
+
+                allItems.push({
+
+                    shopId:
+                    shopId,
+
+                    ...item
+
+                });
+
+            }
+
+        });
+
+    });
+
+
+    if(!allItems.length){
+
+        alert(
+        "Silakan pilih menu terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+
+    const button =
+
+    document
+    .getElementById(
+    "sendOrderButton"
+    );
+
+
+    button.disabled =
+    true;
+
+
+    button.innerText =
+    "MENGIRIM...";
+
+
+    try{
+
+
+        /* CUSTOMER */
+
+        const customerResult =
+
+        await db
+
+        .from("customers")
+
+        .insert({
+
+            name:name,
+
+            phone:phone,
+
+            address:address,
+
+            latitude:
+            customerLatitude,
+
+            longitude:
+            customerLongitude
+
+        })
+
+        .select()
+
+        .single();
+
+
+        if(customerResult.error){
+
+            throw customerResult.error;
+
+        }
+
+
+        /* COURIER */
+
+        const params =
+
+        new URLSearchParams(
+        window.location.search
+        );
+
+
+        let courierId =
+
+        params.get(
+        "courier"
+        );
+
+
+        if(!courierId){
+
+            const shopResult =
+
+            await db
+
+            .from("shops")
+
+            .select("courier_id")
+
+            .eq(
+                "id",
+                allItems[0].shopId
+            )
+
+            .single();
+
+
+            if(shopResult.error){
+
+                throw shopResult.error;
+
+            }
+
+
+            courierId =
+            shopResult.data.courier_id;
+
+        }
+
+
+        /* TOTAL */
+
+        let total = 0;
+
+
+        allItems.forEach(item=>{
+
+            total +=
+
+            item.price *
+
+            item.quantity;
+
+        });
+
+
+        const orderCode =
+
+        "NG-" +
+
+        Date.now()
+        .toString()
+        .slice(-8);
+
+
+        /* CREATE ORDER */
+
+        const orderResult =
+
+        await db
+
+        .from("orders")
+
+        .insert({
+
+            order_code:
+            orderCode,
+
+            courier_id:
+            courierId,
+
+            customer_id:
+            customerResult.data.id,
+
+            customer_name:
+            name,
+
+            customer_phone:
+            phone,
+
+            customer_address:
+            address,
+
+            customer_latitude:
+            customerLatitude,
+
+            customer_longitude:
+            customerLongitude,
+
+            total:
+            total,
+
+            final_total:
+            total,
+
+            status:
+            "menunggu_cek_stok"
+
+        })
+
+        .select()
+
+        .single();
+
+
+        if(orderResult.error){
+
+            throw orderResult.error;
+
+        }
+
+
+        currentOrderId =
+        orderResult.data.id;
+
+
+        const shopIds =
+
+        [
+
+            ...new Set(
+
+                allItems.map(
+                item=>item.shopId
+                )
+
+            )
+
+        ];
+
+
+        /* =================================================
+        CREATE ORDER PER SHOP
+        ================================================= */
+
+        for(const shopId of shopIds){
+
+
+            const stockToken =
+            generateToken();
+
+
+            const shopOrderResult =
+
+            await db
+
+            .from("shop_orders")
+
+            .insert({
+
+                order_id:
+                currentOrderId,
+
+                shop_id:
+                shopId,
+
+                stock_token:
+                stockToken,
+
+                status:
+                "menunggu_cek_stok"
+
+            })
+
+            .select()
+
+            .single();
+
+
+            if(shopOrderResult.error){
+
+                throw shopOrderResult.error;
+
+            }
+
+
+            const shopItems =
+
+            allItems
+
+            .filter(item=>
+
+                item.shopId ===
+                shopId
+
+            )
+
+            .map(item=>({
+
+                order_id:
+                currentOrderId,
+
+                shop_order_id:
+                shopOrderResult.data.id,
+
+                shop_id:
+                shopId,
+
+                menu_id:
+                item.menuId,
+
+                menu_name:
+                item.name,
+
+                variant:
+                item.variant,
+
+                price:
+                item.price,
+
+                quantity:
+                item.quantity,
+
+                item_status:
+                "menunggu"
+
+            }));
+
+
+            const itemResult =
+
+            await db
+
+            .from("order_items")
+
+            .insert(
+            shopItems
+            );
+
+
+            if(itemResult.error){
+
+                throw itemResult.error;
+
+            }
+
+
+            /* SHOP PHONE */
+
+            const shopResult =
+
+            await db
+
+            .from("shops")
+
+            .select("*")
+
+            .eq(
+                "id",
+                shopId
+            )
+
+            .single();
+
+
+            if(shopResult.error){
+
+                continue;
+
+            }
+
+
+            const stockLink =
+
+            baseURL() +
+
+            "?page=stock&token=" +
+
+            stockToken;
+
+
+            const text =
+
+            "🚚 PESANAN BARU NGURIR SIMPEL\n\n" +
+
+            "Silakan cek stok pesanan kedai Anda melalui link berikut:\n\n" +
+
+            stockLink;
+
+
+            if(shopResult.data.phone){
+
+                window.open(
+
+                    "https://wa.me/" +
+
+                    phoneNumber(
+                    shopResult.data.phone
+                    )
+
+                    +
+
+                    "?text=" +
+
+                    encodeURIComponent(text),
+
+                    "_blank"
+
+                );
+
+            }
+
+        }
+
+
+        localStorage
+        .setItem(
+
+            "ngurirLastOrder",
+
+            currentOrderId
+
+        );
+
+
+        alert(
+        "Pesanan berhasil dikirim ke kedai."
+        );
+
+
+        showOrderStatus();
+
+
+    }catch(error){
+
+        alert(
+
+            "Terjadi kesalahan: " +
+
+            error.message
+
+        );
+
+    }finally{
+
+
+        button.disabled =
+        false;
+
+
+        button.innerText =
+        "KIRIM PESANAN";
+
+    }
 
 }
 
-});
 
-});
-
-
-if(!allItems.length){
-
-alert(
-"Silakan pilih menu terlebih dahulu."
-);
-
-return;
-
-}
-
-
-/* CUSTOMER */
-
-const customerResult =
-await db
-.from("customers")
-.insert({
-name:name,
-phone:phone,
-address:address
-})
-.select()
-.single();
-
-if(customerResult.error)
-throw customerResult.error;
-
-
-/* COURIER */
-
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-let courierId =
-params.get("courier");
-
-
-if(!courierId){
-
-const shopResult =
-await db
-.from("shops")
-.select("courier_id")
-.eq(
-"id",
-allItems[0].shopId
-)
-.single();
-
-if(shopResult.error)
-throw shopResult.error;
-
-courierId =
-shopResult.data.courier_id;
-
-}
-
-
-/* TOTAL */
-
-let total=0;
-
-allItems.forEach(item=>{
-
-total +=
-item.price *
-item.quantity;
-
-});
-
-
-const orderCode =
-"NG-" +
-Date.now()
-.toString()
-.slice(-8);
-
-
-/* CREATE ORDER */
-
-const orderResult =
-await db
-.from("orders")
-.insert({
-order_code:orderCode,
-courier_id:courierId,
-customer_id:customerResult.data.id,
-customer_name:name,
-customer_phone:phone,
-customer_address:address,
-total:total,
-final_total:total,
-status:"menunggu_cek_stok"
-})
-.select()
-.single();
-
-if(orderResult.error)
-throw orderResult.error;
-
-
-currentOrderId =
-orderResult.data.id;
-
-
-/* SAVE ORDER */
-
-localStorage.setItem(
-"ngurirLastOrder",
-currentOrderId
-);
-
-
-/* UNIQUE SHOPS */
-
-const shopIds =
-[
-...new Set(
-allItems.map(
-item=>item.shopId
-)
-)
-];
-
-
-/* EACH SHOP */
-
-for(const shopId of shopIds){
-
-const shopOrderResult =
-await db
-.from("shop_orders")
-.insert({
-order_id:currentOrderId,
-shop_id:shopId,
-status:"menunggu_cek_stok"
-})
-.select()
-.single();
-
-if(shopOrderResult.error)
-throw shopOrderResult.error;
-
-
-const shopItems =
-allItems
-.filter(item=>
-item.shopId===shopId
-)
-.map(item=>({
-
-order_id:currentOrderId,
-shop_order_id:
-shopOrderResult.data.id,
-shop_id:shopId,
-menu_id:item.menuId,
-menu_name:item.name,
-variant:item.variant,
-price:item.price,
-quantity:item.quantity,
-item_status:"menunggu"
-
-}));
-
-
-const itemResult =
-await db
-.from("order_items")
-.insert(shopItems);
-
-if(itemResult.error)
-throw itemResult.error;
-
-
-/* SHOP */
-
-const shopResult =
-await db
-.from("shops")
-.select("*")
-.eq("id",shopId)
-.single();
-
-if(shopResult.error) continue;
-
-
-/* STOCK LINK */
-
-const stockLink =
-baseURL() +
-"?page=stock&token=" +
-shopOrderResult.data.stock_token;
-
-
-/* WHATSAPP SHOP */
-
-if(shopResult.data.phone){
-
-const text =
-encodeURIComponent(
-
-"🚚 PESANAN BARU NGURIR SIMPEL\n\n" +
-
-"Silakan cek stok pesanan kedai Anda melalui link berikut:\n\n" +
-
-stockLink
-
-);
-
-window.open(
-
-"https://wa.me/" +
-phoneNumber(
-shopResult.data.phone
-) +
-"?text=" +
-text,
-
-"_blank"
-
-);
-
-}
-
-}
-
-
-/* STATUS LINK */
-
-const statusLink =
-baseURL() +
-"?page=status&token=" +
-orderResult.data.status_token;
-
-
-localStorage.setItem(
-"ngurirStatusLink",
-statusLink
-);
-
-
-alert(
-
-"Pesanan berhasil dikirim.\n\n" +
-
-"Simpan link status pesanan Anda."
-
-);
-
-
-showOrderStatus();
-
-}
-catch(error){
-
-alert(
-"Terjadi kesalahan: " +
-error.message
-);
-
-}
-finally{
-
-button.disabled=false;
-
-button.innerText =
-"KIRIM PESANAN";
-
-}
-
-}
-
-
-/* =====================================
-ORDER STATUS
-===================================== */
+/* =================================================
+SHOW ORDER STATUS
+================================================= */
 
 async function showOrderStatus(){
 
-showPage("orderStatus");
+    showPage(
+    "orderStatus"
+    );
 
-const content =
-document.getElementById(
-"statusContent"
-);
 
-const result =
-await db
-.from("orders")
-.select("*")
-.eq("id",currentOrderId)
-.single();
+    const content =
 
-if(result.error){
+    document
+    .getElementById(
+    "statusContent"
+    );
 
-content.innerHTML =
-result.error.message;
 
-return;
+    const result =
+
+    await db
+
+    .from("orders")
+
+    .select("*")
+
+    .eq(
+        "id",
+        currentOrderId
+    )
+
+    .single();
+
+
+    if(result.error){
+
+        content.innerHTML =
+        result.error.message;
+
+        return;
+
+    }
+
+
+    const order =
+    result.data;
+
+
+    const statusText =
+
+    String(
+    order.status || ""
+    )
+
+    .replaceAll("_"," ")
+
+    .toUpperCase();
+
+
+    content.innerHTML =
+
+    "<b>Kode Pesanan:</b><br>" +
+
+    order.order_code +
+
+    "<br><br>" +
+
+
+    "<b>Nama:</b><br>" +
+
+    order.customer_name +
+
+    "<br><br>" +
+
+
+    "<b>Alamat:</b><br>" +
+
+    order.customer_address +
+
+    "<br><br>" +
+
+
+    "<b>Serlok:</b><br>" +
+
+    "<a target='_blank' href='https://www.google.com/maps?q=" +
+
+    order.customer_latitude +
+
+    "," +
+
+    order.customer_longitude +
+
+    "'>" +
+
+    "📍 BUKA LOKASI" +
+
+    "</a>" +
+
+    "<br><br>" +
+
+
+    "<b>Total Awal:</b><br>" +
+
+    rupiah(order.total) +
+
+    "<br><br>" +
+
+
+    "<b>Total Setelah Cek Stok:</b><br>" +
+
+    rupiah(order.final_total) +
+
+    "<br><br>" +
+
+
+    "<div class='status status-proses'>" +
+
+    "STATUS: " +
+
+    statusText +
+
+    "</div>";
 
 }
 
-const order =
-result.data;
 
-const statusText =
-(order.status || "")
-.replaceAll("_"," ")
-.toUpperCase();
-
-
-content.innerHTML =
-
-"<b>Kode Pesanan:</b><br>" +
-order.order_code +
-
-"<br><br>" +
-
-"<b>Nama:</b><br>" +
-(order.customer_name || "-") +
-
-"<br><br>" +
-
-"<b>Alamat:</b><br>" +
-(order.customer_address || "-") +
-
-"<br><br>" +
-
-"<b>Total Awal:</b><br>" +
-rupiah(order.total) +
-
-"<br><br>" +
-
-"<b>Total Setelah Cek Stok:</b><br>" +
-rupiah(order.final_total) +
-
-"<div class='status status-proses'>" +
-
-"STATUS: " +
-statusText +
-
-"</div>";
-
-
-const cancelButton =
-document.getElementById(
-"cancelButton"
-);
-
-if(
-order.status==="dibatalkan" ||
-order.status==="selesai"
-){
-
-cancelButton.style.display="none";
-
-}else{
-
-cancelButton.style.display="block";
-
-}
-
-}
-
-
-/* =====================================
+/* =================================================
 CANCEL ORDER
-===================================== */
+================================================= */
 
 async function cancelOrder(){
 
-if(!currentOrderId){
+    if(!currentOrderId){
 
-alert(
-"Pesanan tidak ditemukan"
-);
+        alert(
+        "Pesanan tidak ditemukan."
+        );
 
-return;
+        return;
 
-}
-
-const yes =
-confirm(
-"Apakah Anda yakin ingin membatalkan pesanan?"
-);
-
-if(!yes) return;
+    }
 
 
-const orderResult =
-await db
-.from("orders")
-.update({
-status:"dibatalkan"
-})
-.eq("id",currentOrderId);
-
-if(orderResult.error){
-
-alert(orderResult.error.message);
-return;
-
-}
+    const yes =
+    confirm(
+    "Apakah Anda yakin ingin membatalkan pesanan?"
+    );
 
 
-await db
-.from("shop_orders")
-.update({
-status:"dibatalkan"
-})
-.eq(
-"order_id",
-currentOrderId
-);
+    if(!yes){
+
+        return;
+
+    }
 
 
-alert(
-"Pesanan berhasil dibatalkan"
-);
+    const result =
 
-showOrderStatus();
+    await db
 
-}
+    .from("orders")
+
+    .update({
+
+        status:
+        "dibatalkan"
+
+    })
+
+    .eq(
+        "id",
+        currentOrderId
+    );
 
 
-/* =====================================
-OPEN STATUS TOKEN
-===================================== */
+    if(result.error){
 
-async function openStatusPage(token){
+        alert(
+        result.error.message
+        );
 
-const result =
-await db
-.from("orders")
-.select("*")
-.eq("status_token",token)
-.single();
+        return;
 
-if(result.error){
+    }
 
-showPage("orderStatus");
 
-document.getElementById(
-"statusContent"
-).innerHTML =
-"Status pesanan tidak ditemukan.";
+    await db
 
-return;
+    .from("shop_orders")
 
-}
+    .update({
 
-currentOrderId =
-result.data.id;
+        status:
+        "dibatalkan"
 
-showOrderStatus();
+    })
+
+    .eq(
+        "order_id",
+        currentOrderId
+    );
+
+
+    alert(
+    "Pesanan berhasil dibatalkan."
+    );
+
+
+    showOrderStatus();
 
 }
 
 
-/* =====================================
-OPEN STOCK
-===================================== */
+/* =================================================
+OPEN STOCK PAGE
+================================================= */
 
 async function openStockPage(token){
 
-showPage("stockCheck");
+    showPage(
+    "stockCheck"
+    );
 
-const shopOrderResult =
-await db
-.from("shop_orders")
-.select("*")
-.eq("stock_token",token)
-.single();
 
-if(shopOrderResult.error){
+    const shopOrderResult =
 
-document.getElementById(
-"stockInfo"
-).innerHTML =
-"Link pesanan tidak valid.";
+    await db
 
-return;
+    .from("shop_orders")
+
+    .select("*")
+
+    .eq(
+        "stock_token",
+        token
+    )
+
+    .single();
+
+
+    if(shopOrderResult.error){
+
+        document
+        .getElementById(
+        "stockInfo"
+        )
+        .innerHTML =
+
+        "Link pesanan tidak valid.";
+
+        return;
+
+    }
+
+
+    currentShopOrderId =
+    shopOrderResult.data.id;
+
+
+    const orderResult =
+
+    await db
+
+    .from("orders")
+
+    .select("*")
+
+    .eq(
+        "id",
+        shopOrderResult.data.order_id
+    )
+
+    .single();
+
+
+    if(orderResult.error){
+
+        alert(
+        "Pesanan tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    if(
+
+        orderResult.data.status ===
+        "dibatalkan"
+
+    ){
+
+        document
+        .getElementById(
+        "stockInfo"
+        )
+        .innerHTML =
+
+        "<div class='status status-batal'>" +
+
+        "PESANAN SUDAH DIBATALKAN" +
+
+        "</div>";
+
+
+        return;
+
+    }
+
+
+    document
+    .getElementById(
+    "stockInfo"
+    )
+    .innerHTML =
+
+    "<div class='card'>" +
+
+    "<b>Nama Pelanggan:</b><br>" +
+
+    orderResult.data.customer_name +
+
+    "<br><br>" +
+
+    "<b>Silakan cek stok menu di bawah.</b>" +
+
+    "</div>";
+
+
+    const itemsResult =
+
+    await db
+
+    .from("order_items")
+
+    .select("*")
+
+    .eq(
+        "shop_order_id",
+        currentShopOrderId
+    );
+
+
+    const list =
+
+    document
+    .getElementById(
+    "stockList"
+    );
+
+
+    list.innerHTML = "";
+
+
+    itemsResult.data.forEach(item=>{
+
+
+        const div =
+        document
+        .createElement("div");
+
+
+        div.className =
+        "card";
+
+
+        div.innerHTML =
+
+        "<b>" +
+
+        item.menu_name +
+
+        "</b>" +
+
+        "<br>Jumlah: " +
+
+        item.quantity +
+
+        (
+
+            item.variant
+
+            ?
+
+            "<br>Varian: " +
+
+            item.variant
+
+            :
+
+            ""
+
+        ) +
+
+        "<br><br>" +
+
+        "<b>Status:</b> " +
+
+        String(
+        item.item_status
+        )
+
+        .toUpperCase();
+
+
+        const row =
+        document
+        .createElement("div");
+
+
+        row.className =
+        "row";
+
+
+        const ada =
+        document
+        .createElement("button");
+
+
+        ada.className =
+        "btn-success";
+
+
+        ada.innerText =
+        "ADA";
+
+
+        ada.onclick =
+        function(){
+
+            updateItemStatus(
+
+                item.id,
+
+                "ada"
+
+            );
+
+        };
+
+
+        const kosong =
+        document
+        .createElement("button");
+
+
+        kosong.className =
+        "btn-danger";
+
+
+        kosong.innerText =
+        "KOSONG";
+
+
+        kosong.onclick =
+        function(){
+
+            updateItemStatus(
+
+                item.id,
+
+                "kosong"
+
+            );
+
+        };
+
+
+        row.appendChild(ada);
+
+        row.appendChild(kosong);
+
+
+        div.appendChild(row);
+
+
+        list.appendChild(div);
+
+    });
 
 }
 
-const shopOrder =
-shopOrderResult.data;
 
-currentShopOrderId =
-shopOrder.id;
-
-
-/* ORDER */
-
-const orderResult =
-await db
-.from("orders")
-.select("*")
-.eq("id",shopOrder.order_id)
-.single();
-
-if(orderResult.error){
-
-document.getElementById(
-"stockInfo"
-).innerHTML =
-"Pesanan tidak ditemukan.";
-
-return;
-
-}
-
-
-if(
-orderResult.data.status==="dibatalkan"
-){
-
-document.getElementById(
-"stockInfo"
-).innerHTML =
-
-"<div class='status status-batal'>" +
-"PESANAN SUDAH DIBATALKAN" +
-"</div>";
-
-document.getElementById(
-"stockList"
-).innerHTML="";
-
-document.getElementById(
-"processShopButton"
-).style.display="none";
-
-return;
-
-}
-
-
-document.getElementById(
-"stockInfo"
-).innerHTML =
-
-"<div class='card'>" +
-
-"<b>Nama Pelanggan:</b><br>" +
-(orderResult.data.customer_name || "-") +
-
-"<br><br>" +
-
-"<b>Alamat:</b><br>" +
-(orderResult.data.customer_address || "-") +
-
-"</div>";
-
-
-const itemsResult =
-await db
-.from("order_items")
-.select("*")
-.eq(
-"shop_order_id",
-currentShopOrderId
-);
-
-
-const list =
-document.getElementById(
-"stockList"
-);
-
-
-if(
-!itemsResult.data ||
-!itemsResult.data.length
-){
-
-list.innerHTML =
-"Pesanan kosong.";
-
-return;
-
-}
-
-
-list.innerHTML="";
-
-
-itemsResult.data.forEach(item=>{
-
-const div =
-document.createElement("div");
-
-div.className="card";
-
-div.innerHTML =
-
-"<b>" +
-item.menu_name +
-"</b>" +
-
-"<br>Jumlah: " +
-item.quantity +
-
-(item.variant
-?
-"<br>Varian: " +
-item.variant
-:
-""
-) +
-
-"<br><br><b>Status:</b> " +
-
-(item.item_status || "")
-.toUpperCase();
-
-
-if(
-shopOrder.status!=="diproses"
-){
-
-const row =
-document.createElement("div");
-
-row.className="row";
-
-
-const ada =
-document.createElement("button");
-
-ada.className =
-"btn-success";
-
-ada.innerText="ADA";
-
-ada.onclick =
-function(){
-
-updateItemStatus(
-item.id,
-"ada"
-);
-
-};
-
-
-const kosong =
-document.createElement("button");
-
-kosong.className =
-"btn-danger";
-
-kosong.innerText="KOSONG";
-
-kosong.onclick =
-function(){
-
-updateItemStatus(
-item.id,
-"kosong"
-);
-
-};
-
-
-row.appendChild(ada);
-row.appendChild(kosong);
-
-div.appendChild(row);
-
-}
-
-list.appendChild(div);
-
-});
-
-
-const processButton =
-document.getElementById(
-"processShopButton"
-);
-
-if(
-shopOrder.status==="diproses"
-){
-
-processButton.style.display="none";
-
-}else{
-
-processButton.style.display="block";
-
-}
-
-}
-
-
-/* =====================================
+/* =================================================
 UPDATE ITEM STATUS
-===================================== */
+================================================= */
 
 async function updateItemStatus(
 itemId,
 status
 ){
 
-const result =
-await db
-.from("order_items")
-.update({
-item_status:status
-})
-.eq("id",itemId);
+    const result =
 
-if(result.error){
+    await db
 
-alert(result.error.message);
-return;
+    .from("order_items")
 
-}
+    .update({
 
-await updateOrderFinalTotal();
+        item_status:
+        status
 
+    })
 
-const shopOrder =
-await db
-.from("shop_orders")
-.select("stock_token")
-.eq(
-"id",
-currentShopOrderId
-)
-.single();
-
-if(shopOrder.data){
-
-openStockPage(
-shopOrder.data.stock_token
-);
-
-}
-
-}
+    .eq(
+        "id",
+        itemId
+    );
 
 
-/* =====================================
-UPDATE TOTAL
-===================================== */
+    if(result.error){
 
-async function updateOrderFinalTotal(){
+        alert(
+        result.error.message
+        );
 
-const shopOrderResult =
-await db
-.from("shop_orders")
-.select("*")
-.eq(
-"id",
-currentShopOrderId
-)
-.single();
+        return;
 
-if(shopOrderResult.error) return;
+    }
 
 
-const orderId =
-shopOrderResult.data.order_id;
+    const shopOrder =
+
+    await db
+
+    .from("shop_orders")
+
+    .select("stock_token")
+
+    .eq(
+        "id",
+        currentShopOrderId
+    )
+
+    .single();
 
 
-const itemsResult =
-await db
-.from("order_items")
-.select("*")
-.eq(
-"order_id",
-orderId
-);
+    if(shopOrder.data){
 
-if(itemsResult.error) return;
+        openStockPage(
+        shopOrder.data.stock_token
+        );
 
-
-let finalTotal=0;
-
-itemsResult.data.forEach(item=>{
-
-if(item.item_status==="ada"){
-
-finalTotal +=
-Number(item.price) *
-Number(item.quantity);
-
-}
-
-});
-
-
-await db
-.from("orders")
-.update({
-final_total:finalTotal
-})
-.eq("id",orderId);
+    }
 
 }
 
 
-/* =====================================
+/* =================================================
 PROCESS SHOP ORDER
-===================================== */
+
+KURIR TIDAK MENERIMA DETAIL MENU
+================================================= */
 
 async function processShopOrder(){
 
-const button =
-document.getElementById(
-"processShopButton"
-);
+    const shopOrderResult =
 
-button.disabled=true;
+    await db
 
-button.innerText=
-"MEMPROSES...";
+    .from("shop_orders")
 
+    .select("*")
 
-try{
+    .eq(
+        "id",
+        currentShopOrderId
+    )
 
-const shopOrderResult =
-await db
-.from("shop_orders")
-.select("*")
-.eq(
-"id",
-currentShopOrderId
-)
-.single();
-
-if(shopOrderResult.error)
-throw shopOrderResult.error;
+    .single();
 
 
-const shopOrder =
-shopOrderResult.data;
+    if(shopOrderResult.error){
+
+        alert(
+        shopOrderResult.error.message
+        );
+
+        return;
+
+    }
 
 
-if(
-shopOrder.status==="dibatalkan"
-){
+    const shopOrder =
+    shopOrderResult.data;
 
-alert(
-"Pesanan sudah dibatalkan."
-);
 
-return;
+    const itemsResult =
+
+    await db
+
+    .from("order_items")
+
+    .select("*")
+
+    .eq(
+        "shop_order_id",
+        currentShopOrderId
+    );
+
+
+    if(itemsResult.error){
+
+        alert(
+        itemsResult.error.message
+        );
+
+        return;
+
+    }
+
+
+    const items =
+    itemsResult.data;
+
+
+    const waiting =
+
+    items.filter(item=>
+
+        item.item_status ===
+        "menunggu"
+
+    );
+
+
+    if(waiting.length){
+
+        alert(
+        "Silakan pilih ADA atau KOSONG untuk semua menu."
+        );
+
+        return;
+
+    }
+
+
+    /* UPDATE SHOP ORDER */
+
+    await db
+
+    .from("shop_orders")
+
+    .update({
+
+        status:
+        "hasil_stok_dikirim",
+
+        processed_at:
+        new Date().toISOString()
+
+    })
+
+    .eq(
+        "id",
+        currentShopOrderId
+    );
+
+
+    /* GET ORDER */
+
+    const orderResult =
+
+    await db
+
+    .from("orders")
+
+    .select("*")
+
+    .eq(
+        "id",
+        shopOrder.order_id
+    )
+
+    .single();
+
+
+    /* GET SHOP */
+
+    const shopResult =
+
+    await db
+
+    .from("shops")
+
+    .select("*")
+
+    .eq(
+        "id",
+        shopOrder.shop_id
+    )
+
+    .single();
+
+
+    /* RECALCULATE TOTAL */
+
+    const allItemsResult =
+
+    await db
+
+    .from("order_items")
+
+    .select("*")
+
+    .eq(
+        "order_id",
+        shopOrder.order_id
+    );
+
+
+    let finalTotal = 0;
+
+
+    allItemsResult.data
+    .forEach(item=>{
+
+        if(
+
+            item.item_status ===
+            "ada"
+
+        ){
+
+            finalTotal +=
+
+            Number(item.price) *
+
+            Number(item.quantity);
+
+        }
+
+    });
+
+
+    await db
+
+    .from("orders")
+
+    .update({
+
+        final_total:
+        finalTotal
+
+    })
+
+    .eq(
+        "id",
+        shopOrder.order_id
+    );
+
+
+    /* =================================================
+    INFORMASI KE KURIR
+
+    TIDAK ADA:
+    - MENU
+    - VARIAN
+    - JUMLAH
+    - HARGA
+    ================================================= */
+
+
+    const message =
+
+    "🚚 INFORMASI PESANAN NGURIR SIMPEL\n\n" +
+
+    "Nama Pelanggan:\n" +
+
+    orderResult.data.customer_name +
+
+    "\n\nAlamat:\n" +
+
+    orderResult.data.customer_address +
+
+    "\n\n📍 Serlok Pelanggan:\n" +
+
+    "https://www.google.com/maps?q=" +
+
+    orderResult.data.customer_latitude +
+
+    "," +
+
+    orderResult.data.customer_longitude +
+
+    "\n\nKedai yang sudah mengirim hasil cek stok:\n" +
+
+    (
+
+        shopResult.data
+
+        ?
+
+        shopResult.data.name
+
+        :
+
+        "-"
+
+    );
+
+
+    const courierResult =
+
+    await db
+
+    .from("couriers")
+
+    .select("*")
+
+    .eq(
+        "id",
+        orderResult.data.courier_id
+    )
+
+    .single();
+
+
+    if(
+
+        courierResult.data &&
+
+        courierResult.data.phone
+
+    ){
+
+        window.open(
+
+            "https://wa.me/" +
+
+            phoneNumber(
+            courierResult.data.phone
+            )
+
+            +
+
+            "?text=" +
+
+            encodeURIComponent(
+            message
+            ),
+
+            "_blank"
+
+        );
+
+    }
+
+
+    alert(
+
+    "Hasil cek stok berhasil dikirim."
+
+    );
+
+
+    openStockPage(
+    shopOrder.stock_token
+    );
 
 }
 
 
-if(
-shopOrder.status==="diproses"
-){
-
-alert(
-"Pesanan ini sudah diproses."
-);
-
-return;
-
-}
-
-
-/* ORDER */
-
-const orderResult =
-await db
-.from("orders")
-.select("*")
-.eq(
-"id",
-shopOrder.order_id
-)
-.single();
-
-
-if(
-orderResult.data.status==="dibatalkan"
-){
-
-alert(
-"Pesanan sudah dibatalkan pelanggan."
-);
-
-return;
-
-}
-
-
-/* ITEMS */
-
-const itemsResult =
-await db
-.from("order_items")
-.select("*")
-.eq(
-"shop_order_id",
-currentShopOrderId
-);
-
-if(itemsResult.error)
-throw itemsResult.error;
-
-
-const items =
-itemsResult.data;
-
-
-const waiting =
-items.filter(item=>
-item.item_status==="menunggu"
-);
-
-
-if(waiting.length){
-
-alert(
-
-"Silakan tandai semua barang dengan ADA atau KOSONG terlebih dahulu."
-
-);
-
-return;
-
-}
-
-
-const available =
-items.filter(item=>
-item.item_status==="ada"
-);
-
-
-/* UPDATE SHOP ORDER */
-
-await db
-.from("shop_orders")
-.update({
-status:"diproses",
-processed_at:new Date().toISOString()
-})
-.eq(
-"id",
-currentShopOrderId
-);
-
-
-/* UPDATE TOTAL */
-
-await updateOrderFinalTotal();
-
-
-/* CHECK ALL SHOP */
-
-const allShopOrders =
-await db
-.from("shop_orders")
-.select("*")
-.eq(
-"order_id",
-shopOrder.order_id
-);
-
-
-const allProcessed =
-allShopOrders.data.every(data=>
-
-data.status==="diproses" ||
-data.status==="dibatalkan"
-
-);
-
-
-if(allProcessed){
-
-await db
-.from("orders")
-.update({
-status:"diproses"
-})
-.eq(
-"id",
-shopOrder.order_id
-);
-
-}
-
-
-/* GET LATEST ORDER */
-
-const latestOrder =
-await db
-.from("orders")
-.select("*")
-.eq(
-"id",
-shopOrder.order_id
-)
-.single();
-
-
-/* MESSAGE */
-
-let message =
-
-"🚚 INFORMASI PESANAN NGURIR SIMPEL\n\n";
-
-
-message +=
-
-"Nama Pelanggan: " +
-(orderResult.data.customer_name || "-") +
-"\n\n";
-
-
-message +=
-"MENU YANG TERSEDIA:\n";
-
-
-if(!available.length){
-
-message +=
-"\nTidak ada menu yang tersedia.";
-
-}else{
-
-available.forEach(item=>{
-
-message +=
-
-"\n- " +
-item.menu_name +
-" x " +
-item.quantity;
-
-if(item.variant){
-
-message +=
-" (" +
-item.variant +
-")";
-
-}
-
-});
-
-}
-
-
-message +=
-
-"\n\nAlamat:\n" +
-(orderResult.data.customer_address || "-");
-
-
-message +=
-
-"\n\nTotal pesanan terbaru: " +
-rupiah(
-latestOrder.data.final_total
-);
-
-
-/* GET COURIER */
-
-const courierResult =
-await db
-.from("couriers")
-.select("*")
-.eq(
-"id",
-orderResult.data.courier_id
-)
-.single();
-
-
-if(
-courierResult.data &&
-courierResult.data.phone
-){
-
-window.open(
-
-"https://wa.me/" +
-phoneNumber(
-courierResult.data.phone
-) +
-"?text=" +
-encodeURIComponent(message),
-
-"_blank"
-
-);
-
-}
-
-
-alert(
-"Pesanan kedai berhasil diproses."
-);
-
-
-/* REFRESH */
-
-const refreshResult =
-await db
-.from("shop_orders")
-.select("stock_token")
-.eq(
-"id",
-currentShopOrderId
-)
-.single();
-
-if(refreshResult.data){
-
-openStockPage(
-refreshResult.data.stock_token
-);
-
-}
-
-}
-catch(error){
-
-alert(
-"Terjadi kesalahan: " +
-error.message
-);
-
-}
-finally{
-
-button.disabled=false;
-
-button.innerText=
-"PROSES PESANAN SAYA";
-
-}
-
-}
-
-
-/* =====================================
+/* =================================================
 CHECK URL
-===================================== */
+================================================= */
 
 function checkURL(){
 
-const params =
-new URLSearchParams(
-window.location.search
-);
+    const params =
 
-const page =
-params.get("page");
+    new URLSearchParams(
+    window.location.search
+    );
 
 
-/* CUSTOMER */
+    const page =
+    params.get(
+    "page"
+    );
 
-if(page==="customer"){
 
-openCustomer();
+    /* CUSTOMER */
 
-return;
+    if(page === "customer"){
+
+        openCustomer();
+
+        return;
+
+    }
+
+
+    /* SHOP REGISTER */
+
+    if(page === "shop-register"){
+
+
+        document
+        .getElementById(
+        "registerShopName"
+        )
+        .value = "";
+
+
+        document
+        .getElementById(
+        "registerShopPhone"
+        )
+        .value = "";
+
+
+        registerShopLatitude =
+        null;
+
+
+        registerShopLongitude =
+        null;
+
+
+        document
+        .getElementById(
+        "registerShopLocationText"
+        )
+        .innerText =
+
+        "Lokasi belum diambil.";
+
+
+        showPage(
+        "shopRegister"
+        );
+
+        return;
+
+    }
+
+
+    /* STOCK */
+
+    if(page === "stock"){
+
+        const token =
+        params.get(
+        "token"
+        );
+
+
+        if(token){
+
+            openStockPage(
+            token
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    showPage(
+    "home"
+    );
 
 }
 
 
-/* SHOP REGISTER */
-
-if(page==="shop-register"){
-
-document.getElementById(
-"registerShopName"
-).value="";
-
-document.getElementById(
-"registerShopPhone"
-).value="";
-
-registerShopLatitude=null;
-registerShopLongitude=null;
-
-document.getElementById(
-"registerShopLocationText"
-).innerText =
-"Lokasi belum diambil.";
-
-showPage("shopRegister");
-
-return;
-
-}
-
-
-/* STOCK */
-
-if(page==="stock"){
-
-const token =
-params.get("token");
-
-if(token){
-
-openStockPage(token);
-
-}
-
-return;
-
-}
-
-
-/* STATUS */
-
-if(page==="status"){
-
-const token =
-params.get("token");
-
-if(token){
-
-openStatusPage(token);
-
-}
-
-return;
-
-}
-
-
-/* HOME */
-
-showPage("home");
-
-}
-
-
-/* =====================================
+/* =================================================
 START
-===================================== */
+================================================= */
 
 checkURL();
+
 
 </script>
 
