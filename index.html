@@ -9,12 +9,14 @@
 
 <style>
 *{box-sizing:border-box}
+
 body{
  margin:0;
  font-family:Arial,sans-serif;
  background:#f4f6f8;
  color:#222
 }
+
 header{
  background:#1565c0;
  color:#fff;
@@ -26,13 +28,20 @@ header{
  top:0;
  z-index:100
 }
+
 .container{
  max-width:700px;
  margin:auto;
  padding:15px
 }
-.page{display:none}
-.page.active{display:block}
+
+.page{
+ display:none
+}
+
+.page.active{
+ display:block
+}
 
 .card{
  background:#fff;
@@ -915,6 +924,10 @@ let currentOrderId=null;
 
 let currentShopOrderId=null;
 
+let currentStockToken=null;
+
+let currentStockShopId=null;
+
 let courierLatitude=null;
 
 let courierLongitude=null;
@@ -988,9 +1001,11 @@ function phoneNumber(phone){
  .replace(/\D/g,"");
 
  if(phone.startsWith("0")){
+
   phone=
   "62"+
   phone.substring(1);
+
  }
 
  return phone;
@@ -2184,10 +2199,6 @@ function renderDraftMenus(){
 
 /* =========================================
 KIRIM INFORMASI KEDAI
-KOREKSI 1:
-SETELAH SEMUA INFORMASI KEDAI,
-MENU DAN VARIAN BERHASIL DISIMPAN
-UNTUK KURIR, KEMBALI KE WHATSAPP
 ========================================= */
 
 async function sendCompleteShopRegistration(){
@@ -2265,9 +2276,6 @@ async function sendCompleteShopRegistration(){
  }
 
 
- /* SIMPAN INFORMASI KEDAI
- TERHUBUNG KE KURIR PEMBUAT LINK */
-
  const shop=
  await db
  .from("shops")
@@ -2298,8 +2306,6 @@ async function sendCompleteShopRegistration(){
  if(shop.error)
  return alert(shop.error.message);
 
-
- /* SIMPAN SEMUA MENU DAN VARIAN */
 
  const menus=
  await db
@@ -2334,9 +2340,6 @@ async function sendCompleteShopRegistration(){
  }
 
 
- /* SEMUA INFORMASI SUDAH MASUK
- KE DATA KURIR YANG MEMBUAT LINK */
-
  pendingShopData=null;
 
  draftMenus=[];
@@ -2347,9 +2350,6 @@ async function sendCompleteShopRegistration(){
  "berhasil dikirim."
  );
 
-
- /* LANGSUNG KEMBALI
- KE TAMPILAN AWAL WHATSAPP */
 
  window.location.href=
  "https://wa.me/";
@@ -2628,8 +2628,6 @@ shopName
  );
 
 
- /* MENU MEMILIKI VARIAN */
-
  if(variants.length){
 
  const vc=
@@ -2835,8 +2833,6 @@ shopName
 
  }
 
-
- /* MENU TANPA VARIAN */
 
  else{
 
@@ -3184,10 +3180,8 @@ function renderCart(){
 
 
 /* =========================================
-SEND ORDER
-KOREKSI 2:
-SETIAP KEDAI MENERIMA LINK KHUSUS
-DAN HANYA MELIHAT PESANANNYA SENDIRI
+KIRIM PESANAN
+LINK KHUSUS UNTUK KEDAI
 ========================================= */
 
 async function sendOrder(){
@@ -3412,15 +3406,9 @@ async function sendOrder(){
  ){
 
 
- /* TOKEN KHUSUS UNTUK
- PESANAN KEDAI INI */
-
  const token=
  generateToken();
 
-
- /* BUAT PESANAN KHUSUS
- UNTUK SATU KEDAI */
 
  const so=
 
@@ -3448,9 +3436,6 @@ async function sendOrder(){
  if(so.error)
  throw so.error;
 
-
- /* SIMPAN HANYA MENU
- MILIK KEDAI INI */
 
  const items=
 
@@ -3515,11 +3500,25 @@ async function sendOrder(){
  .single();
 
 
+ if(shop.error){
+
+ throw shop.error;
+
+ }
+
+
  if(shop.data?.phone){
 
 
- /* LINK KHUSUS CEK STOK
- UNTUK KEDAI TERSEBUT */
+ /* =====================================
+ LINK CEK STOK DIPERBAIKI
+
+ TOKEN = PESANAN KHUSUS
+ SHOP = KEDAI KHUSUS
+
+ KEDAI A TIDAK DAPAT MELIHAT
+ PESANAN KEDAI B
+ ===================================== */
 
  const link=
 
@@ -3527,24 +3526,39 @@ async function sendOrder(){
 
  "?page=stock&token="+
 
- encodeURIComponent(token);
+ encodeURIComponent(token)+
+
+ "&shop="+
+
+ encodeURIComponent(shopId);
 
 
  const text=
 
  "🚚 PESANAN BARU NGURIR SIMPEL\n\n"+
 
- "Silakan buka link berikut "+
- "untuk melihat daftar pesanan "+
- "pelanggan khusus untuk kedai Anda.\n\n"+
+ "Ada pesanan baru untuk Kedai "+
 
- "Di setiap menu tersedia "+
- "pilihan ADA atau KOSONG.\n\n"+
+ shop.data.name+
+
+ ".\n\n"+
+
+ "Silakan buka LINK CEK STOK "+
+ "berikut.\n\n"+
+
+ "Di dalam halaman akan tampil "+
+ "pesanan pelanggan khusus untuk "+
+ "kedai Anda.\n\n"+
+
+ "Pilih status ADA atau KOSONG "+
+ "untuk setiap menu.\n\n"+
+
+ "👇 BUKA CEK STOK:\n"+
 
  link;
 
 
- window.open(
+ const whatsappLink=
 
  "https://wa.me/"+
 
@@ -3554,10 +3568,14 @@ async function sendOrder(){
 
  "?text="+
 
- encodeURIComponent(text),
+ encodeURIComponent(text);
 
+
+ /* Membuka WhatsApp */
+
+ window.open(
+ whatsappLink,
  "_blank"
-
  );
 
  }
@@ -3778,12 +3796,18 @@ async function cancelOrder(){
 
 
 /* =========================================
-STOCK PAGE
-KEDAI HANYA MELIHAT PESANAN
-MILIK KEDAI TERSEBUT
+HALAMAN CEK STOK KEDAI
+
+LINK:
+?page=stock&token=XXXX&shop=XXXX
+
+KEDAI HANYA MELIHAT PESANANNYA SENDIRI
 ========================================= */
 
-async function openStockPage(token){
+async function openStockPage(
+token,
+shopId
+){
 
  showPage(
  "stockCheck"
@@ -3804,15 +3828,40 @@ async function openStockPage(token){
  );
 
 
+ const processButton=
+ document
+ .getElementById(
+ "processShopButton"
+ );
+
+
  info.innerHTML=
- "Memuat...";
+ "Memuat pesanan...";
 
 
  list.innerHTML="";
 
 
- /* CARI TOKEN KHUSUS
- PESANAN KEDAI */
+ processButton.style.display=
+ "block";
+
+
+ currentStockToken=
+ token;
+
+
+ currentStockShopId=
+ shopId;
+
+
+ /* =====================================
+ CARI PESANAN BERDASARKAN:
+
+ 1. TOKEN
+ 2. ID KEDAI
+
+ INI MEMBUAT LINK LEBIH AMAN
+ ===================================== */
 
  const so=
 
@@ -3823,14 +3872,26 @@ async function openStockPage(token){
  "stock_token",
  token
  )
+ .eq(
+ "shop_id",
+ shopId
+ )
  .single();
 
 
- if(so.error){
+ if(so.error||!so.data){
 
  info.innerHTML=
 
- "Link pesanan tidak valid.";
+ "<div class='status status-batal'>"+
+ "LINK PESANAN TIDAK VALID ATAU "+
+ "PESANAN TIDAK DITEMUKAN."+
+ "</div>";
+
+ list.innerHTML="";
+
+ processButton.style.display=
+ "none";
 
  return;
 
@@ -3853,8 +3914,21 @@ async function openStockPage(token){
  .single();
 
 
+ if(order.error||!order.data){
+
+ info.innerHTML=
+ "Data pesanan tidak ditemukan.";
+
+ processButton.style.display=
+ "none";
+
+ return;
+
+ }
+
+
  if(
- order.data?.status===
+ order.data.status===
  "dibatalkan"
  ){
 
@@ -3863,6 +3937,9 @@ async function openStockPage(token){
  "<div class='status status-batal'>"+
  "PESANAN SUDAH DIBATALKAN"+
  "</div>";
+
+ processButton.style.display=
+ "none";
 
  return;
 
@@ -3880,34 +3957,65 @@ async function openStockPage(token){
  "PESANAN SUDAH DIBATALKAN"+
  "</div>";
 
+ processButton.style.display=
+ "none";
+
  return;
 
  }
+
+
+ const shop=
+
+ await db
+ .from("shops")
+ .select("*")
+ .eq(
+ "id",
+ shopId
+ )
+ .single();
 
 
  info.innerHTML=
 
  "<div class='card'>"+
 
- "<b>Nama Pelanggan:</b><br>"+
+ "<b>KEDAI:</b><br>"+
+
+ (
+ shop.data?.name||
+ "Kedai"
+ )+
+
+ "<br><br>"+
+
+ "<b>NAMA PELANGGAN:</b><br>"+
 
  order.data.customer_name+
 
  "<br><br>"+
 
- "<b>Daftar pesanan khusus "+
- "untuk kedai Anda.</b>"+
+ "<b>DAFTAR PESANAN:</b><br>"+
+
+ "Pesanan di bawah ini khusus "+
+ "untuk kedai Anda."+
+
 
  "<br><br>"+
 
- "<b>Silakan pilih ADA atau "+
- "KOSONG untuk setiap menu.</b>"+
+ "<span class='small'>"+
+ "Pilih ADA atau KOSONG "+
+ "untuk setiap menu."+
+ "</span>"+
 
  "</div>";
 
 
- /* AMBIL HANYA ITEM
- DENGAN SHOP_ORDER_ID INI */
+ /* =====================================
+ AMBIL HANYA PESANAN
+ SHOP ORDER INI
+ ===================================== */
 
  const items=
 
@@ -3930,6 +4038,19 @@ async function openStockPage(token){
  }
 
 
+ if(!items.data.length){
+
+ list.innerHTML=
+ "<p>Tidak ada menu pesanan.</p>";
+
+ processButton.style.display=
+ "none";
+
+ return;
+
+ }
+
+
  items.data.forEach(item=>{
 
 
@@ -3941,13 +4062,33 @@ async function openStockPage(token){
  "card";
 
 
+ let statusText=
+ "BELUM DIPILIH";
+
+
+ if(item.item_status==="ada"){
+
+ statusText=
+ "ADA";
+
+ }
+
+
+ if(item.item_status==="kosong"){
+
+ statusText=
+ "KOSONG";
+
+ }
+
+
  d.innerHTML=
 
  "<b>"+
  item.menu_name+
  "</b>"+
 
- "<br>Jumlah: "+
+ "<br><br>Jumlah: "+
  item.quantity+
 
  (
@@ -3967,10 +4108,7 @@ async function openStockPage(token){
 
  "<b>Status:</b> "+
 
- String(
- item.item_status
- )
- .toUpperCase();
+ statusText;
 
 
  const row=
@@ -3997,7 +4135,8 @@ async function openStockPage(token){
  updateItemStatus(
  item.id,
  "ada",
- token
+ token,
+ shopId
  );
 
 
@@ -4017,7 +4156,8 @@ async function openStockPage(token){
  updateItemStatus(
  item.id,
  "kosong",
- token
+ token,
+ shopId
  );
 
 
@@ -4039,13 +4179,14 @@ async function openStockPage(token){
 
 
 /* =========================================
-UPDATE ITEM STOCK
+UPDATE STATUS STOK
 ========================================= */
 
 async function updateItemStatus(
 id,
 status,
-token
+token,
+shopId
 ){
 
  const r=
@@ -4064,20 +4205,39 @@ token
  );
 
 
- if(r.error)
- return alert(r.error.message);
+ if(r.error){
+
+ return alert(
+ r.error.message
+ );
+
+ }
 
 
- openStockPage(token);
+ /* KEMBALI MEMUAT LINK YANG SAMA */
+
+ openStockPage(
+ token,
+ shopId
+ );
 
 }
 
 
 /* =========================================
-PROCESS STOCK
+KIRIM HASIL CEK STOK
 ========================================= */
 
 async function processShopOrder(){
+
+ if(!currentShopOrderId){
+
+ return alert(
+ "Data pesanan kedai tidak ditemukan."
+ );
+
+ }
+
 
  const so=
 
@@ -4110,6 +4270,15 @@ async function processShopOrder(){
  return alert(items.error.message);
 
 
+ if(!items.data.length){
+
+ return alert(
+ "Tidak ada menu pesanan."
+ );
+
+ }
+
+
  if(
  items.data.some(
  i=>
@@ -4127,6 +4296,8 @@ async function processShopOrder(){
 
  }
 
+
+ const updateShop=
 
  await db
  .from("shop_orders")
@@ -4146,6 +4317,15 @@ async function processShopOrder(){
  );
 
 
+ if(updateShop.error){
+
+ return alert(
+ updateShop.error.message
+ );
+
+ }
+
+
  const all=
 
  await db
@@ -4155,6 +4335,15 @@ async function processShopOrder(){
  "order_id",
  so.data.order_id
  );
+
+
+ if(all.error){
+
+ return alert(
+ all.error.message
+ );
+
+ }
 
 
  let finalTotal=0;
@@ -4203,6 +4392,10 @@ async function processShopOrder(){
  .single();
 
 
+ if(order.error)
+ return alert(order.error.message);
+
+
  const shop=
 
  await db
@@ -4227,7 +4420,21 @@ async function processShopOrder(){
  .single();
 
 
- /* KURIR TIDAK MENERIMA DETAIL MENU */
+ /* =====================================
+ KIRIM INFORMASI KE KURIR
+
+ KURIR TIDAK MELIHAT:
+ - NAMA MENU
+ - VARIAN
+ - JUMLAH
+ - HARGA
+
+ KURIR HANYA MELIHAT:
+ - PELANGGAN
+ - ALAMAT
+ - SERLOK
+ - NAMA KEDAI
+ ===================================== */
 
  if(courier.data?.phone){
 
@@ -4287,8 +4494,12 @@ async function processShopOrder(){
  );
 
 
+ /* TETAP MEMBUKA PESANAN
+ DENGAN TOKEN DAN KEDAI YANG SAMA */
+
  openStockPage(
- so.data.stock_token
+ currentStockToken,
+ currentStockShopId
  );
 
 }
@@ -4311,7 +4522,9 @@ function checkURL(){
  params.get("page");
 
 
- /* LINK PELANGGAN */
+ /* =====================================
+ LINK PELANGGAN
+ ===================================== */
 
  if(page==="customer"){
 
@@ -4322,7 +4535,9 @@ function checkURL(){
  }
 
 
- /* LINK PENDAFTARAN KEDAI */
+ /* =====================================
+ LINK PENDAFTARAN KEDAI
+ ===================================== */
 
  if(page==="shop-register"){
 
@@ -4381,8 +4596,13 @@ function checkURL(){
  }
 
 
- /* LINK CEK STOK
- KHUSUS UNTUK KEDAI */
+ /* =====================================
+ LINK CEK STOK KEDAI
+
+ WAJIB MEMILIKI:
+ TOKEN
+ SHOP ID
+ ===================================== */
 
  if(page==="stock"){
 
@@ -4390,7 +4610,11 @@ function checkURL(){
  params.get("token");
 
 
- if(!token){
+ const shopId=
+ params.get("shop");
+
+
+ if(!token||!shopId){
 
  alert(
  "Link pesanan tidak valid."
@@ -4403,7 +4627,10 @@ function checkURL(){
  }
 
 
- openStockPage(token);
+ openStockPage(
+ token,
+ shopId
+ );
 
 
  return;
@@ -4411,7 +4638,9 @@ function checkURL(){
  }
 
 
- /* HALAMAN NORMAL */
+ /* =====================================
+ HALAMAN NORMAL
+ ===================================== */
 
  if(currentCourierId){
 
