@@ -2025,7 +2025,88 @@ function continueShopRegistration(){
 }
 
 
+/* =========================================
+PERBAIKAN MENU PENDAFTARAN KEDAI
+
+ISI MENU TIDAK AKAN HILANG SAAT:
+- TAMBAH MENU
+- TAMBAH VARIAN
+- HAPUS MENU
+- HAPUS VARIAN
+========================================= */
+
+
+/* =========================================
+SIMPAN NILAI MENU SEBELUM RENDER ULANG
+========================================= */
+
+function saveDraftMenuValues(){
+
+ draftMenus.forEach(menu=>{
+
+  const nameInput=
+  document.getElementById(
+  "name_"+menu.id
+  );
+
+  const priceInput=
+  document.getElementById(
+  "price_"+menu.id
+  );
+
+
+  if(nameInput){
+
+   menu.name=
+   nameInput.value;
+
+  }
+
+
+  if(priceInput){
+
+   menu.price=
+   priceInput.value;
+
+  }
+
+
+  menu.variants.forEach(
+  (variant,index)=>{
+
+   const variantInput=
+   document.getElementById(
+
+   "variant_"+
+   menu.id+
+   "_"+
+   index
+
+   );
+
+
+   if(variantInput){
+
+    menu.variants[index]=
+    variantInput.value;
+
+   }
+
+  });
+
+ });
+
+}
+
+
+/* =========================================
+TAMBAH MENU
+========================================= */
+
 function addDraftMenu(){
+
+ saveDraftMenuValues();
+
 
  draftMenus.push({
 
@@ -2038,33 +2119,54 @@ function addDraftMenu(){
  .toString(36)
  .substring(2,7),
 
+ name:"",
+
+ price:"",
+
  variants:[]
 
  });
+
 
  renderDraftMenus();
 
 }
 
 
+/* =========================================
+HAPUS MENU
+========================================= */
+
 function removeDraftMenu(id){
+
+ saveDraftMenuValues();
+
 
  draftMenus=
  draftMenus.filter(
  m=>m.id!==id
  );
 
+
  renderDraftMenus();
 
 }
 
 
+/* =========================================
+TAMBAH VARIAN
+========================================= */
+
 function addDraftVariant(id){
+
+ saveDraftMenuValues();
+
 
  const menu=
  draftMenus.find(
  m=>m.id===id
  );
+
 
  if(menu){
 
@@ -2077,6 +2179,43 @@ function addDraftVariant(id){
 }
 
 
+/* =========================================
+HAPUS VARIAN
+========================================= */
+
+function removeDraftVariant(
+menuId,
+index
+){
+
+ saveDraftMenuValues();
+
+
+ const menu=
+ draftMenus.find(
+ m=>m.id===menuId
+ );
+
+
+ if(!menu)
+ return;
+
+
+ menu.variants.splice(
+ index,
+ 1
+ );
+
+
+ renderDraftMenus();
+
+}
+
+
+/* =========================================
+TAMPILKAN MENU KEDAI
+========================================= */
+
 function renderDraftMenus(){
 
  const c=
@@ -2085,79 +2224,196 @@ function renderDraftMenus(){
  "draftMenuList"
  );
 
+
  c.innerHTML="";
+
 
  draftMenus.forEach(
  (menu,index)=>{
 
+
  const d=
  document.createElement("div");
+
 
  d.className=
  "draft-menu";
 
- d.innerHTML=
 
- "<h3>MENU "+
- (index+1)+
- "</h3>"+
+ /* JUDUL */
 
- "<label>Nama Menu</label>"+
+ const title=
+ document.createElement("h3");
 
- "<input id='name_"+
- menu.id+
- "' placeholder='Nama menu'>"+
 
- "<label>Harga Menu</label>"+
+ title.innerText=
+ "MENU "+(index+1);
 
- "<input type='number' id='price_"+
- menu.id+
- "' placeholder='Harga'>"+
 
- "<label>Varian</label>"+
+ d.appendChild(title);
 
- "<div id='variants_"+
- menu.id+
- "'></div>"+
 
- "<button class='btn-warning' "+
- "onclick=\"addDraftVariant('"+
- menu.id+
- "')\">"+
- "+ TAMBAH VARIAN"+
- "</button>"+
+ /* =====================
+ NAMA MENU
+ ===================== */
 
- "<button class='btn-danger' "+
- "onclick=\"removeDraftMenu('"+
- menu.id+
- "')\">"+
- "HAPUS MENU"+
- "</button>";
+ const nameLabel=
+ document.createElement("label");
 
- c.appendChild(d);
+
+ nameLabel.innerText=
+ "Nama Menu";
+
+
+ const nameInput=
+ document.createElement("input");
+
+
+ nameInput.id=
+ "name_"+menu.id;
+
+
+ nameInput.placeholder=
+ "Nama menu";
+
+
+ nameInput.value=
+ menu.name||"";
+
+
+ nameInput.oninput=()=>{
+
+  menu.name=
+  nameInput.value;
+
+ };
+
+
+ d.appendChild(
+ nameLabel
+ );
+
+
+ d.appendChild(
+ nameInput
+ );
+
+
+ /* =====================
+ HARGA MENU
+ ===================== */
+
+ const priceLabel=
+ document.createElement("label");
+
+
+ priceLabel.innerText=
+ "Harga Menu";
+
+
+ const priceInput=
+ document.createElement("input");
+
+
+ priceInput.type=
+ "number";
+
+
+ priceInput.id=
+ "price_"+menu.id;
+
+
+ priceInput.placeholder=
+ "Harga";
+
+
+ priceInput.value=
+ menu.price||"";
+
+
+ priceInput.oninput=()=>{
+
+  menu.price=
+  priceInput.value;
+
+ };
+
+
+ d.appendChild(
+ priceLabel
+ );
+
+
+ d.appendChild(
+ priceInput
+ );
+
+
+ /* =====================
+ VARIAN
+ ===================== */
+
+ const variantLabel=
+ document.createElement("label");
+
+
+ variantLabel.innerText=
+ "Varian";
+
+
+ d.appendChild(
+ variantLabel
+ );
+
+
+ const variantContainer=
+ document.createElement("div");
+
+
+ variantContainer.id=
+ "variants_"+menu.id;
+
+
+ d.appendChild(
+ variantContainer
+ );
+
+
+ /* =====================
+ DAFTAR VARIAN
+ ===================== */
 
  menu.variants.forEach(
  (value,i)=>{
 
- const vc=
- document
- .getElementById(
- "variants_"+menu.id
- );
 
  const row=
  document.createElement("div");
 
+
  row.className=
  "variant-row";
+
 
  const input=
  document.createElement("input");
 
- input.value=value;
+
+ input.id=
+
+ "variant_"+
+ menu.id+
+ "_"+
+ i;
+
+
+ input.value=
+ value||"";
+
 
  input.placeholder=
  "Contoh: Pedas";
+
 
  input.oninput=()=>{
 
@@ -2166,31 +2422,111 @@ function renderDraftMenus(){
 
  };
 
- const b=
+
+ const deleteButton=
  document.createElement("button");
 
- b.className=
+
+ deleteButton.className=
  "btn-danger";
 
- b.innerText=
+
+ deleteButton.innerText=
  "HAPUS";
 
- b.onclick=()=>{
 
-  menu.variants.splice(i,1);
+ deleteButton.onclick=()=>{
 
-  renderDraftMenus();
+  removeDraftVariant(
+  menu.id,
+  i
+  );
 
  };
 
- row.append(
- input,
- b
+
+ row.appendChild(
+ input
  );
 
- vc.appendChild(row);
+
+ row.appendChild(
+ deleteButton
+ );
+
+
+ variantContainer.appendChild(
+ row
+ );
+
 
  });
+
+
+ /* =====================
+ TAMBAH VARIAN
+ ===================== */
+
+ const addVariantButton=
+ document.createElement("button");
+
+
+ addVariantButton.className=
+ "btn-warning";
+
+
+ addVariantButton.innerText=
+ "+ TAMBAH VARIAN";
+
+
+ addVariantButton.onclick=()=>{
+
+  addDraftVariant(
+  menu.id
+  );
+
+ };
+
+
+ d.appendChild(
+ addVariantButton
+ );
+
+
+ /* =====================
+ HAPUS MENU
+ ===================== */
+
+ const deleteMenuButton=
+ document.createElement("button");
+
+
+ deleteMenuButton.className=
+ "btn-danger";
+
+
+ deleteMenuButton.innerText=
+ "HAPUS MENU";
+
+
+ deleteMenuButton.onclick=()=>{
+
+  removeDraftMenu(
+  menu.id
+  );
+
+ };
+
+
+ d.appendChild(
+ deleteMenuButton
+ );
+
+
+ c.appendChild(
+ d
+ );
+
 
  });
 
@@ -2202,6 +2538,9 @@ KIRIM INFORMASI KEDAI
 ========================================= */
 
 async function sendCompleteShopRegistration(){
+
+ saveDraftMenuValues();
+
 
  if(!pendingShopData){
 
@@ -2226,25 +2565,15 @@ async function sendCompleteShopRegistration(){
  ){
 
  const name=
- document
- .getElementById(
- "name_"+menu.id
- )
- .value
+ String(menu.name||"")
  .trim();
 
  const price=
- Number(
- document
- .getElementById(
- "price_"+menu.id
- )
- .value
- );
+ Number(menu.price);
 
  const variants=
  menu.variants
- .map(v=>v.trim())
+ .map(v=>String(v||"").trim())
  .filter(Boolean);
 
  if(!name||price<=0){
@@ -3510,16 +3839,6 @@ async function sendOrder(){
  if(shop.data?.phone){
 
 
- /* =====================================
- LINK CEK STOK DIPERBAIKI
-
- TOKEN = PESANAN KHUSUS
- SHOP = KEDAI KHUSUS
-
- KEDAI A TIDAK DAPAT MELIHAT
- PESANAN KEDAI B
- ===================================== */
-
  const link=
 
  baseURL()+
@@ -3570,8 +3889,6 @@ async function sendOrder(){
 
  encodeURIComponent(text);
 
-
- /* Membuka WhatsApp */
 
  window.open(
  whatsappLink,
@@ -3797,11 +4114,6 @@ async function cancelOrder(){
 
 /* =========================================
 HALAMAN CEK STOK KEDAI
-
-LINK:
-?page=stock&token=XXXX&shop=XXXX
-
-KEDAI HANYA MELIHAT PESANANNYA SENDIRI
 ========================================= */
 
 async function openStockPage(
@@ -3853,15 +4165,6 @@ shopId
  currentStockShopId=
  shopId;
 
-
- /* =====================================
- CARI PESANAN BERDASARKAN:
-
- 1. TOKEN
- 2. ID KEDAI
-
- INI MEMBUAT LINK LEBIH AMAN
- ===================================== */
 
  const so=
 
@@ -4011,11 +4314,6 @@ shopId
 
  "</div>";
 
-
- /* =====================================
- AMBIL HANYA PESANAN
- SHOP ORDER INI
- ===================================== */
 
  const items=
 
@@ -4213,8 +4511,6 @@ shopId
 
  }
 
-
- /* KEMBALI MEMUAT LINK YANG SAMA */
 
  openStockPage(
  token,
@@ -4420,22 +4716,6 @@ async function processShopOrder(){
  .single();
 
 
- /* =====================================
- KIRIM INFORMASI KE KURIR
-
- KURIR TIDAK MELIHAT:
- - NAMA MENU
- - VARIAN
- - JUMLAH
- - HARGA
-
- KURIR HANYA MELIHAT:
- - PELANGGAN
- - ALAMAT
- - SERLOK
- - NAMA KEDAI
- ===================================== */
-
  if(courier.data?.phone){
 
 
@@ -4494,9 +4774,6 @@ async function processShopOrder(){
  );
 
 
- /* TETAP MEMBUKA PESANAN
- DENGAN TOKEN DAN KEDAI YANG SAMA */
-
  openStockPage(
  currentStockToken,
  currentStockShopId
@@ -4522,9 +4799,7 @@ function checkURL(){
  params.get("page");
 
 
- /* =====================================
- LINK PELANGGAN
- ===================================== */
+ /* LINK PELANGGAN */
 
  if(page==="customer"){
 
@@ -4535,9 +4810,7 @@ function checkURL(){
  }
 
 
- /* =====================================
- LINK PENDAFTARAN KEDAI
- ===================================== */
+ /* LINK PENDAFTARAN KEDAI */
 
  if(page==="shop-register"){
 
@@ -4596,13 +4869,7 @@ function checkURL(){
  }
 
 
- /* =====================================
- LINK CEK STOK KEDAI
-
- WAJIB MEMILIKI:
- TOKEN
- SHOP ID
- ===================================== */
+ /* LINK CEK STOK KEDAI */
 
  if(page==="stock"){
 
@@ -4638,9 +4905,7 @@ function checkURL(){
  }
 
 
- /* =====================================
- HALAMAN NORMAL
- ===================================== */
+ /* HALAMAN NORMAL */
 
  if(currentCourierId){
 
