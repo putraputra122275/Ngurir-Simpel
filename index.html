@@ -1864,6 +1864,41 @@ async function submitShopRegistration(){
         return;
     }
 
+    const uniqueDraftMenus = [];
+    const seenDraftMenuKeys = new Set();
+
+    for(const draft of shopDraftMenus){
+
+        const draftVariants =
+            uniqueVariantObjects(
+                (draft.variants || []).filter(
+                    v=>v.name.trim()
+                )
+            );
+
+        const draftKey =
+            String(draft.name || "")
+            .trim()
+            .toLowerCase() +
+            "|" +
+            String(Number(draft.price) || 0) +
+            "|" +
+            String(draft.selection_type || "single") +
+            "|" +
+            draftVariants
+                .map(v=>String(v.name || "").trim().toLowerCase())
+                .sort()
+                .join("|");
+
+        if(!seenDraftMenuKeys.has(draftKey)){
+            draft.variants = draftVariants;
+            seenDraftMenuKeys.add(draftKey);
+            uniqueDraftMenus.push(draft);
+        }
+    }
+
+    shopDraftMenus = uniqueDraftMenus;
+
     for(
         let i=0;
         i<shopDraftMenus.length;
@@ -2429,9 +2464,29 @@ async function saveNewMenu(){
         );
 
     const variants =
-        Array.from(variantInputs)
-        .map(i=>i.value.trim())
-        .filter(Boolean);
+        uniqueVariantObjects(
+            Array.from(variantInputs)
+            .map(i=>({name:i.value.trim()}))
+            .filter(v=>v.name)
+        ).map(v=>v.name);
+
+    const {data:existingMenus} =
+        await db
+        .from("menus")
+        .select("id,name,price")
+        .eq("shop_id",currentShop.id)
+        .ilike("name",name);
+
+    const duplicateMenu =
+        (existingMenus || []).find(
+            existing=>Number(existing.price) === Number(price)
+        );
+
+    if(duplicateMenu){
+
+        alert("Menu dengan nama dan harga yang sama sudah ada.");
+        return;
+    }
 
     const {data:menu,error} =
         await db
@@ -4611,20 +4666,32 @@ async function getCartDetailed(){
 function calculateCartTotal(lines){
 
     let total = 0;
+    const counted = new Set();
 
-    for(const line of lines){
+    for(const line of lines || []){
+
+        if(!line || !line.menu) continue;
+
+        const key =
+            String(line.shop?.id || "") +
+            "_" +
+            String(line.menu.id || "");
+
+        if(counted.has(key)) continue;
+        counted.add(key);
 
         const price =
-            Number(line.menu.price) || 0;
+            Number(line.menu.price);
 
         const qty =
-            Number(line.quantity) || 0;
+            Number(line.quantity);
 
-        total +=
-            price * qty;
+        if(!Number.isFinite(price) || !Number.isFinite(qty)) continue;
+
+        total += price * Math.max(0, qty);
     }
 
-    return total;
+    return Math.round(total);
 }
 
 async function showCart(){
@@ -4678,8 +4745,10 @@ async function showCart(){
         group.lines.forEach(line=>{
 
             const subtotal =
-                Number(line.menu.price) *
-                Number(line.quantity);
+                Math.round(
+                    Number(line.menu.price) *
+                    Math.max(0, Number(line.quantity))
+                );
 
             html += `
                 <div
@@ -6833,4 +6902,4 @@ render();
 </script>
 
 </body>
-    </html>
+</html
