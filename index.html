@@ -4181,6 +4181,7 @@ async function openCustomerShopMenu(shopId){
     }
 
     const menuData = [];
+    const seenMenuKeys = new Set();
 
     for(const menu of menus || []){
 
@@ -4200,12 +4201,39 @@ async function openCustomerShopMenu(shopId){
             .eq("menu_id",menu.id)
             .maybeSingle();
 
+        const selectionType =
+            setting?.selection_type ||
+            "single";
+
+        const menuKey =
+            String(menu.name || "")
+            .trim()
+            .toLowerCase() +
+            "|" +
+            String(Number(menu.price) || 0) +
+            "|" +
+            selectionType +
+            "|" +
+            variants
+                .map(v=>
+                    String(v.name || "")
+                    .trim()
+                    .toLowerCase()
+                )
+                .sort()
+                .join("|");
+
+        if(seenMenuKeys.has(menuKey)){
+            continue;
+        }
+
+        seenMenuKeys.add(menuKey);
+
         menuData.push({
             menu,
             variants,
             selection_type:
-                setting?.selection_type ||
-                "single"
+                selectionType
         });
     }
 
@@ -4773,6 +4801,12 @@ async function sendCustomerOrder(){
     const total =
         calculateCartTotal(lines);
 
+    const orderCode =
+        "ORD-" +
+        Date.now().toString(36).toUpperCase() +
+        "-" +
+        randomToken(6).toUpperCase();
+
     const {
         data:order,
         error:orderError
@@ -4780,6 +4814,9 @@ async function sendCustomerOrder(){
         await db
         .from("orders")
         .insert({
+            order_code:
+                orderCode,
+
             courier_id:
                 currentCustomer.courier_id,
 
