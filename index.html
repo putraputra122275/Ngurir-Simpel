@@ -1902,8 +1902,10 @@ async function submitShopRegistration(){
         }
 
         menu.variants =
-            menu.variants.filter(
-                v=>v.name.trim()
+            uniqueVariantObjects(
+                menu.variants.filter(
+                    v=>v.name.trim()
+                )
             );
     }
 
@@ -1979,7 +1981,9 @@ async function submitShopRegistration(){
         ){
 
             const variantRows =
-                draft.variants.map(
+                uniqueVariantObjects(
+                    draft.variants
+                ).map(
                     v=>({
                         menu_id:menu.id,
                         name:v.name.trim()
@@ -2241,6 +2245,28 @@ async function showShopMenus(){
     app().innerHTML = html;
 }
 
+function uniqueVariantObjects(variants){
+
+    const seen = new Set();
+
+    return (variants || []).filter(v=>{
+
+        const name =
+            String(v?.name || "")
+            .trim();
+
+        const key =
+            name.toLowerCase();
+
+        if(!name || seen.has(key)){
+            return false;
+        }
+
+        seen.add(key);
+        return true;
+    });
+}
+
 async function getMenuVariants(menuId){
 
     const {data,error} =
@@ -2254,7 +2280,7 @@ async function getMenuVariants(menuId){
         return [];
     }
 
-    return data || [];
+    return uniqueVariantObjects(data || []);
 }
 
 
@@ -2729,13 +2755,17 @@ async function saveEditedMenu(){
         .eq("menu_id",data.menu.id);
 
     const variants =
-        Array.from(
-            document.querySelectorAll(
-                ".edit-variant"
+        uniqueVariantObjects(
+            Array.from(
+                document.querySelectorAll(
+                    ".edit-variant"
+                )
             )
-        )
-        .map(i=>i.value.trim())
-        .filter(Boolean);
+            .map(i=>({
+                name:i.value.trim()
+            }))
+            .filter(v=>v.name)
+        );
 
     if(variants.length>0){
 
@@ -3266,22 +3296,26 @@ async function saveCourierMenu(shopId){
     }
 
     const variants =
-        Array.from(
-            document.querySelectorAll(
-                ".courier-new-variant"
+        uniqueVariantObjects(
+            Array.from(
+                document.querySelectorAll(
+                    ".courier-new-variant"
+                )
             )
-        )
-        .map(i=>i.value.trim())
-        .filter(Boolean);
+            .map(i=>({
+                name:i.value.trim()
+            }))
+            .filter(v=>v.name)
+        );
 
     if(variants.length){
 
         await db
         .from("menu_variants")
         .insert(
-            variants.map(name=>({
+            variants.map(v=>({
                 menu_id:menu.id,
-                name:name
+                name:v.name
             }))
         );
 
@@ -3464,22 +3498,26 @@ async function saveCourierEditedMenu(
     .eq("menu_id",menuId);
 
     const variants =
-        Array.from(
-            document.querySelectorAll(
-                ".courier-edit-variant"
+        uniqueVariantObjects(
+            Array.from(
+                document.querySelectorAll(
+                    ".courier-edit-variant"
+                )
             )
-        )
-        .map(i=>i.value.trim())
-        .filter(Boolean);
+            .map(i=>({
+                name:i.value.trim()
+            }))
+            .filter(v=>v.name)
+        );
 
     if(variants.length){
 
         await db
         .from("menu_variants")
         .insert(
-            variants.map(name=>({
+            variants.map(v=>({
                 menu_id:menuId,
-                name:name
+                name:v.name
             }))
         );
 
@@ -4427,14 +4465,40 @@ function finishCustomerShopMenu(){
             "_" +
             item.menu.id;
 
-        const saved =
-            cart[key];
+        if(!cart[key]){
+
+            cart[key] = {
+                quantity:0,
+                variants:[]
+            };
+        }
+
+        const checkedInputs =
+            Array.from(
+                document.querySelectorAll(
+                    'input[name="variant_' +
+                    safeId(key) +
+                    '"]:checked'
+                )
+            );
+
+        if(item.variants.length > 0){
+
+            cart[key].variants =
+                uniqueVariantObjects(
+                    checkedInputs.map(input=>({
+                        name:input.value
+                    }))
+                ).map(v=>v.name);
+        }else{
+
+            cart[key].variants = [];
+        }
 
         if(
-            saved &&
-            saved.quantity > 0 &&
+            cart[key].quantity > 0 &&
             item.variants.length > 0 &&
-            saved.variants.length === 0
+            cart[key].variants.length === 0
         ){
 
             alert(
@@ -6732,4 +6796,4 @@ render();
 </script>
 
 </body>
-</html>
+    </html>
