@@ -4581,6 +4581,52 @@ function finishCustomerShopMenu(){
    CART
 ========================================================= */
 
+function isUuid(value){
+
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        .test(String(value || "").trim());
+}
+
+async function resolveShopUuid(shopReference){
+
+    const reference =
+        String(shopReference || "").trim();
+
+    if(!reference){
+        return null;
+    }
+
+    /*
+       shop_orders.shop_id dan menus.shop_id
+       menggunakan shops.id (UUID).
+
+       Jika keranjang lama menyimpan
+       registration_token sebagai referensi kedai,
+       ubah referensi tersebut menjadi shops.id
+       sebelum dipakai untuk membuat pesanan.
+    */
+
+    if(isUuid(reference)){
+        const {data:shopById} =
+            await db
+            .from("shops")
+            .select("id")
+            .eq("id",reference)
+            .maybeSingle();
+
+        return shopById?.id || null;
+    }
+
+    const {data:shopByToken} =
+        await db
+        .from("shops")
+        .select("id")
+        .eq("registration_token",reference)
+        .maybeSingle();
+
+    return shopByToken?.id || null;
+}
+
 async function getCartDetailed(){
 
     const result = [];
@@ -4602,11 +4648,20 @@ async function getCartDetailed(){
         const parts =
             key.split("_");
 
-        const shopId =
+        const shopReference =
             parts[0];
+
+        const shopId =
+            await resolveShopUuid(
+                shopReference
+            );
 
         const menuId =
             parts.slice(1).join("_");
+
+        if(!shopId){
+            continue;
+        }
 
         const {data:menu} =
             await db
@@ -4627,7 +4682,7 @@ async function getCartDetailed(){
             .eq("id",shopId)
             .maybeSingle();
 
-        if(!shop) continue;
+        if(!shop || !isUuid(shop.id)) continue;
 
         result.push({
             key:key,
