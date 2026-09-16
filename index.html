@@ -1083,6 +1083,12 @@ function showCourierDashboard(){
             </button>
 
             <button
+                onclick="showCourierProcessedOrders()"
+                class="success">
+                PESANAN MASUK
+            </button>
+
+            <button
                 onclick="copyCustomerLink()"
                 class="success">
                 SALIN LINK PELANGGAN
@@ -1864,41 +1870,6 @@ async function submitShopRegistration(){
         return;
     }
 
-    const uniqueDraftMenus = [];
-    const seenDraftMenuKeys = new Set();
-
-    for(const draft of shopDraftMenus){
-
-        const draftVariants =
-            uniqueVariantObjects(
-                (draft.variants || []).filter(
-                    v=>v.name.trim()
-                )
-            );
-
-        const draftKey =
-            String(draft.name || "")
-            .trim()
-            .toLowerCase() +
-            "|" +
-            String(Number(draft.price) || 0) +
-            "|" +
-            String(draft.selection_type || "single") +
-            "|" +
-            draftVariants
-                .map(v=>String(v.name || "").trim().toLowerCase())
-                .sort()
-                .join("|");
-
-        if(!seenDraftMenuKeys.has(draftKey)){
-            draft.variants = draftVariants;
-            seenDraftMenuKeys.add(draftKey);
-            uniqueDraftMenus.push(draft);
-        }
-    }
-
-    shopDraftMenus = uniqueDraftMenus;
-
     for(
         let i=0;
         i<shopDraftMenus.length;
@@ -1950,6 +1921,53 @@ async function submitShopRegistration(){
         </div>
     `;
 
+    /*
+       Ambil ID kurir langsung dari link pendaftaran.
+       Jangan bergantung pada selectedCourierId karena
+       variabel tersebut dapat berubah selama alur
+       pendaftaran kedai.
+    */
+
+    const courierIdFromLink =
+        urlParams.get("courier");
+
+    const courierId =
+        courierIdFromLink ||
+        selectedCourierId;
+
+    if(!courierId){
+
+        alert(
+            "ID kurir pada link pendaftaran tidak ditemukan."
+        );
+
+        return;
+    }
+
+    /*
+       Pastikan ID kurir dari link benar-benar
+       merupakan akun kurir yang ada di Supabase.
+    */
+
+    const {
+        data:courier,
+        error:courierError
+    } =
+        await db
+        .from("couriers")
+        .select("id")
+        .eq("id",courierId)
+        .maybeSingle();
+
+    if(courierError || !courier){
+
+        alert(
+            "Akun kurir pada link tidak ditemukan."
+        );
+
+        return;
+    }
+
     const registrationToken =
         randomToken(40);
 
@@ -1957,7 +1975,7 @@ async function submitShopRegistration(){
         await db
         .from("shops")
         .insert({
-            courier_id:selectedCourierId,
+            courier_id:courierId,
             name:window.shopDraftInfo.name,
             whatsapp:window.shopDraftInfo.whatsapp,
             latitude:window.shopDraftInfo.latitude,
@@ -2142,6 +2160,16 @@ function showShopDashboard(){
                     )}
                 </b>
             </div>
+
+            <button
+                onclick="showShopStockChecks()">
+                PENGECEKAN STOK
+            </button>
+
+            <button
+                onclick="showShopOrders()">
+                PESANAN
+            </button>
 
             <button
                 onclick="showShopAddMenu()">
@@ -2464,29 +2492,9 @@ async function saveNewMenu(){
         );
 
     const variants =
-        uniqueVariantObjects(
-            Array.from(variantInputs)
-            .map(i=>({name:i.value.trim()}))
-            .filter(v=>v.name)
-        ).map(v=>v.name);
-
-    const {data:existingMenus} =
-        await db
-        .from("menus")
-        .select("id,name,price")
-        .eq("shop_id",currentShop.id)
-        .ilike("name",name);
-
-    const duplicateMenu =
-        (existingMenus || []).find(
-            existing=>Number(existing.price) === Number(price)
-        );
-
-    if(duplicateMenu){
-
-        alert("Menu dengan nama dan harga yang sama sudah ada.");
-        return;
-    }
+        Array.from(variantInputs)
+        .map(i=>i.value.trim())
+        .filter(Boolean);
 
     const {data:menu,error} =
         await db
@@ -4236,7 +4244,6 @@ async function openCustomerShopMenu(shopId){
     }
 
     const menuData = [];
-    const seenMenuKeys = new Set();
 
     for(const menu of menus || []){
 
@@ -4256,39 +4263,12 @@ async function openCustomerShopMenu(shopId){
             .eq("menu_id",menu.id)
             .maybeSingle();
 
-        const selectionType =
-            setting?.selection_type ||
-            "single";
-
-        const menuKey =
-            String(menu.name || "")
-            .trim()
-            .toLowerCase() +
-            "|" +
-            String(Number(menu.price) || 0) +
-            "|" +
-            selectionType +
-            "|" +
-            variants
-                .map(v=>
-                    String(v.name || "")
-                    .trim()
-                    .toLowerCase()
-                )
-                .sort()
-                .join("|");
-
-        if(seenMenuKeys.has(menuKey)){
-            continue;
-        }
-
-        seenMenuKeys.add(menuKey);
-
         menuData.push({
             menu,
             variants,
             selection_type:
-                selectionType
+                setting?.selection_type ||
+                "single"
         });
     }
 
@@ -4666,32 +4646,20 @@ async function getCartDetailed(){
 function calculateCartTotal(lines){
 
     let total = 0;
-    const counted = new Set();
 
-    for(const line of lines || []){
-
-        if(!line || !line.menu) continue;
-
-        const key =
-            String(line.shop?.id || "") +
-            "_" +
-            String(line.menu.id || "");
-
-        if(counted.has(key)) continue;
-        counted.add(key);
+    for(const line of lines){
 
         const price =
-            Number(line.menu.price);
+            Number(line.menu.price) || 0;
 
         const qty =
-            Number(line.quantity);
+            Number(line.quantity) || 0;
 
-        if(!Number.isFinite(price) || !Number.isFinite(qty)) continue;
-
-        total += price * Math.max(0, qty);
+        total +=
+            price * qty;
     }
 
-    return Math.round(total);
+    return total;
 }
 
 async function showCart(){
@@ -4745,10 +4713,8 @@ async function showCart(){
         group.lines.forEach(line=>{
 
             const subtotal =
-                Math.round(
-                    Number(line.menu.price) *
-                    Math.max(0, Number(line.quantity))
-                );
+                Number(line.menu.price) *
+                Number(line.quantity);
 
             html += `
                 <div
@@ -4870,12 +4836,6 @@ async function sendCustomerOrder(){
     const total =
         calculateCartTotal(lines);
 
-    const orderCode =
-        "ORD-" +
-        Date.now().toString(36).toUpperCase() +
-        "-" +
-        randomToken(6).toUpperCase();
-
     const {
         data:order,
         error:orderError
@@ -4883,9 +4843,6 @@ async function sendCustomerOrder(){
         await db
         .from("orders")
         .insert({
-            order_code:
-                orderCode,
-
             courier_id:
                 currentCustomer.courier_id,
 
@@ -5042,12 +4999,6 @@ async function sendCustomerOrder(){
 
     cart = {};
 
-    await sendShopLinksToCourier(
-        order,
-        shopOrders,
-        grouped
-    );
-
     showOrderSent();
 }
 
@@ -5152,23 +5103,10 @@ function showOrderSent(){
             </p>
 
             <p>
-                Kedai akan melakukan pengecekan
-                stok.
+                Pesanan sekarang langsung masuk ke
+                menu PENGECEKAN STOK pada masing-masing
+                kedai.
             </p>
-
-            ${
-                window.lastCourierWhatsApp
-                ? `
-                <button
-                    onclick="
-                    openWhatsAppLink(
-                        '${window.lastCourierWhatsApp.replace(/'/g,"\\'")}'
-                    )">
-                    BUKA WHATSAPP KURIR
-                </button>
-                `
-                : ""
-            }
 
             <button
                 onclick="
@@ -6894,6 +6832,792 @@ async function render(){
 
 
 /* =========================================================
+   SHOP STOCK CHECKS
+========================================================= */
+
+async function showShopStockChecks(){
+
+    if(!currentShop) return;
+
+    app().innerHTML =
+        `<div class="card loading">
+            Memuat pengecekan stok...
+        </div>`;
+
+    const {
+        data:shopOrders,
+        error
+    } =
+        await db
+        .from("shop_orders")
+        .select("*")
+        .eq(
+            "shop_id",
+            currentShop.id
+        )
+        .eq(
+            "status",
+            "menunggu_stok"
+        )
+        .order(
+            "created_at",
+            {ascending:false}
+        );
+
+    if(error){
+
+        app().innerHTML = `
+            <div class="card">
+                <div class="error-box">
+                    ${escapeHtml(error.message)}
+                </div>
+
+                <button
+                    onclick="showShopDashboard()"
+                    class="secondary">
+                    KEMBALI
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+    let html = `
+        <div class="card">
+
+            <h2>📦 PENGECEKAN STOK</h2>
+
+            <p>
+                Pesanan baru dari pelanggan yang
+                masuk ke kedai ini.
+            </p>
+    `;
+
+    if(!shopOrders || shopOrders.length===0){
+
+        html += `
+            <div class="info">
+                Belum ada pesanan yang perlu
+                dicek stoknya.
+            </div>
+        `;
+    }
+
+    for(const shopOrder of shopOrders || []){
+
+        const {
+            data:items
+        } =
+            await db
+            .from("order_items")
+            .select("*")
+            .eq(
+                "shop_order_id",
+                shopOrder.id
+            )
+            .order("created_at");
+
+        const {
+            data:order
+        } =
+            await db
+            .from("orders")
+            .select("id,customer_id,created_at")
+            .eq(
+                "id",
+                shopOrder.order_id
+            )
+            .maybeSingle();
+
+        const {
+            data:customer
+        } =
+            order
+            ? await db
+                .from("customers")
+                .select("name")
+                .eq(
+                    "id",
+                    order.customer_id
+                )
+                .maybeSingle()
+            : {data:null};
+
+        html += `
+            <div class="menu-card">
+
+                <h3>
+                    📦 PESANAN
+                </h3>
+
+                <div class="info">
+                    <b>
+                        Pelanggan:
+                    </b>
+                    ${escapeHtml(
+                        customer?.name || "-"
+                    )}
+                </div>
+        `;
+
+        (items || []).forEach(item=>{
+
+            html += `
+                <div class="status-row">
+
+                    <div class="status-name">
+
+                        <b>
+                            ${escapeHtml(
+                                item.menu_name
+                            )}
+                        </b>
+
+                        ${
+                            item.variant
+                            ? `
+                            <div style="
+                                font-size:13px;
+                                color:#666">
+                                Varian:
+                                ${escapeHtml(
+                                    item.variant
+                                )}
+                            </div>
+                            `
+                            : ""
+                        }
+
+                        <div>
+                            Jumlah:
+                            ${Number(item.quantity) || 0}
+                        </div>
+
+                        <div>
+                            ${money(item.price)}
+                        </div>
+
+                    </div>
+
+                    <div>
+                        ${
+                            item.stock_status === "ada"
+                            ? `
+                            <span class="
+                                badge
+                                badge-green">
+                                ADA
+                            </span>
+                            `
+                            : item.stock_status === "kosong"
+                            ? `
+                            <span class="
+                                badge
+                                badge-red">
+                                KOSONG
+                            </span>
+                            `
+                            : `
+                            <span class="
+                                badge
+                                badge-orange">
+                                MENUNGGU
+                            </span>
+                            `
+                        }
+                    </div>
+
+                </div>
+            `;
+        });
+
+        html += `
+                <button
+                    onclick="
+                    openShopStockOrder(
+                        '${shopOrder.id}'
+                    )"
+                    class="success">
+                    CEK STOK
+                </button>
+
+            </div>
+        `;
+    }
+
+    html += `
+            <button
+                onclick="showShopDashboard()"
+                class="secondary">
+                KEMBALI
+            </button>
+
+        </div>
+    `;
+
+    app().innerHTML = html;
+}
+
+async function openShopStockOrder(shopOrderId){
+
+    const {
+        data:shopOrder,
+        error
+    } =
+        await db
+        .from("shop_orders")
+        .select("*")
+        .eq(
+            "id",
+            shopOrderId
+        )
+        .eq(
+            "shop_id",
+            currentShop.id
+        )
+        .maybeSingle();
+
+    if(error || !shopOrder){
+
+        alert("Pesanan tidak ditemukan.");
+        return;
+    }
+
+    window.currentStockShopOrder =
+        shopOrder;
+
+    const {
+        data:items
+    } =
+        await db
+        .from("order_items")
+        .select("*")
+        .eq(
+            "shop_order_id",
+            shopOrder.id
+        )
+        .order("created_at");
+
+    window.currentStockItems =
+        items || [];
+
+    const {
+        data:order
+    } =
+        await db
+        .from("orders")
+        .select("customer_id")
+        .eq(
+            "id",
+            shopOrder.order_id
+        )
+        .maybeSingle();
+
+    const {
+        data:customer
+    } =
+        order
+        ? await db
+            .from("customers")
+            .select("name")
+            .eq(
+                "id",
+                order.customer_id
+            )
+            .maybeSingle()
+        : {data:null};
+
+    renderInternalStockCheck(
+        currentShop,
+        shopOrder,
+        items || [],
+        customer?.name || "-"
+    );
+}
+
+function renderInternalStockCheck(
+    shop,
+    shopOrder,
+    items,
+    customerName
+){
+
+    let html = `
+        <div class="card">
+
+            <h2>📦 CEK STOK PESANAN</h2>
+
+            <h3>
+                🏪
+                ${escapeHtml(shop.name)}
+            </h3>
+
+            <div class="info">
+                Pelanggan:
+                <b>
+                    ${escapeHtml(customerName)}
+                </b>
+            </div>
+    `;
+
+    items.forEach(item=>{
+
+        const status =
+            item.stock_status;
+
+        html += `
+            <div class="status-row">
+
+                <div class="status-name">
+
+                    <b>
+                        ${escapeHtml(
+                            item.menu_name
+                        )}
+                    </b>
+
+                    ${
+                        item.variant
+                        ? `
+                        <div style="
+                            font-size:13px;
+                            color:#666">
+                            Varian:
+                            ${escapeHtml(
+                                item.variant
+                            )}
+                        </div>
+                        `
+                        : ""
+                    }
+
+                    <div>
+                        Jumlah:
+                        ${Number(item.quantity) || 0}
+                    </div>
+
+                </div>
+
+                <div class="status-buttons">
+
+                    <button
+                        class="${
+                            status === "ada"
+                            ? "active-ada"
+                            : ""
+                        }"
+                        onclick="
+                        setStockStatusInternal(
+                            '${item.id}',
+                            'ada'
+                        )">
+                        ADA
+                    </button>
+
+                    <button
+                        class="${
+                            status === "kosong"
+                            ? "active-kosong"
+                            : ""
+                        }"
+                        onclick="
+                        setStockStatusInternal(
+                            '${item.id}',
+                            'kosong'
+                        )">
+                        KOSONG
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    });
+
+    html += `
+            <button
+                onclick="sendStockResultInternal()"
+                class="success">
+                KIRIM HASIL CEK STOK
+            </button>
+
+            <button
+                onclick="showShopStockChecks()"
+                class="secondary">
+                KEMBALI
+            </button>
+
+        </div>
+    `;
+
+    app().innerHTML = html;
+}
+
+async function setStockStatusInternal(
+    itemId,
+    status
+){
+
+    const {
+        error
+    } =
+        await db
+        .from("order_items")
+        .update({
+            stock_status:status
+        })
+        .eq(
+            "id",
+            itemId
+        )
+        .eq(
+            "shop_order_id",
+            window.currentStockShopOrder.id
+        );
+
+    if(error){
+
+        alert(
+            "Gagal mengubah status:\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    await openShopStockOrder(
+        window.currentStockShopOrder.id
+    );
+}
+
+async function sendStockResultInternal(){
+
+    const {
+        data:items,
+        error:itemError
+    } =
+        await db
+        .from("order_items")
+        .select("stock_status")
+        .eq(
+            "shop_order_id",
+            window.currentStockShopOrder.id
+        );
+
+    if(itemError){
+
+        alert(
+            "Gagal memeriksa stok:\n" +
+            itemError.message
+        );
+
+        return;
+    }
+
+    if(
+        !items ||
+        items.length===0
+    ){
+
+        alert("Tidak ada item pesanan.");
+        return;
+    }
+
+    const incomplete =
+        items.some(
+            item=>
+                !["ada","kosong"]
+                .includes(
+                    item.stock_status
+                )
+        );
+
+    if(incomplete){
+
+        alert(
+            "Semua menu harus diberi status ADA atau KOSONG."
+        );
+
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+        await db
+        .from("shop_orders")
+        .update({
+            status:"hasil_stok"
+        })
+        .eq(
+            "id",
+            window.currentStockShopOrder.id
+        )
+        .eq(
+            "shop_id",
+            currentShop.id
+        )
+        .select("*")
+        .single();
+
+    if(error){
+
+        alert(
+            "Gagal mengirim hasil:\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    window.currentStockShopOrder =
+        data;
+
+    await sendCustomerResultLink(data);
+
+    app().innerHTML = `
+        <div class="card">
+
+            <div class="success-box">
+                ✅ HASIL CEK STOK BERHASIL DISIMPAN
+            </div>
+
+            <p>
+                Hasil pengecekan stok kedai sudah
+                tersimpan dan dapat diproses
+                oleh pelanggan.
+            </p>
+
+            <button
+                onclick="showShopStockChecks()"
+                class="secondary">
+                KEMBALI KE PENGECEKAN STOK
+            </button>
+
+            <button
+                onclick="showShopOrders()">
+                LIHAT PESANAN
+            </button>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   SHOP ORDERS
+========================================================= */
+
+async function showShopOrders(){
+
+    if(!currentShop) return;
+
+    app().innerHTML =
+        `<div class="card loading">
+            Memuat pesanan...
+        </div>`;
+
+    const {
+        data:shopOrders,
+        error
+    } =
+        await db
+        .from("shop_orders")
+        .select("*")
+        .eq(
+            "shop_id",
+            currentShop.id
+        )
+        .in(
+            "status",
+            ["hasil_stok","diproses"]
+        )
+        .order(
+            "created_at",
+            {ascending:false}
+        );
+
+    if(error){
+
+        app().innerHTML = `
+            <div class="card">
+                <div class="error-box">
+                    ${escapeHtml(error.message)}
+                </div>
+
+                <button
+                    onclick="showShopDashboard()"
+                    class="secondary">
+                    KEMBALI
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+    let html = `
+        <div class="card">
+
+            <h2>📋 PESANAN</h2>
+    `;
+
+    if(!shopOrders || shopOrders.length===0){
+
+        html += `
+            <div class="info">
+                Belum ada pesanan.
+            </div>
+        `;
+    }
+
+    for(const shopOrder of shopOrders || []){
+
+        const {
+            data:order
+        } =
+            await db
+            .from("orders")
+            .select("customer_id,created_at")
+            .eq(
+                "id",
+                shopOrder.order_id
+            )
+            .maybeSingle();
+
+        const {
+            data:customer
+        } =
+            order
+            ? await db
+                .from("customers")
+                .select("name")
+                .eq(
+                    "id",
+                    order.customer_id
+                )
+                .maybeSingle()
+            : {data:null};
+
+        const {
+            data:items
+        } =
+            await db
+            .from("order_items")
+            .select("*")
+            .eq(
+                "shop_order_id",
+                shopOrder.id
+            )
+            .order("created_at");
+
+        html += `
+            <div class="menu-card">
+
+                <h3>
+                    📦 PESANAN
+                </h3>
+
+                <div class="info">
+                    Pelanggan:
+                    <b>
+                        ${escapeHtml(
+                            customer?.name || "-"
+                        )}
+                    </b>
+                </div>
+        `;
+
+        (items || []).forEach(item=>{
+
+            html += `
+                <div class="status-row">
+
+                    <div class="status-name">
+
+                        <b>
+                            ${escapeHtml(
+                                item.menu_name
+                            )}
+                        </b>
+
+                        ${
+                            item.variant
+                            ? `
+                            <div style="
+                                font-size:13px">
+                                Varian:
+                                ${escapeHtml(
+                                    item.variant
+                                )}
+                            </div>
+                            `
+                            : ""
+                        }
+
+                        <div>
+                            Jumlah:
+                            ${Number(item.quantity) || 0}
+                        </div>
+
+                    </div>
+
+                    <div>
+                        ${
+                            item.stock_status === "ada"
+                            ? `
+                            <span class="
+                                badge
+                                badge-green">
+                                ADA
+                            </span>
+                            `
+                            : `
+                            <span class="
+                                badge
+                                badge-red">
+                                KOSONG
+                            </span>
+                            `
+                        }
+                    </div>
+
+                </div>
+            `;
+        });
+
+        html += `
+                <div class="info">
+                    Status:
+                    <b>
+                        ${
+                            shopOrder.status === "diproses"
+                            ? "DIPROSES"
+                            : "HASIL CEK STOK"
+                        }
+                    </b>
+                </div>
+
+            </div>
+        `;
+    }
+
+    html += `
+            <button
+                onclick="showShopDashboard()"
+                class="secondary">
+                KEMBALI
+            </button>
+
+        </div>
+    `;
+
+    app().innerHTML = html;
+}
+
+/* =========================================================
    INITIAL LOAD
 ========================================================= */
 
@@ -6902,4 +7626,4 @@ render();
 </script>
 
 </body>
-</html
+    </html>
