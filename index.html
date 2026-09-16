@@ -4843,6 +4843,12 @@ async function sendCustomerOrder(){
         await db
         .from("orders")
         .insert({
+            order_code:
+                "ORD-" +
+                Date.now() +
+                "-" +
+                randomToken(6),
+
             courier_id:
                 currentCustomer.courier_id,
 
