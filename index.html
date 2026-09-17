@@ -4602,32 +4602,56 @@ async function getCartDetailed(){
         const parts =
             key.split("_");
 
-        const shopId =
-            parts[0];
+        const rawShopId =
+            String(parts[0] || "").trim();
 
         const menuId =
             parts.slice(1).join("_");
+
+        const shopUuidPattern =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+        let shop = null;
+
+        if(shopUuidPattern.test(rawShopId)){
+
+            const {data:shopById} =
+                await db
+                .from("shops")
+                .select("*")
+                .eq("id",rawShopId)
+                .maybeSingle();
+
+            shop = shopById || null;
+
+        }else{
+
+            const {data:shopByToken} =
+                await db
+                .from("shops")
+                .select("*")
+                .eq("registration_token",rawShopId)
+                .maybeSingle();
+
+            shop = shopByToken || null;
+        }
+
+        if(!shop || !shopUuidPattern.test(String(shop.id).trim())){
+            continue;
+        }
+
+        const realShopId =
+            String(shop.id).trim();
 
         const {data:menu} =
             await db
             .from("menus")
             .select("*")
             .eq("id",menuId)
-            .eq("shop_id",shopId)
+            .eq("shop_id",realShopId)
             .maybeSingle();
 
         if(!menu) continue;
-
-        const {
-            data:shop
-        } =
-            await db
-            .from("shops")
-            .select("*")
-            .eq("id",shopId)
-            .maybeSingle();
-
-        if(!shop) continue;
 
         result.push({
             key:key,
@@ -4890,20 +4914,39 @@ async function sendCustomerOrder(){
 
     const grouped = {};
 
-    lines.forEach(line=>{
+    const shopUuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-        if(!grouped[line.shop.id]){
+    for(const line of lines){
 
-            grouped[line.shop.id] = {
-                shop:line.shop,
+        const shop = line.shop;
+
+        const shopId =
+            shop && shop.id
+                ? String(shop.id).trim()
+                : "";
+
+        if(!shopUuidPattern.test(shopId)){
+
+            alert(
+                "ID kedai tidak valid. Pesanan tidak dibagi ke kedai agar data tidak masuk ke kedai yang salah."
+            );
+
+            return;
+        }
+
+        if(!grouped[shopId]){
+
+            grouped[shopId] = {
+                shop:shop,
                 lines:[]
             };
         }
 
-        grouped[line.shop.id]
+        grouped[shopId]
             .lines
             .push(line);
-    });
+    }
 
     let shopOrderRows = [];
 
@@ -4911,9 +4954,21 @@ async function sendCustomerOrder(){
         const group of Object.values(grouped)
     ){
 
+        const realShopId =
+            String(group.shop.id).trim();
+
+        if(!shopUuidPattern.test(realShopId)){
+
+            alert(
+                "ID kedai tidak valid. Pesanan tidak dibagi ke kedai agar data tidak masuk ke kedai yang salah."
+            );
+
+            return;
+        }
+
         shopOrderRows.push({
             order_id:order.id,
-            shop_id:group.shop.id,
+            shop_id:realShopId,
             stock_token:randomToken(48),
             customer_result_token:randomToken(48),
             process_token:randomToken(48),
