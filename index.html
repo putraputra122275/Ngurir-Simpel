@@ -4914,8 +4914,7 @@ async function sendCustomerOrder(){
         shopOrderRows.push({
             order_id:order.id,
             shop_id:group.shop.id,
-            stock_token:
-                crypto.randomUUID(),
+            stock_token:randomToken(48),
             customer_result_token:randomToken(48),
             process_token:randomToken(48),
             status:"menunggu_stok"
@@ -4953,6 +4952,9 @@ async function sendCustomerOrder(){
         group.lines.forEach(line=>{
 
             orderItems.push({
+                order_id:
+                    order.id,
+
                 shop_order_id:
                     shopOrder.id,
 
