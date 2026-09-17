@@ -4216,6 +4216,30 @@ async function openCustomerShopMenu(shopId){
         return;
     }
 
+    /*
+       SATU PESANAN HANYA UNTUK SATU KEDAI.
+       Jika pelanggan sudah memilih menu dari kedai lain,
+       pelanggan tetap berada pada kedai tersebut sampai
+       pesanan selesai/dibatalkan.
+    */
+    const cartShopIds =
+        [...new Set(
+            Object.keys(cart)
+            .filter(key=>Number(cart[key]?.quantity || 0) > 0)
+            .map(key=>key.split("_")[0])
+        )];
+
+    if(
+        cartShopIds.length > 0 &&
+        !cartShopIds.includes(shopId)
+    ){
+        alert(
+            "Satu pesanan hanya dapat memilih satu kedai.\n\n" +
+            "Silakan selesaikan atau kosongkan pesanan dari kedai yang sedang dipilih terlebih dahulu."
+        );
+        return;
+    }
+
     selectedShopId = shopId;
 
     app().innerHTML =
@@ -4585,9 +4609,6 @@ async function getCartDetailed(){
 
     const result = [];
 
-    const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
     for(
         const key of Object.keys(cart)
     ){
@@ -4605,56 +4626,32 @@ async function getCartDetailed(){
         const parts =
             key.split("_");
 
-        const rawShopId =
-            String(parts[0] || "").trim();
+        const shopId =
+            parts[0];
 
         const menuId =
             parts.slice(1).join("_");
-
-        let shop = null;
-
-        if(uuidPattern.test(rawShopId)){
-
-            const {data:shopById} =
-                await db
-                .from("shops")
-                .select("*")
-                .eq("id",rawShopId)
-                .maybeSingle();
-
-            shop = shopById || null;
-
-        }else if(rawShopId){
-
-            const {data:shopByToken} =
-                await db
-                .from("shops")
-                .select("*")
-                .eq("registration_token",rawShopId)
-                .maybeSingle();
-
-            shop = shopByToken || null;
-        }
-
-        if(
-            !shop ||
-            !uuidPattern.test(String(shop.id || "").trim())
-        ){
-            continue;
-        }
-
-        const realShopId =
-            String(shop.id).trim();
 
         const {data:menu} =
             await db
             .from("menus")
             .select("*")
             .eq("id",menuId)
-            .eq("shop_id",realShopId)
+            .eq("shop_id",shopId)
             .maybeSingle();
 
         if(!menu) continue;
+
+        const {
+            data:shop
+        } =
+            await db
+            .from("shops")
+            .select("*")
+            .eq("id",shopId)
+            .maybeSingle();
+
+        if(!shop) continue;
 
         result.push({
             key:key,
@@ -4855,6 +4852,40 @@ async function sendCustomerOrder(){
         return;
     }
 
+    /*
+       SATU PESANAN = SATU KEDAI.
+       Tidak ada lagi pembagian pesanan ke beberapa kedai.
+    */
+    const shopId =
+        String(
+            selectedShopId ||
+            lines[0]?.shop?.id ||
+            ""
+        ).trim();
+
+    if(!shopId){
+
+        alert(
+            "Kedai pesanan tidak ditemukan."
+        );
+
+        return;
+    }
+
+    const differentShop =
+        lines.some(
+            line=>String(line.shop?.id || "").trim() !== shopId
+        );
+
+    if(differentShop){
+
+        alert(
+            "Satu pesanan hanya dapat dikirim ke satu kedai."
+        );
+
+        return;
+    }
+
     app().innerHTML =
         `<div class="card loading">
             Mengirim pesanan...
@@ -4915,97 +4946,71 @@ async function sendCustomerOrder(){
         return;
     }
 
-    const grouped = {};
-
-    lines.forEach(line=>{
-
-        if(!grouped[line.shop.id]){
-
-            grouped[line.shop.id] = {
-                shop:line.shop,
-                lines:[]
-            };
-        }
-
-        grouped[line.shop.id]
-            .lines
-            .push(line);
-    });
-
-    let shopOrderRows = [];
-
-    for(
-        const group of Object.values(grouped)
-    ){
-
-        shopOrderRows.push({
-            order_id:order.id,
-            shop_id:group.shop.id,
-            customer_result_token:randomToken(48),
-            process_token:randomToken(48),
-            status:"menunggu_stok"
-        });
-    }
-
+    /*
+       Hanya dibuat SATU shop_order untuk kedai yang dipilih.
+       stock_token dibiarkan dibuat oleh default UUID Supabase.
+    */
     const {
-        data:shopOrders,
+        data:shopOrder,
         error:shopOrderError
     } =
         await db
         .from("shop_orders")
-        .insert(shopOrderRows)
-        .select("*");
+        .insert({
+            order_id:order.id,
+            shop_id:shopId,
+            customer_result_token:randomToken(48),
+            process_token:randomToken(48),
+            status:"menunggu_stok"
+        })
+        .select("*")
+        .single();
 
     if(shopOrderError){
 
         alert(
-            "Pesanan dibuat tetapi pembagian kedai gagal:\n" +
+            "Pesanan dibuat tetapi gagal masuk ke kedai:\n" +
             shopOrderError.message
         );
 
         return;
     }
 
-    let orderItems = [];
+    const orderItems =
+        lines.map(line=>({
 
-    for(
-        const shopOrder of shopOrders
-    ){
+            /* UUID asli dari tabel orders */
+            order_id:
+                order.id,
 
-        const group =
-            grouped[shopOrder.shop_id];
+            /* UUID asli dari tabel shop_orders */
+            shop_order_id:
+                shopOrder.id,
 
-        group.lines.forEach(line=>{
+            /* UUID asli dari tabel shops */
+            shop_id:
+                shopId,
 
-            orderItems.push({
-                order_id:
-                    order.id,
+            menu_id:
+                line.menu.id,
 
-                shop_order_id:
-                    shopOrder.id,
+            menu_name:
+                line.menu.name,
 
-                menu_id:
-                    line.menu.id,
+            variant:
+                line.variants.length
+                ? line.variants.join(", ")
+                : null,
 
-                menu_name:
-                    line.menu.name,
+            price:
+                Number(line.menu.price),
 
-                variant:
-                    line.variants.length
-                    ? line.variants.join(", ")
-                    : null,
+            quantity:
+                Number(line.quantity),
 
-                price:
-                    Number(line.menu.price),
-
-                quantity:
-                    Number(line.quantity),
-
-                stock_status:
-                    "menunggu"
-            });
-        });
-    }
+            stock_status:
+                "menunggu"
+        }));
 
     const {
         error:itemError
@@ -5030,7 +5035,6 @@ async function sendCustomerOrder(){
 
     showOrderSent();
 }
-
 
 /* =========================================================
    SEND SHOP LINKS TO COURIER
@@ -5127,14 +5131,9 @@ function showOrderSent(){
             </div>
 
             <p>
-                Pesanan sudah dipisahkan berdasarkan
-                kedai.
-            </p>
-
-            <p>
-                Pesanan sekarang langsung masuk ke
-                menu PENGECEKAN STOK pada masing-masing
-                kedai.
+                Pesanan langsung masuk ke
+                menu PENGECEKAN STOK pada kedai yang
+                dipilih.
             </p>
 
             <button
