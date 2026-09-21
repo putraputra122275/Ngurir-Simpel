@@ -362,22 +362,6 @@ hr{
     font-size:12px;
     padding:20px;
 }
-
-.courier-name-banner{
-    background:white;
-    border-radius:12px;
-    padding:12px 15px;
-    margin-bottom:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-    text-align:center;
-    font-weight:bold;
-    font-size:18px;
-    color:#1565c0;
-}
-
-.auto-back-button{
-    margin-top:10px;
-}
 </style>
 </head>
 
@@ -434,7 +418,6 @@ let currentShop = null;
 
 let selectedCourierId = null;
 let selectedShopId = null;
-let linkCourierName = "";
 let currentOrderId = null;
 
 let selectedOrderLocation = null;
@@ -453,95 +436,6 @@ let urlParams = new URLSearchParams(window.location.search);
 function app(){
     return document.getElementById("app");
 }
-
-function getVisibleCourierName(){
-    if(currentCustomer){
-        return linkCourierName || window.linkCourierName || "";
-    }
-
-    if(currentShop){
-        return linkCourierName || window.linkCourierName || "";
-    }
-
-    return linkCourierName || window.linkCourierName || "";
-}
-
-function goBackFromPage(){
-    if(window.history.length > 1){
-        window.history.back();
-        return;
-    }
-
-    if(currentCustomer){
-        showCustomerDashboard();
-        return;
-    }
-
-    if(currentShop){
-        showShopDashboard();
-        return;
-    }
-
-    showHome();
-}
-
-function addRoleDisplayElements(){
-
-    const root = app();
-    if(!root) return;
-
-    const name = getVisibleCourierName();
-    const isCustomerOrShop =
-        !!currentCustomer ||
-        !!currentShop ||
-        urlParams.has("c") ||
-        urlParams.has("courier");
-
-    if(!isCustomerOrShop) return;
-
-    if(name && !root.querySelector(".courier-name-banner")){
-        const banner = document.createElement("div");
-        banner.className = "courier-name-banner";
-        banner.textContent = name;
-        root.prepend(banner);
-    }
-
-    const pageText = (root.innerText || "").trim();
-    const isDashboard =
-        (currentCustomer && pageText.includes("MENU PELANGGAN")) ||
-        (currentShop && pageText.includes("KEDAI SAYA"));
-
-    const isCustomerEntry =
-        urlParams.has("c") &&
-        pageText.includes("NGURIR SIMPEL") &&
-        !pageText.includes("DAFTAR PELANGGAN") &&
-        !pageText.includes("MASUK KE AKUN PELANGGAN");
-
-    if(
-        !isDashboard &&
-        !isCustomerEntry &&
-        !root.querySelector(".auto-back-button") &&
-        !/\bKEMBALI\b/i.test(pageText)
-    ){
-        const button = document.createElement("button");
-        button.className = "secondary auto-back-button";
-        button.textContent = "KEMBALI";
-        button.onclick = goBackFromPage;
-        root.appendChild(button);
-    }
-}
-
-const roleDisplayObserver = new MutationObserver(()=>{
-    addRoleDisplayElements();
-});
-
-window.addEventListener("DOMContentLoaded",()=>{
-    const root = app();
-    if(root){
-        roleDisplayObserver.observe(root,{childList:true,subtree:true});
-        addRoleDisplayElements();
-    }
-});
 
 function money(value){
     value = Number(value) || 0;
@@ -776,7 +670,11 @@ function showHome(){
             <button
                 onclick="showExistingCourierLogin()"
                 class="secondary">
-                MASUK KE AKUN YANG SUDAH ADA
+                MASUK AKUN YANG SUDAH ADA
+            </button>
+
+            <button onclick="showCourierLogin()">
+                MASUK AKUN
             </button>
 
         </div>
@@ -1511,44 +1409,19 @@ function openWhatsAppLink(link){
 
 async function showShopRegister(){
 
-    const courierId =
-        urlParams.get("courier");
+    const courierId = urlParams.get("courier");
 
     if(!courierId){
-
-        app().innerHTML = `
-            <div class="card">
-                <div class="error-box">
-                    Link pendaftaran kedai tidak valid.
-                </div>
-            </div>
-        `;
-
+        app().innerHTML = `<div class="card"><div class="error-box">Link pendaftaran kedai tidak valid.</div></div>`;
         return;
     }
 
     selectedCourierId = courierId;
 
-    const {data:linkCourier} =
-        await db
-        .from("couriers")
-        .select("name")
-        .eq("id",courierId)
-        .maybeSingle();
-
-    linkCourierName = linkCourier?.name || "";
-    window.linkCourierName = linkCourierName;
-
-    const savedShop =
-        loadCurrentShop();
-
-    if(savedShop &&
-       savedShop.courier_id === courierId){
-
+    const savedShop = loadCurrentShop();
+    if(savedShop && savedShop.courier_id === courierId){
         currentShop = savedShop;
-
         showShopDashboard();
-
         return;
     }
 
@@ -1560,57 +1433,75 @@ async function showShopRegister(){
         .maybeSingle();
 
     if(error || !data){
-
-        app().innerHTML = `
-            <div class="card">
-
-                <div class="error-box">
-                    Link pendaftaran kedai tidak valid.
-                </div>
-
-            </div>
-        `;
-
+        app().innerHTML = `<div class="card"><div class="error-box">Link pendaftaran kedai tidak valid.</div></div>`;
         return;
     }
 
     app().innerHTML = `
         <div class="card">
-
-            <h2>🏪 DAFTAR KEDAI</h2>
-
-            <div class="info">
-                Kedai terhubung dengan kurir.
-            </div>
-
-            <label>Nama Kedai</label>
-
-            <input id="shopName">
-
-            <label>Nomor WhatsApp Kedai</label>
-
-            <input
-                id="shopWhatsapp"
-                type="tel">
-
-            <button
-                onclick="getShopLocation()"
-                class="success">
-                📍 BAGIKAN LOKASI / SERLOK
+            <h2>🏪 KEDAI</h2>
+            <button onclick="showShopRegistrationForm('${courierId}')">
+                DAFTAR AKUN
             </button>
-
-            <div
-                id="shopLocationInfo"
-                class="info">
-                Lokasi belum diambil
-            </div>
-
-            <button onclick="continueShopRegistration()">
-                LANJUT
+            <button onclick="showShopLoginForm('${courierId}')">
+                MASUK KE AKUN YANG SUDAH ADA
             </button>
-
         </div>
     `;
+}
+
+function showShopRegistrationForm(courierId){
+    app().innerHTML = `
+        <div class="card">
+            <h2>🏪 DAFTAR KEDAI</h2>
+            <div class="info">Kedai terhubung dengan kurir.</div>
+            <label>Nama Kedai</label>
+            <input id="shopName">
+            <label>Nomor WhatsApp Kedai</label>
+            <input id="shopWhatsapp" type="tel">
+            <button onclick="getShopLocation()" class="success">📍 BAGIKAN LOKASI / SERLOK</button>
+            <div id="shopLocationInfo" class="info">Lokasi belum diambil</div>
+            <button onclick="continueShopRegistration()">SELESAI PENDAFTARAN KEDAI</button>
+            <button onclick="showShopRegister()" class="secondary">KEMBALI</button>
+        </div>
+    `;
+}
+
+function showShopLoginForm(courierId){
+    app().innerHTML = `
+        <div class="card">
+            <h2>🏪 MASUK KEDAI</h2>
+            <label>ID AKUN KEDAI</label>
+            <input id="shopAccountId" placeholder="KEDAI-...">
+            <button onclick="loginShopById('${courierId}')">MASUK</button>
+            <button onclick="showShopRegister()" class="secondary">KEMBALI</button>
+        </div>
+    `;
+}
+
+async function loginShopById(courierId){
+    const accountId = document.getElementById("shopAccountId")?.value.trim();
+    if(!accountId){
+        alert("ID akun kedai wajib diisi.");
+        return;
+    }
+
+    const {data,error} =
+        await db
+        .from("shops")
+        .select("*")
+        .eq("registration_token",accountId)
+        .eq("courier_id",courierId)
+        .maybeSingle();
+
+    if(error || !data){
+        alert("ID akun kedai tidak ditemukan.");
+        return;
+    }
+
+    currentShop = data;
+    saveShop(data);
+    showShopDashboard();
 }
 
 function getShopLocation(){
@@ -1640,17 +1531,10 @@ function getShopLocation(){
     );
 }
 
-function continueShopRegistration(){
+async function continueShopRegistration(){
 
-    const name =
-        document.getElementById(
-            "shopName"
-        ).value.trim();
-
-    const whatsapp =
-        document.getElementById(
-            "shopWhatsapp"
-        ).value.trim();
+    const name = document.getElementById("shopName").value.trim();
+    const whatsapp = document.getElementById("shopWhatsapp").value.trim();
 
     if(!name || !whatsapp){
         alert("Nama kedai dan WhatsApp wajib diisi.");
@@ -1662,16 +1546,55 @@ function continueShopRegistration(){
         return;
     }
 
-    window.shopDraftInfo = {
-        name:name,
-        whatsapp:whatsapp,
-        latitude:window.shopLocation.latitude,
-        longitude:window.shopLocation.longitude
-    };
+    const courierIdFromLink = urlParams.get("courier");
+    const courierId = courierIdFromLink || selectedCourierId;
 
+    if(!courierId){
+        alert("ID kurir pada link pendaftaran tidak ditemukan.");
+        return;
+    }
+
+    const {data:courier,error:courierError} =
+        await db
+        .from("couriers")
+        .select("id")
+        .eq("id",courierId)
+        .maybeSingle();
+
+    if(courierError || !courier){
+        alert("Akun kurir pada link tidak ditemukan.");
+        return;
+    }
+
+    const registrationToken =
+        "KEDAI-" + randomToken(6).toUpperCase();
+
+    const {data:shop,error:shopError} =
+        await db
+        .from("shops")
+        .insert({
+            courier_id:courierId,
+            name:name,
+            whatsapp:whatsapp,
+            latitude:window.shopLocation.latitude,
+            longitude:window.shopLocation.longitude,
+            registration_token:registrationToken
+        })
+        .select("*")
+        .single();
+
+    if(shopError){
+        alert("Gagal menyimpan kedai:\n" + shopError.message);
+        return;
+    }
+
+    currentShop = shop;
+    saveShop(shop);
+    window.shopDraftInfo = null;
     shopDraftMenus = [];
 
-    showShopMenuSetup();
+    alert("Pendaftaran kedai berhasil.\nID Akun Kedai: " + (shop.registration_token || registrationToken));
+    showShopDashboard();
 }
 
 
@@ -2080,9 +2003,6 @@ async function submitShopRegistration(){
         return;
     }
 
-    linkCourierName = data.name || "";
-    window.linkCourierName = linkCourierName;
-
     const registrationToken =
         randomToken(40);
 
@@ -2252,62 +2172,54 @@ async function submitShopRegistration(){
 async function showShopDashboard(){
 
     if(!currentShop){
-
-        currentShop =
-            loadCurrentShop();
+        currentShop = loadCurrentShop();
     }
 
     if(!currentShop){
-
         go("home");
         return;
     }
 
-    if(!linkCourierName && currentShop.courier_id){
-        const {data:courier} =
-            await db
-            .from("couriers")
-            .select("name")
-            .eq("id",currentShop.courier_id)
-            .maybeSingle();
+    app().innerHTML = `
+        <div class="card loading">
+            Memuat informasi kedai...
+        </div>
+    `;
 
-        linkCourierName = courier?.name || "";
-        window.linkCourierName = linkCourierName;
-    }
+    const {data:courier} =
+        await db
+        .from("couriers")
+        .select("name")
+        .eq("id",currentShop.courier_id)
+        .maybeSingle();
 
     app().innerHTML = `
         <div class="card">
-
             <h2>🏪 KEDAI SAYA</h2>
 
             <div class="info">
-                <b>
-                    ${escapeHtml(
-                        currentShop.name
-                    )}
-                </b>
+                <b>${escapeHtml(courier?.name || "")}</b>
             </div>
 
-            <button
-                onclick="showShopStockChecks()">
+            <div class="info">
+                <b>${escapeHtml(currentShop.name)}</b>
+            </div>
+
+            <button onclick="showShopStockChecks()">
                 PENGECEKAN STOK
             </button>
 
-            <button
-                onclick="showShopOrders()">
+            <button onclick="showShopOrders()">
                 PESANAN
             </button>
 
-            <button
-                onclick="showShopAddMenu()">
+            <button onclick="showShopAddMenu()">
                 TAMBAH MENU
             </button>
 
-            <button
-                onclick="showShopEditInfo()">
+            <button onclick="showShopEditInfo()">
                 EDIT INFORMASI
             </button>
-
         </div>
     `;
 }
@@ -2473,106 +2385,7 @@ async function getMenuVariants(menuId){
    SHOP ADD MENU
 ========================================================= */
 
-async function showShopAddMenu(){
-
-    if(!currentShop) return;
-
-    app().innerHTML = `
-        <div class="card loading">
-            Memuat menu...
-        </div>`;
-
-    const {data:menus,error} =
-        await db
-        .from("menus")
-        .select("*")
-        .eq("shop_id",currentShop.id)
-        .order("created_at");
-
-    if(error){
-
-        app().innerHTML = `
-            <div class="card">
-                <div class="error-box">
-                    ${escapeHtml(error.message)}
-                </div>
-                <button
-                    onclick="showShopDashboard()"
-                    class="secondary">
-                    KEMBALI
-                </button>
-            </div>
-        `;
-        return;
-    }
-
-    let html = `
-        <div class="card">
-            <h2>+ TAMBAH MENU</h2>
-    `;
-
-    if(!menus || menus.length===0){
-        html += `
-            <div class="info">
-                Belum ada menu yang ditambahkan.
-            </div>
-        `;
-    }
-
-    for(const menu of menus || []){
-
-        const variants =
-            await getMenuVariants(menu.id);
-
-        html += `
-            <div class="menu-card">
-                <div class="menu-name">
-                    ${escapeHtml(menu.name)}
-                </div>
-                <div class="menu-price">
-                    ${money(menu.price)}
-                </div>
-                ${
-                    variants.length > 0
-                    ? `
-                    <div class="variant-box">
-                        <b>Varian:</b><br>
-                        ${variants.map(v=>escapeHtml(v.name)).join(", ")}
-                    </div>`
-                    : ""
-                }
-                <button
-                    class="small"
-                    onclick="editMenu('${menu.id}')">
-                    EDIT MENU
-                </button>
-                <button
-                    class="small danger"
-                    onclick="deleteMenu('${menu.id}')">
-                    HAPUS MENU
-                </button>
-            </div>
-        `;
-    }
-
-    html += `
-            <button
-                onclick="showShopNewMenuForm()">
-                TAMBAH MENU
-            </button>
-
-            <button
-                onclick="showShopDashboard()"
-                class="secondary">
-                KEMBALI
-            </button>
-        </div>
-    `;
-
-    app().innerHTML = html;
-}
-
-function showShopNewMenuForm(){
+function showShopAddMenu(){
 
     app().innerHTML = `
         <div class="card">
@@ -2778,7 +2591,7 @@ async function saveNewMenu(){
 
     alert("Menu berhasil ditambahkan.");
 
-    showShopAddMenu();
+    showShopMenus();
 }
 
 
@@ -3091,7 +2904,7 @@ async function saveEditedMenu(){
 
     alert("Menu berhasil diubah.");
 
-    showShopAddMenu();
+    showShopMenus();
 }
 
 
@@ -3128,7 +2941,7 @@ async function deleteMenu(menuId){
 
     alert("Menu berhasil dihapus.");
 
-    showShopAddMenu();
+    showShopMenus();
 }
 
 
@@ -3326,7 +3139,7 @@ async function showCourierShops(){
         `;
     }
 
-    (shops || []).filter(shop=>shop.status !== "nonaktif").forEach(shop=>{
+    shops.forEach(shop=>{
 
         html += `
             <div
@@ -3371,7 +3184,7 @@ async function showCourierShopDetail(shopId){
         .eq("courier_id",currentCourier.id)
         .single();
 
-    if(error || !shop || shop.status === "nonaktif"){
+    if(error || !shop){
         alert("Kedai tidak ditemukan.");
         return;
     }
@@ -3389,94 +3202,32 @@ async function showCourierShopDetail(shopId){
     `;
 
     if(!menus || menus.length===0){
-        html += `
-            <div class="info">
-                Belum ada menu.
-            </div>
-        `;
+        html += `<div class="info">Belum ada menu.</div>`;
     }
 
     for(const menu of menus || []){
         const variants = await getMenuVariants(menu.id);
         html += `
             <div class="menu-card">
-                <div class="menu-name">
-                    ${escapeHtml(menu.name)}
-                </div>
-                <div class="menu-price">
-                    ${money(menu.price)}
-                </div>
-                ${
-                    variants.length > 0
-                    ? `
+                <div class="menu-name">${escapeHtml(menu.name)}</div>
+                <div class="menu-price">${money(menu.price)}</div>
+                ${variants.length ? `
                     <div class="variant-box">
-                        <b>Varian:</b><br>
                         ${variants.map(v=>escapeHtml(v.name)).join(", ")}
-                    </div>`
-                    : ""
-                }
+                    </div>
+                ` : ""}
             </div>
         `;
     }
 
     html += `
-            <button
-                onclick="courierDeleteShop('${shop.id}')"
-                class="danger">
-                HAPUS KEDAI
-            </button>
-
-            <button
-                onclick="showCourierShops()"
-                class="secondary">
+            <button onclick="showCourierShops()" class="secondary">
                 KEMBALI
             </button>
         </div>
     `;
 
     app().innerHTML = html;
-}
-
-async function courierDeleteShop(shopId){
-
-    if(!currentCourier) return;
-
-    const {data:shop} =
-        await db
-        .from("shops")
-        .select("id,name")
-        .eq("id",shopId)
-        .eq("courier_id",currentCourier.id)
-        .maybeSingle();
-
-    if(!shop){
-        alert("Kedai tidak ditemukan.");
-        return;
-    }
-
-    if(!confirm("Hapus kedai " + shop.name + "?")){
-        return;
-    }
-
-    /*
-       Gunakan status nonaktif agar data pesanan lama
-       tidak rusak karena foreign key. Kedai hilang
-       dari daftar kedai aktif.
-    */
-    const {error} =
-        await db
-        .from("shops")
-        .update({status:"nonaktif"})
-        .eq("id",shopId)
-        .eq("courier_id",currentCourier.id);
-
-    if(error){
-        alert("Gagal menghapus kedai:\n" + error.message);
-        return;
-    }
-
-    alert("Kedai berhasil dihapus dari daftar aktif.");
-    showCourierShops();
 }
 
 
@@ -3892,48 +3643,23 @@ async function courierDeleteMenu(
 
 async function showCustomerEntry(){
 
-    const encoded =
-        urlParams.get("c");
+    const encoded = urlParams.get("c");
 
     if(!encoded){
-
-        app().innerHTML = `
-            <div class="card">
-
-                <div class="error-box">
-                    Link pelanggan tidak valid.
-                </div>
-
-            </div>
-        `;
-
+        app().innerHTML = `<div class="card"><div class="error-box">Link pelanggan tidak valid.</div></div>`;
         return;
     }
 
-    const courierId =
-        decodeCourierId(encoded);
+    const courierId = decodeCourierId(encoded);
 
     if(!courierId){
-
-        app().innerHTML = `
-            <div class="card">
-
-                <div class="error-box">
-                    Link pelanggan tidak valid.
-                </div>
-
-            </div>
-        `;
-
+        app().innerHTML = `<div class="card"><div class="error-box">Link pelanggan tidak valid.</div></div>`;
         return;
     }
 
     selectedCourierId = courierId;
 
-    const {
-        data:courier,
-        error:courierError
-    } =
+    const {data:courier,error:courierError} =
         await db
         .from("couriers")
         .select("*")
@@ -3941,130 +3667,61 @@ async function showCustomerEntry(){
         .maybeSingle();
 
     if(courierError || !courier){
-
-        app().innerHTML = `
-            <div class="card">
-
-                <div class="error-box">
-                    Data kurir tidak ditemukan.
-                </div>
-
-            </div>
-        `;
-
+        app().innerHTML = `<div class="card"><div class="error-box">Data kurir tidak ditemukan.</div></div>`;
         return;
     }
 
-    linkCourierName = courier.name || "";
-    window.linkCourierName = linkCourierName;
-
-    const saved =
-        loadCustomer(courierId);
+    const saved = loadCustomer(courierId);
 
     if(saved){
-
         currentCustomer = saved;
-
         showCustomerDashboard();
-
         return;
     }
 
     app().innerHTML = `
-        <div class="card center">
-
-            <h2>👤 NGURIR SIMPEL</h2>
-
-            <button
-                onclick="showCustomerRegister('${courierId}')">
+        <div class="card">
+            <h2>👤 PELANGGAN</h2>
+            <button onclick="showCustomerRegistrationForm('${courierId}')">
                 DAFTAR AKUN
             </button>
-
-            <button
-                onclick="showExistingCustomerLogin('${courierId}')"
-                class="secondary">
+            <button onclick="showCustomerLoginForm('${courierId}')">
                 MASUK KE AKUN YANG SUDAH ADA
             </button>
-
         </div>
     `;
 }
 
-function showCustomerRegister(courierId){
-
-    selectedCourierId = courierId;
-
+function showCustomerRegistrationForm(courierId){
     app().innerHTML = `
         <div class="card">
-
             <h2>👤 DAFTAR PELANGGAN</h2>
-
             <label>Nama</label>
-
             <input id="customerName">
-
             <label>Nomor WhatsApp</label>
-
-            <input
-                id="customerWhatsapp"
-                type="tel">
-
-            <button
-                onclick="registerCustomer('${courierId}')"
-                class="success">
-                SELESAI
-            </button>
-
-            <button
-                onclick="showCustomerEntry()"
-                class="secondary">
-                KEMBALI
-            </button>
-
+            <input id="customerWhatsapp" type="tel">
+            <button onclick="registerCustomer('${courierId}')">SELESAI</button>
+            <button onclick="showCustomerEntry()" class="secondary">KEMBALI</button>
         </div>
     `;
 }
 
-function showExistingCustomerLogin(courierId){
-
-    selectedCourierId = courierId;
-
+function showCustomerLoginForm(courierId){
     app().innerHTML = `
         <div class="card">
-
-            <h2>👤 MASUK KE AKUN PELANGGAN</h2>
-
-            <label>Nomor WhatsApp</label>
-
-            <input
-                id="existingCustomerWhatsapp"
-                type="tel"
-                placeholder="Masukkan nomor WhatsApp">
-
-            <button
-                onclick="loginCustomerByWhatsapp('${courierId}')">
-                MASUK
-            </button>
-
-            <button
-                onclick="showCustomerEntry()"
-                class="secondary">
-                KEMBALI
-            </button>
-
+            <h2>👤 MASUK PELANGGAN</h2>
+            <label>ID AKUN PELANGGAN</label>
+            <input id="customerAccountId" placeholder="Masukkan ID akun">
+            <button onclick="loginCustomerById('${courierId}')">MASUK</button>
+            <button onclick="showCustomerEntry()" class="secondary">KEMBALI</button>
         </div>
     `;
 }
 
-async function loginCustomerByWhatsapp(courierId){
-
-    const whatsapp =
-        document.getElementById(
-            "existingCustomerWhatsapp"
-        ).value.trim();
-
-    if(!whatsapp){
-        alert("Masukkan nomor WhatsApp.");
+async function loginCustomerById(courierId){
+    const id = document.getElementById("customerAccountId")?.value.trim();
+    if(!id){
+        alert("ID akun wajib diisi.");
         return;
     }
 
@@ -4072,24 +3729,17 @@ async function loginCustomerByWhatsapp(courierId){
         await db
         .from("customers")
         .select("*")
+        .eq("id",id)
         .eq("courier_id",courierId)
-        .eq("whatsapp",whatsapp)
         .maybeSingle();
 
     if(error || !data){
-
-        alert("Akun pelanggan tidak ditemukan.");
+        alert("ID akun pelanggan tidak ditemukan.");
         return;
     }
 
     currentCustomer = data;
-    selectedCourierId = courierId;
-
-    saveCustomer(
-        courierId,
-        data
-    );
-
+    saveCustomer(courierId,data);
     showCustomerDashboard();
 }
 
@@ -4159,7 +3809,7 @@ async function registerCustomer(courierId){
    CUSTOMER DASHBOARD
 ========================================================= */
 
-function showCustomerDashboard(){
+async function showCustomerDashboard(){
 
     if(!currentCustomer){
         showHome();
@@ -4167,255 +3817,39 @@ function showCustomerDashboard(){
     }
 
     app().innerHTML = `
-        <div class="card">
+        <div class="card loading">
+            Memuat menu pelanggan...
+        </div>
+    `;
 
+    const {data:courier} =
+        await db
+        .from("couriers")
+        .select("name")
+        .eq("id",currentCustomer.courier_id)
+        .maybeSingle();
+
+    app().innerHTML = `
+        <div class="card">
             <h2>👤 MENU PELANGGAN</h2>
 
             <div class="info">
-                Halo,
-                <b>
-                    ${escapeHtml(
-                        currentCustomer.name
-                    )}
-                </b>
+                <b>${escapeHtml(courier?.name || "")}</b>
             </div>
 
-            <button
-                onclick="
-                startCustomerOrder()">
+            <button onclick="startCustomerOrder()">
                 BUAT PESANAN
             </button>
 
-            <button
-                onclick="
-                showCustomerStockResults()"
-                class="success">
+            <button onclick="showCustomerOrderResults()">
                 HASIL PENGECEKAN STOK
             </button>
 
-            <button
-                onclick="
-                customerLogout()"
-                class="danger">
+            <button onclick="customerLogout()" class="danger">
                 KELUAR
             </button>
-
         </div>
     `;
-}
-
-
-/* =========================================================
-   CUSTOMER STOCK RESULTS
-   Tambahan: hasil pengecekan stok dari kedai
-   ditampilkan langsung di akun pelanggan.
-========================================================= */
-
-async function showCustomerStockResults(){
-
-    if(!currentCustomer) return;
-
-    app().innerHTML =
-        `<div class="card loading">
-            Memuat hasil pengecekan stok...
-        </div>`;
-
-    const {
-        data:orders,
-        error:ordersError
-    } =
-        await db
-        .from("orders")
-        .select("*")
-        .eq(
-            "customer_id",
-            currentCustomer.id
-        )
-        .order(
-            "created_at",
-            {ascending:false}
-        );
-
-    if(ordersError){
-
-        app().innerHTML = `
-            <div class="card">
-                <div class="error-box">
-                    ${escapeHtml(ordersError.message)}
-                </div>
-
-                <button
-                    onclick="showCustomerDashboard()"
-                    class="secondary">
-                    KEMBALI
-                </button>
-            </div>
-        `;
-
-        return;
-    }
-
-    let html = `
-        <div class="card">
-
-            <h2>📦 HASIL PENGECEKAN STOK</h2>
-    `;
-
-    let foundResult = false;
-
-    for(const order of orders || []){
-
-        const {
-            data:shopOrders
-        } =
-            await db
-            .from("shop_orders")
-            .select("*")
-            .eq(
-                "order_id",
-                order.id
-            )
-            .eq(
-                "status",
-                "hasil_stok"
-            )
-            .order(
-                "created_at",
-                {ascending:false}
-            );
-
-        for(const shopOrder of shopOrders || []){
-
-            foundResult = true;
-
-            const {
-                data:shop
-            } =
-                await db
-                .from("shops")
-                .select("name")
-                .eq(
-                    "id",
-                    shopOrder.shop_id
-                )
-                .maybeSingle();
-
-            const {
-                data:items
-            } =
-                await db
-                .from("order_items")
-                .select("*")
-                .eq(
-                    "shop_order_id",
-                    shopOrder.id
-                )
-                .order("created_at");
-
-            html += `
-                <div class="menu-card">
-
-                    <h3>
-                        🏪
-                        ${escapeHtml(
-                            shop?.name || "Kedai"
-                        )}
-                    </h3>
-
-                    <div class="info">
-                        Hasil pengecekan stok sudah dikirim oleh kedai.
-                    </div>
-            `;
-
-            (items || []).forEach(item=>{
-
-                html += `
-                    <div class="status-row">
-
-                        <div class="status-name">
-                            <b>
-                                ${escapeHtml(
-                                    item.menu_name || ""
-                                )}
-                            </b>
-
-                            ${
-                                item.variant
-                                ? `
-                                <div style="font-size:13px">
-                                    ${escapeHtml(
-                                        item.variant
-                                    )}
-                                </div>
-                                `
-                                : ""
-                            }
-                        </div>
-
-                        <div>
-                            ${
-                                item.stock_status === "ada"
-                                ? `
-                                <span class="badge badge-green">
-                                    ADA
-                                </span>
-                                `
-                                : `
-                                <span class="badge badge-red">
-                                    KOSONG
-                                </span>
-                                `
-                            }
-                        </div>
-
-                    </div>
-                `;
-            });
-
-            html += `
-                    <button
-                        onclick="
-                        processShopOrder(
-                            '${shopOrder.id}'
-                        )"
-                        class="success">
-                        PROSES PESANAN SAYA
-                    </button>
-
-                    <button
-                        onclick="
-                        cancelShopOrder(
-                            '${shopOrder.id}'
-                        )"
-                        class="danger">
-                        BATALKAN PESANAN SAYA
-                    </button>
-
-                </div>
-            `;
-        }
-    }
-
-    if(!foundResult){
-
-        html += `
-            <div class="info">
-                Belum ada hasil pengecekan stok dari kedai.
-            </div>
-        `;
-    }
-
-    html += `
-            <button
-                onclick="showCustomerDashboard()"
-                class="secondary">
-                KEMBALI
-            </button>
-
-        </div>
-    `;
-
-    app().innerHTML = html;
 }
 
 
@@ -4641,7 +4075,7 @@ async function showShopSelection(){
     }
 
     window.customerShops =
-        (shops || []).filter(shop=>shop.status !== "nonaktif");
+        shops || [];
 
     renderShopSelection(
         window.customerShops
@@ -4775,16 +4209,10 @@ async function openCustomerShopMenu(shopId){
         return;
     }
 
-    /*
-       SATU PESANAN HANYA UNTUK SATU KEDAI.
-       Jika pelanggan sudah memilih menu dari kedai lain,
-       pelanggan tetap berada pada kedai tersebut sampai
-       pesanan selesai/dibatalkan.
-    */
     const cartShopIds =
         [...new Set(
             Object.keys(cart)
-            .filter(key=>Number(cart[key]?.quantity || 0) > 0)
+            .filter(key=>Number(cart[key]?.quantity || 0) > 0 || Object.values(cart[key]?.variantQuantities || {}).some(q=>Number(q)>0))
             .map(key=>key.split("_")[0])
         )];
 
@@ -4793,7 +4221,7 @@ async function openCustomerShopMenu(shopId){
         !cartShopIds.includes(shopId)
     ){
         alert(
-            "Satu pesanan hanya dapat memilih satu kedai.\n\n" +
+            "Satu pesanan hanya dapat memilih satu kedai.\n\n"+
             "Silakan selesaikan atau kosongkan pesanan dari kedai yang sedang dipilih terlebih dahulu."
         );
         return;
@@ -4831,9 +4259,7 @@ async function openCustomerShopMenu(shopId){
     for(const menu of menus || []){
 
         const variants =
-            await getMenuVariants(
-                menu.id
-            );
+            await getMenuVariants(menu.id);
 
         const {
             data:setting
@@ -4886,149 +4312,114 @@ function renderCustomerShopMenu(
 
     menuData.forEach(item=>{
 
-        const menu =
-            item.menu;
+        const menu = item.menu;
+        const key = shop.id + "_" + menu.id;
+        const saved = cart[key] || {
+            quantity:0,
+            variants:[],
+            variantQuantities:{}
+        };
 
-        const key =
-            shop.id +
-            "_" +
-            menu.id;
+        if(item.variants.length > 0 && item.selection_type === "multiple"){
 
-        const saved =
-            cart[key] || {
-                quantity:0,
-                variants:[]
-            };
+            html += `
+                <div class="menu-card">
+                    <div class="menu-row">
+                        <div class="menu-info">
+                            <div class="menu-name">
+                                ${escapeHtml(menu.name)}
+                            </div>
+                            <div class="menu-price">
+                                ${money(menu.price)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="variant-box">
+                        ${item.variants.map(v=>{
+                            const q = Number(
+                                saved.variantQuantities?.[v.name] || 0
+                            );
+                            const vkey = key + "_v_" + safeId(v.name);
+                            return `
+                                <div class="menu-row">
+                                    <div class="menu-info">
+                                        <div class="menu-name">
+                                            ${escapeHtml(v.name)}
+                                        </div>
+                                        <div class="menu-price">
+                                            ${money(menu.price)}
+                                        </div>
+                                    </div>
+                                    <div class="qty-box">
+                                        <button onclick="changeCartQty('${key}',-1,'${escapeHtml(v.name).replace(/'/g,"\\'")}')">−</button>
+                                        <div id="qty_${safeId(vkey)}" class="qty-number">${q}</div>
+                                        <button onclick="changeCartQty('${key}',1,'${escapeHtml(v.name).replace(/'/g,"\\'")}')">+</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                </div>
+            `;
+            return;
+        }
 
         html += `
             <div class="menu-card">
-
                 <div class="menu-row">
-
                     <div class="menu-info">
-
                         <div class="menu-name">
-                            ${escapeHtml(
-                                menu.name
-                            )}
+                            ${escapeHtml(menu.name)}
                         </div>
-
                         <div class="menu-price">
                             ${money(menu.price)}
                         </div>
-
                     </div>
-
                     <div class="qty-box">
-
-                        <button
-                            onclick="
-                            changeCartQty(
-                                '${key}',
-                                -1
-                            )">
-                            −
-                        </button>
-
-                        <div
-                            id="qty_${safeId(key)}"
-                            class="qty-number">
-                            ${saved.quantity}
-                        </div>
-
-                        <button
-                            onclick="
-                            changeCartQty(
-                                '${key}',
-                                1
-                            )">
-                            +
-                        </button>
-
+                        <button onclick="changeCartQty('${key}',-1)">−</button>
+                        <div id="qty_${safeId(key)}" class="qty-number">${saved.quantity}</div>
+                        <button onclick="changeCartQty('${key}',1)">+</button>
                     </div>
-
                 </div>
 
                 ${
                     item.variants.length > 0
                     ? `
                     <div class="variant-box">
-
-                        ${item.variants.map(
-                            (v,index)=>{
-
+                        ${item.variants.map(v=>{
                             const checked =
-                                saved.variants
-                                .includes(v.name);
-
-                            const inputType =
-                                item.selection_type ===
-                                "multiple"
-                                ? "checkbox"
-                                : "radio";
-
+                                saved.variants.includes(v.name);
                             return `
-                                <label
-                                    class="variant-option">
-
+                                <label class="variant-option">
                                     <input
-                                        type="${inputType}"
+                                        type="radio"
                                         name="variant_${safeId(key)}"
-                                        ${
-                                            checked
-                                            ? "checked"
-                                            : ""
-                                        }
-                                        onchange="
-                                        changeCartVariant(
-                                            '${key}',
-                                            '${escapeHtml(v.name).replace(/'/g,"\\'")}',
-                                            ${
-                                                item.selection_type ===
-                                                "multiple"
-                                                ? "true"
-                                                : "false"
-                                            }
-                                        ">
-
-                                    <span>
-                                        ${escapeHtml(v.name)}
-                                    </span>
-
+                                        value="${escapeHtml(v.name)}"
+                                        ${checked ? "checked" : ""}
+                                        onchange="changeCartVariant('${key}','${escapeHtml(v.name).replace(/'/g,"\\'")}',false)">
+                                    <span>${escapeHtml(v.name)}</span>
                                 </label>
                             `;
                         }).join("")}
-
                     </div>
                     `
                     : ""
                 }
-
             </div>
         `;
     });
 
-    const hasSelectedMenu =
-        Object.keys(cart).some(key=>
-            key.startsWith(shop.id + "_") &&
-            Number(cart[key]?.quantity || 0) > 0
-        );
-
     html += `
             <button
-                onclick="finishCustomerShopMenu()"
-                class="success">
+                onclick="showCart()">
                 LIHAT PESANAN
             </button>
 
             <button
-                onclick="changeCustomerShop()"
-                class="secondary">
-                ${
-                    hasSelectedMenu
-                    ? "GANTI KEDAI"
-                    : "KEMBALI UNTUK MELIHAT KEDAI YANG LAIN"
-                }
+                onclick="finishCustomerShopMenu()"
+                class="success">
+                SELESAI
             </button>
 
         </div>
@@ -5045,21 +4436,48 @@ function safeId(text){
     .replace(/[^a-zA-Z0-9]/g,"");
 }
 
-function changeCartQty(key,delta){
+function changeCartQty(key,delta,variantName=null){
 
     if(!cart[key]){
-
         cart[key] = {
             quantity:0,
-            variants:[]
+            variants:[],
+            variantQuantities:{}
         };
     }
 
-    cart[key].quantity += delta;
+    if(variantName){
+        if(!cart[key].variantQuantities){
+            cart[key].variantQuantities = {};
+        }
 
-    if(cart[key].quantity < 0){
-        cart[key].quantity = 0;
+        const old =
+            Number(cart[key].variantQuantities[variantName] || 0);
+
+        const next =
+            Math.max(0,old + delta);
+
+        if(next===0){
+            delete cart[key].variantQuantities[variantName];
+        }else{
+            cart[key].variantQuantities[variantName] = next;
+        }
+
+        const totalQty =
+            Object.values(cart[key].variantQuantities)
+            .reduce((sum,q)=>sum + Number(q || 0),0);
+
+        cart[key].quantity = totalQty;
+
+        const el = document.getElementById(
+            "qty_" + safeId(key + "_v_" + variantName)
+        );
+        if(el) el.textContent = next;
+        return;
     }
+
+    cart[key].quantity =
+        Math.max(0,Number(cart[key].quantity || 0) + delta);
 
     const el =
         document.getElementById(
@@ -5067,8 +4485,7 @@ function changeCartQty(key,delta){
         );
 
     if(el){
-        el.textContent =
-            cart[key].quantity;
+        el.textContent = cart[key].quantity;
     }
 }
 
@@ -5116,43 +4533,48 @@ function changeCartVariant(
 function finishCustomerShopMenu(){
 
     const menuData =
-        window.currentCustomerShopMenu ||
-        [];
+        window.currentCustomerShopMenu || [];
 
     for(const item of menuData){
 
         const key =
-            selectedShopId +
-            "_" +
-            item.menu.id;
+            selectedShopId + "_" + item.menu.id;
 
         if(!cart[key]){
-
             cart[key] = {
                 quantity:0,
-                variants:[]
+                variants:[],
+                variantQuantities:{}
             };
         }
 
-        const checkedInputs =
-            Array.from(
-                document.querySelectorAll(
-                    'input[name="variant_' +
-                    safeId(key) +
-                    '"]:checked'
-                )
-            );
+        if(item.variants.length > 0 && item.selection_type === "multiple"){
+            const quantities = {};
+            item.variants.forEach(v=>{
+                const q = Number(
+                    cart[key].variantQuantities?.[v.name] || 0
+                );
+                if(q>0) quantities[v.name] = q;
+            });
+            cart[key].variantQuantities = quantities;
+            cart[key].variants = Object.keys(quantities);
+            cart[key].quantity = Object.values(quantities)
+                .reduce((sum,q)=>sum+Number(q||0),0);
+            continue;
+        }
+
+        const checkedInputs = Array.from(
+            document.querySelectorAll(
+                'input[name="variant_' + safeId(key) + '"]:checked'
+            )
+        );
 
         if(item.variants.length > 0){
-
             cart[key].variants =
                 uniqueVariantObjects(
-                    checkedInputs.map(input=>({
-                        name:input.value
-                    }))
+                    checkedInputs.map(input=>({name:input.value}))
                 ).map(v=>v.name);
         }else{
-
             cart[key].variants = [];
         }
 
@@ -5161,31 +4583,14 @@ function finishCustomerShopMenu(){
             item.variants.length > 0 &&
             cart[key].variants.length === 0
         ){
-
             alert(
                 "Silakan pilih varian untuk " +
                 item.menu.name
             );
-
             return;
         }
     }
 
-    showCart();
-}
-
-function changeCustomerShop(){
-
-    if(selectedShopId){
-
-        Object.keys(cart).forEach(key=>{
-            if(key.startsWith(selectedShopId + "_")){
-                delete cart[key];
-            }
-        });
-    }
-
-    selectedShopId = null;
     showShopSelection();
 }
 
@@ -5198,42 +4603,19 @@ async function getCartDetailed(){
 
     const result = [];
 
-    for(
-        const key of Object.keys(cart)
-    ){
+    for(const key of Object.keys(cart)){
 
-        const line =
-            cart[key];
+        const line = cart[key];
 
-        if(
-            !line ||
-            Number(line.quantity) <= 0
-        ){
-            continue;
-        }
+        if(!line) continue;
 
-        const parts =
-            key.split("_");
+        const parts = key.split("_");
+        const shopId = String(parts[0] || "").trim();
+        const menuId = parts.slice(1).join("_");
 
-        const shopId =
-            parts[0];
+        if(!shopId || !menuId) continue;
 
-        const menuId =
-            parts.slice(1).join("_");
-
-        const {data:menu} =
-            await db
-            .from("menus")
-            .select("*")
-            .eq("id",menuId)
-            .eq("shop_id",shopId)
-            .maybeSingle();
-
-        if(!menu) continue;
-
-        const {
-            data:shop
-        } =
+        const {data:shop} =
             await db
             .from("shops")
             .select("*")
@@ -5242,11 +4624,49 @@ async function getCartDetailed(){
 
         if(!shop) continue;
 
+        const {data:menu} =
+            await db
+            .from("menus")
+            .select("*")
+            .eq("id",menuId)
+            .eq("shop_id",shop.id)
+            .maybeSingle();
+
+        if(!menu) continue;
+
+        const {data:setting} =
+            await db
+            .from("menu_variant_settings")
+            .select("selection_type")
+            .eq("menu_id",menu.id)
+            .maybeSingle();
+
+        if(
+            setting?.selection_type === "multiple" &&
+            line.variantQuantities
+        ){
+            for(const [variant,qty] of Object.entries(line.variantQuantities)){
+                const q = Number(qty || 0);
+                if(q<=0) continue;
+                result.push({
+                    key:key,
+                    shop:shop,
+                    menu:menu,
+                    quantity:q,
+                    variants:[variant]
+                });
+            }
+            continue;
+        }
+
+        const quantity = Number(line.quantity || 0);
+        if(quantity<=0) continue;
+
         result.push({
             key:key,
             shop:shop,
             menu:menu,
-            quantity:Number(line.quantity),
+            quantity:quantity,
             variants:Array.isArray(line.variants)
                 ? line.variants
                 : []
@@ -5261,15 +4681,9 @@ function calculateCartTotal(lines){
     let total = 0;
 
     for(const line of lines){
-
-        const price =
-            Number(line.menu.price) || 0;
-
-        const qty =
-            Number(line.quantity) || 0;
-
-        total +=
-            price * qty;
+        const price = Number(line.menu.price) || 0;
+        const qty = Number(line.quantity) || 0;
+        total += price * qty;
     }
 
     return total;
@@ -5277,136 +4691,76 @@ function calculateCartTotal(lines){
 
 async function showCart(){
 
-    const lines =
-        await getCartDetailed();
+    const lines = await getCartDetailed();
 
     if(lines.length===0){
-
-        alert(
-            "Belum ada menu yang dipilih."
-        );
-
+        app().innerHTML = `
+            <div class="card">
+                <div class="info">
+                    Belum ada menu yang dipilih.
+                </div>
+                <button onclick="showShopSelection()">
+                    KEMBALI UNTUK MELIHAT KEDAI YANG LAIN
+                </button>
+            </div>
+        `;
         return;
     }
 
     const grouped = {};
-
     lines.forEach(line=>{
-
         if(!grouped[line.shop.id]){
-            grouped[line.shop.id] = {
-                shop:line.shop,
-                lines:[]
-            };
+            grouped[line.shop.id] = {shop:line.shop,lines:[]};
         }
-
-        grouped[line.shop.id]
-            .lines
-            .push(line);
+        grouped[line.shop.id].lines.push(line);
     });
 
     let html = `
         <div class="card">
-
             <h2>🛒 PESANAN SAYA</h2>
     `;
 
-    Object.values(grouped)
-    .forEach(group=>{
-
-        html += `
-            <h3>
-                🏪
-                ${escapeHtml(
-                    group.shop.name
-                )}
-            </h3>
-        `;
+    Object.values(grouped).forEach(group=>{
+        html += `<h3>🏪 ${escapeHtml(group.shop.name)}</h3>`;
 
         group.lines.forEach(line=>{
-
             const subtotal =
-                Number(line.menu.price) *
-                Number(line.quantity);
+                Number(line.menu.price) * Number(line.quantity);
+            const displayName =
+                line.variants.length
+                ? line.menu.name + " " + line.variants.join(" ")
+                : line.menu.name;
 
             html += `
-                <div
-                    style="
-                    padding:8px 0;
-                    border-bottom:1px solid #eee">
-
-                    <b>
-                        ${escapeHtml(
-                            line.menu.name
-                        )}
-                    </b>
-
-                    ${
-                        line.variants.length
-                        ? `
-                        <div style="
-                            font-size:13px;
-                            color:#555">
-                            Varian:
-                            ${escapeHtml(
-                                line.variants.join(", ")
-                            )}
-                        </div>
-                        `
-                        : ""
-                    }
-
+                <div style="padding:8px 0;border-bottom:1px solid #eee">
+                    <b>${escapeHtml(displayName)}</b>
                     <div>
-                        ${line.quantity}
-                        x
-                        ${money(line.menu.price)}
-
-                        <span style="float:right">
-                            ${money(subtotal)}
-                        </span>
+                        ${line.quantity} x ${money(line.menu.price)}
+                        <span style="float:right">${money(subtotal)}</span>
                     </div>
-
                 </div>
             `;
         });
-
         html += `<hr>`;
     });
 
-    const total =
-        calculateCartTotal(lines);
+    const total = calculateCartTotal(lines);
 
     html += `
             <div class="total-box">
-
                 <div class="total-line">
-
-                    <span>
-                        TOTAL PESANAN
-                    </span>
-
-                    <b>
-                        ${money(total)}
-                    </b>
-
+                    <span>TOTAL PESANAN</span>
+                    <b>${money(total)}</b>
                 </div>
-
             </div>
 
-            <button
-                onclick="
-                sendCustomerOrder()"
-                class="success">
+            <button onclick="sendCustomerOrder()" class="success">
                 KIRIM PESANAN
             </button>
 
-            <button
-                onclick="
-                showShopSelection()"
-                class="secondary">
-                KEMBALI PILIH KEDAI
+            <button onclick="showShopSelection()" class="secondary">
+                GANTI KEDAI
             </button>
-
         </div>
     `;
 
@@ -5418,232 +4772,115 @@ async function showCart(){
    SEND CUSTOMER ORDER
 ========================================================= */
 
-function isDirectCourierMenu(menuName){
-
-    return String(menuName || "")
-        .trim()
-        .replace(/\s+/g," ")
-        .toLowerCase() === "es teh";
-}
-
 async function sendCustomerOrder(){
 
-    const lines =
-        await getCartDetailed();
+    const lines = await getCartDetailed();
 
     if(lines.length===0){
-
-        alert(
-            "Pesanan masih kosong."
-        );
-
+        alert("Pesanan masih kosong.");
         return;
     }
 
     if(!selectedOrderLocation){
-
-        alert(
-            "Lokasi pesanan belum diambil."
-        );
-
+        alert("Lokasi pesanan belum diambil.");
         return;
     }
 
-    /*
-       SATU PESANAN = SATU KEDAI.
-       Tidak ada lagi pembagian pesanan ke beberapa kedai.
-    */
-    const shopId =
-        String(
-            selectedShopId ||
-            lines[0]?.shop?.id ||
-            ""
-        ).trim();
+    const shopIds = [...new Set(
+        lines.map(line=>String(line.shop?.id || "").trim())
+    )];
 
-    if(!shopId){
-
-        alert(
-            "Kedai pesanan tidak ditemukan."
-        );
-
+    if(shopIds.length !== 1 || !shopIds[0]){
+        alert("Satu pesanan hanya dapat dikirim ke satu kedai.");
         return;
     }
 
-    const differentShop =
-        lines.some(
-            line=>String(line.shop?.id || "").trim() !== shopId
-        );
-
-    if(differentShop){
-
-        alert(
-            "Satu pesanan hanya dapat dikirim ke satu kedai."
-        );
-
-        return;
-    }
+    const shopId = shopIds[0];
 
     app().innerHTML =
         `<div class="card loading">
             Mengirim pesanan...
         </div>`;
 
-    const total =
-        calculateCartTotal(lines);
+    const total = calculateCartTotal(lines);
 
-    const {
-        data:order,
-        error:orderError
-    } =
+    const {data:order,error:orderError} =
         await db
         .from("orders")
         .insert({
-            courier_id:
-                currentCustomer.courier_id,
-
-            customer_id:
-                currentCustomer.id,
-
-            latitude:
-                selectedOrderLocation.latitude,
-
-            longitude:
-                selectedOrderLocation.longitude,
-
+            courier_id:currentCustomer.courier_id,
+            customer_id:currentCustomer.id,
+            latitude:selectedOrderLocation.latitude,
+            longitude:selectedOrderLocation.longitude,
             total:total,
-
             delivery_fee:0,
-
             total_payment:total,
-
             status:"menunggu_stok"
         })
         .select("*")
         .single();
 
     if(orderError){
-
         app().innerHTML = `
             <div class="card">
-
                 <div class="error-box">
                     Gagal membuat pesanan:<br><br>
-                    ${escapeHtml(
-                        orderError.message
-                    )}
+                    ${escapeHtml(orderError.message)}
                 </div>
-
-                <button onclick="showCart()">
-                    KEMBALI
-                </button>
-
+                <button onclick="showCart()">KEMBALI</button>
             </div>
         `;
-
         return;
     }
 
-    /*
-       Menu "Es Teh" (termasuk Es Teh/es teh/ES TEH)
-       langsung masuk ke alur kurir. Menu lainnya
-       tetap masuk ke pengecekan stok kedai.
-    */
-    const normalLines =
-        lines.filter(line=>!isDirectCourierMenu(line.menu.name));
+    const {data:shopOrder,error:shopOrderError} =
+        await db
+        .from("shop_orders")
+        .insert({
+            order_id:order.id,
+            shop_id:shopId,
+            customer_result_token:randomToken(48),
+            process_token:randomToken(48),
+            status:"menunggu_stok"
+        })
+        .select("*")
+        .single();
 
-    const directLines =
-        lines.filter(line=>isDirectCourierMenu(line.menu.name));
-
-    const createdShopOrders = [];
-
-    async function createShopOrderForLines(
-        orderLines,
-        status
-    ){
-
-        if(orderLines.length===0) return null;
-
-        const {data:shopOrder,error:shopOrderError} =
-            await db
-            .from("shop_orders")
-            .insert({
-                order_id:order.id,
-                shop_id:shopId,
-                customer_result_token:randomToken(48),
-                process_token:randomToken(48),
-                status:status,
-                processed_at:
-                    status === "diproses"
-                    ? new Date().toISOString()
-                    : null
-            })
-            .select("*")
-            .single();
-
-        if(shopOrderError){
-            throw new Error(shopOrderError.message);
-        }
-
-        const orderItems =
-            orderLines.map(line=>({
-                order_id:order.id,
-                shop_order_id:shopOrder.id,
-                shop_id:shopId,
-                menu_id:line.menu.id,
-                menu_name:line.menu.name,
-                variant:line.variants.length
-                    ? line.variants.join(", ")
-                    : null,
-                price:Number(line.menu.price),
-                quantity:Number(line.quantity),
-                stock_status:
-                    status === "diproses"
-                    ? "ada"
-                    : "menunggu"
-            }));
-
-        const {error:itemError} =
-            await db
-            .from("order_items")
-            .insert(orderItems);
-
-        if(itemError){
-            throw new Error(itemError.message);
-        }
-
-        createdShopOrders.push(shopOrder);
-        return shopOrder;
+    if(shopOrderError){
+        await db.from("orders").delete().eq("id",order.id);
+        alert("Pesanan gagal masuk ke kedai:\n" + shopOrderError.message);
+        return;
     }
 
-    try{
-        await createShopOrderForLines(
-            normalLines,
-            "menunggu_stok"
-        );
+    const orderItems = lines.map(line=>({
+        order_id:order.id,
+        shop_order_id:shopOrder.id,
+        shop_id:shopId,
+        menu_id:line.menu.id,
+        menu_name:line.menu.name,
+        variant:line.variants.length ? line.variants.join(", ") : null,
+        price:Number(line.menu.price),
+        quantity:Number(line.quantity),
+        stock_status:"menunggu"
+    }));
 
-        await createShopOrderForLines(
-            directLines,
-            "diproses"
-        );
-    }catch(e){
+    const {error:itemError} =
+        await db
+        .from("order_items")
+        .insert(orderItems);
 
-        alert(
-            "Pesanan dibuat tetapi item pesanan gagal disimpan:\n" +
-            e.message
-        );
-
+    if(itemError){
+        await db.from("shop_orders").delete().eq("id",shopOrder.id);
+        await db.from("orders").delete().eq("id",order.id);
+        alert("Item pesanan gagal disimpan:\n" + itemError.message);
         return;
     }
 
     currentOrderId = order.id;
-
-    window.lastOrderHasDirectCourierMenu =
-        directLines.length > 0;
-
     cart = {};
-
     showOrderSent();
 }
+
 
 /* =========================================================
    SEND SHOP LINKS TO COURIER
@@ -5734,34 +4971,25 @@ function showOrderSent(){
 
     app().innerHTML = `
         <div class="card">
-
             <div class="success-box">
                 ✅ PESANAN BERHASIL DIKIRIM
             </div>
 
             <p>
-                ${
-                    window.lastOrderHasDirectCourierMenu
-                    ? "Menu Es Teh langsung diteruskan ke kurir. Menu lainnya mengikuti pengecekan stok kedai."
-                    : "Pesanan langsung masuk ke menu PENGECEKAN STOK pada kedai yang dipilih."
-                }
+                Pesanan langsung masuk ke kedai yang dipilih.
             </p>
 
-            <button
-                onclick="
-                showCustomerOrderStatus(
-                    '${currentOrderId}'
-                )">
+            <p>
+                Kedai dapat melihat pesanan tersebut pada menu PENGECEKAN STOK.
+            </p>
+
+            <button onclick="showCustomerOrderStatus('${currentOrderId}')">
                 LIHAT STATUS PESANAN
             </button>
 
-            <button
-                onclick="
-                showCustomerDashboard()"
-                class="secondary">
+            <button onclick="showCustomerDashboard()" class="secondary">
                 MENU PELANGGAN
             </button>
-
         </div>
     `;
 }
@@ -6229,6 +5457,39 @@ async function sendCustomerResultLink(
        dapat dibuka oleh pihak yang menjalankan
        halaman.
     */
+}
+
+
+async function showCustomerOrderResults(){
+
+    if(!currentCustomer){
+        showHome();
+        return;
+    }
+
+    const {data:orders,error} =
+        await db
+        .from("orders")
+        .select("id")
+        .eq("customer_id",currentCustomer.id)
+        .order("created_at",{ascending:false})
+        .limit(1);
+
+    if(error || !orders || orders.length===0){
+        app().innerHTML = `
+            <div class="card">
+                <div class="info">
+                    Belum ada hasil pengecekan stok.
+                </div>
+                <button onclick="showCustomerDashboard()" class="secondary">
+                    KEMBALI
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    await showCustomerOrderStatus(orders[0].id);
 }
 
 
@@ -6741,7 +6002,7 @@ async function showCourierProcessedOrders(){
                 <br>
 
                 <a
-                    href="https://www.google.com/maps/dir/?api=1&destination=${
+                    href="https://www.google.com/maps?q=${
                         order.latitude
                     },${
                         order.longitude
@@ -7483,215 +6744,84 @@ async function showShopStockChecks(){
             Memuat pengecekan stok...
         </div>`;
 
-    const {
-        data:shopOrders,
-        error
-    } =
+    const {data:shopOrders,error} =
         await db
         .from("shop_orders")
         .select("*")
-        .eq(
-            "shop_id",
-            currentShop.id
-        )
-        .eq(
-            "status",
-            "menunggu_stok"
-        )
-        .order(
-            "created_at",
-            {ascending:false}
-        );
+        .eq("shop_id",currentShop.id)
+        .eq("status","menunggu_stok")
+        .order("created_at",{ascending:false});
 
     if(error){
-
         app().innerHTML = `
             <div class="card">
-                <div class="error-box">
-                    ${escapeHtml(error.message)}
-                </div>
-
-                <button
-                    onclick="showShopDashboard()"
-                    class="secondary">
-                    KEMBALI
-                </button>
+                <div class="error-box">${escapeHtml(error.message)}</div>
+                <button onclick="showShopDashboard()" class="secondary">KEMBALI</button>
             </div>
         `;
-
         return;
     }
 
     let html = `
         <div class="card">
-
             <h2>📦 PENGECEKAN STOK</h2>
-
-            <p>
-                Pesanan baru dari pelanggan yang
-                masuk ke kedai ini.
-            </p>
+            <p>Pesanan baru dari pelanggan yang masuk ke kedai ini.</p>
     `;
 
     if(!shopOrders || shopOrders.length===0){
-
-        html += `
-            <div class="info">
-                Belum ada pesanan yang perlu
-                dicek stoknya.
-            </div>
-        `;
+        html += `<div class="info">Belum ada pesanan yang perlu dicek stoknya.</div>`;
     }
 
     for(const shopOrder of shopOrders || []){
-
-        const {
-            data:items
-        } =
+        const {data:items} =
             await db
             .from("order_items")
             .select("*")
-            .eq(
-                "shop_order_id",
-                shopOrder.id
-            )
+            .eq("shop_order_id",shopOrder.id)
             .order("created_at");
-
-        const {
-            data:order
-        } =
-            await db
-            .from("orders")
-            .select("id,customer_id,created_at")
-            .eq(
-                "id",
-                shopOrder.order_id
-            )
-            .maybeSingle();
-
-        const {
-            data:customer
-        } =
-            order
-            ? await db
-                .from("customers")
-                .select("name")
-                .eq(
-                    "id",
-                    order.customer_id
-                )
-                .maybeSingle()
-            : {data:null};
 
         html += `
             <div class="menu-card">
-
-                <h3>
-                    📦 PESANAN
-                </h3>
-
-                <div class="info">
-                    <b>
-                        Pelanggan:
-                    </b>
-                    ${escapeHtml(
-                        customer?.name || "-"
-                    )}
-                </div>
+                <h3>📦 PESANAN</h3>
         `;
 
         (items || []).forEach(item=>{
+            const displayName = item.variant
+                ? item.menu_name + " " + item.variant
+                : item.menu_name;
 
             html += `
                 <div class="status-row">
-
                     <div class="status-name">
-
-                        <b>
-                            ${escapeHtml(
-                                item.menu_name
-                            )}
-                        </b>
-
-                        ${
-                            item.variant
-                            ? `
-                            <div style="
-                                font-size:13px;
-                                color:#666">
-                                Varian:
-                                ${escapeHtml(
-                                    item.variant
-                                )}
-                            </div>
-                            `
-                            : ""
-                        }
-
-                        <div>
-                            Jumlah:
-                            ${Number(item.quantity) || 0}
-                        </div>
-
-                        <div>
-                            ${money(item.price)}
-                        </div>
-
+                        <b>${escapeHtml(displayName)}</b>
+                        <div>Jumlah: ${Number(item.quantity) || 0}</div>
+                        <div>${money(item.price)}</div>
                     </div>
-
                     <div>
                         ${
                             item.stock_status === "ada"
-                            ? `
-                            <span class="
-                                badge
-                                badge-green">
-                                ADA
-                            </span>
-                            `
+                            ? `<span class="badge badge-green">ADA</span>`
                             : item.stock_status === "kosong"
-                            ? `
-                            <span class="
-                                badge
-                                badge-red">
-                                KOSONG
-                            </span>
-                            `
-                            : `
-                            <span class="
-                                badge
-                                badge-orange">
-                                MENUNGGU
-                            </span>
-                            `
+                            ? `<span class="badge badge-red">KOSONG</span>`
+                            : `<span class="badge badge-orange">MENUNGGU</span>`
                         }
                     </div>
-
                 </div>
             `;
         });
 
         html += `
-                <button
-                    onclick="
-                    openShopStockOrder(
-                        '${shopOrder.id}'
-                    )"
-                    class="success">
+                <button onclick="openShopStockOrder('${shopOrder.id}')" class="success">
                     CEK STOK
                 </button>
-
             </div>
         `;
     }
 
     html += `
-            <button
-                onclick="showShopDashboard()"
-                class="secondary">
+            <button onclick="showShopDashboard()" class="secondary">
                 KEMBALI
             </button>
-
         </div>
     `;
 
