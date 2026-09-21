@@ -115,16 +115,18 @@ button:disabled{
 }
 
 .notification-badge{
-    display:inline-block;
-    min-width:22px;
-    padding:2px 7px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:24px;
+    height:24px;
+    padding:0 7px;
     margin-left:6px;
     border-radius:12px;
     background:#c62828;
-    color:white;
-    font-size:12px;
-    line-height:18px;
-    vertical-align:middle;
+    color:#fff;
+    font-size:13px;
+    font-weight:bold;
 }
 
 .hidden{
@@ -428,6 +430,9 @@ try{
 let currentCourier = null;
 let currentCustomer = null;
 let currentShop = null;
+let shopNotificationTimer = null;
+let shopNotifiedStatusIds = { menunggu_stok:new Set(), diproses:new Set() };
+let shopNotificationInitialized = false;
 
 let selectedCourierId = null;
 let selectedShopId = null;
@@ -767,7 +772,8 @@ function getCourierLocation(){
         },
         {
             enableHighAccuracy:true,
-            timeout:15000
+            timeout:30000,
+            maximumAge:0
         }
     );
 }
@@ -1206,7 +1212,8 @@ function updateCourierLocation(){
         },
         {
             enableHighAccuracy:true,
-            timeout:15000
+            timeout:30000,
+            maximumAge:0
         }
     );
 }
@@ -2182,30 +2189,6 @@ async function submitShopRegistration(){
    SHOP DASHBOARD
 ========================================================= */
 
-async function notifyShopBrowser(title,message){
-
-    try{
-        if(!("Notification" in window)){
-            return;
-        }
-
-        if(Notification.permission === "default"){
-            await Notification.requestPermission();
-        }
-
-        if(Notification.permission === "granted"){
-            new Notification(
-                title,
-                {
-                    body:message
-                }
-            );
-        }
-    }catch(error){
-        /* Notifikasi browser tidak boleh mengganggu alur aplikasi. */
-    }
-}
-
 async function showShopDashboard(){
 
     if(!currentShop){
@@ -2230,40 +2213,6 @@ async function showShopDashboard(){
         .eq("id",currentShop.courier_id)
         .maybeSingle();
 
-    const {count:stockNotificationCount} =
-        await db
-        .from("shop_orders")
-        .select("id",{count:"exact",head:true})
-        .eq("shop_id",currentShop.id)
-        .eq("status","menunggu_stok");
-
-    const {count:processedNotificationCount} =
-        await db
-        .from("shop_orders")
-        .select("id",{count:"exact",head:true})
-        .eq("shop_id",currentShop.id)
-        .eq("status","diproses");
-
-    const stockCount =
-        Number(stockNotificationCount || 0);
-
-    const processedCount =
-        Number(processedNotificationCount || 0);
-
-    if(stockCount > 0){
-        notifyShopBrowser(
-            "NGURIR SIMPEL - Pengecekan Stok Baru",
-            "Ada " + stockCount + " pengecekan stok baru dari pelanggan."
-        );
-    }
-
-    if(processedCount > 0){
-        notifyShopBrowser(
-            "NGURIR SIMPEL - Pesanan Diproses",
-            "Ada " + processedCount + " pesanan yang sudah diproses pelanggan."
-        );
-    }
-
     app().innerHTML = `
         <div class="card">
             <h2>🏪 KEDAI SAYA</h2>
@@ -2277,21 +2226,13 @@ async function showShopDashboard(){
             </div>
 
             <button onclick="showShopStockChecks()">
-                PENGECEKAN STOK
-                ${
-                    stockCount > 0
-                    ? `<span class="notification-badge">${stockCount}</span>`
-                    : ""
-                }
+                📦 PENGECEKAN STOK
+                <span id="shopStockNotificationBadge"></span>
             </button>
 
             <button onclick="showShopOrders()">
-                PESANAN
-                ${
-                    processedCount > 0
-                    ? `<span class="notification-badge">${processedCount}</span>`
-                    : ""
-                }
+                📋 PESANAN
+                <span id="shopOrderNotificationBadge"></span>
             </button>
 
             <button onclick="showShopAddMenu()">
@@ -2303,8 +2244,124 @@ async function showShopDashboard(){
             </button>
         </div>
     `;
+
+    startShopNotifications();
 }
 
+
+/* =========================================================
+   NOTIFIKASI KEDAI
+========================================================= */
+
+function stopShopNotifications(){
+    if(shopNotificationTimer){
+        clearInterval(shopNotificationTimer);
+        shopNotificationTimer = null;
+    }
+}
+
+async function notifyShopBrowser(title,message){
+    try{
+        if(!("Notification" in window)) return;
+
+        if(Notification.permission === "default"){
+            const permission = await Notification.requestPermission();
+            if(permission !== "granted") return;
+        }
+
+        if(Notification.permission === "granted"){
+            new Notification(title,{
+                body:message
+            });
+        }
+    }catch(e){}
+}
+
+async function refreshShopNotifications(){
+
+    if(!currentShop) return;
+
+    const {data:rows,error} =
+        await db
+        .from("shop_orders")
+        .select("id,status")
+        .eq("shop_id",currentShop.id)
+        .in("status",["menunggu_stok","diproses"]);
+
+    if(error) return;
+
+    const currentIds = {
+        menunggu_stok:new Set(
+            (rows || [])
+            .filter(row=>row.status === "menunggu_stok")
+            .map(row=>String(row.id))
+        ),
+        diproses:new Set(
+            (rows || [])
+            .filter(row=>row.status === "diproses")
+            .map(row=>String(row.id))
+        )
+    };
+
+    /*
+       Saat pertama kali dashboard dibuka, hanya catat
+       pesanan yang sudah ada. Jangan menganggapnya sebagai
+       pesanan baru agar tidak muncul notifikasi palsu.
+    */
+    if(!shopNotificationInitialized){
+        shopNotifiedStatusIds = currentIds;
+        shopNotificationInitialized = true;
+        return;
+    }
+
+    for(const id of currentIds.menunggu_stok){
+
+        if(!shopNotifiedStatusIds.menunggu_stok.has(id)){
+
+            await notifyShopBrowser(
+                "NGURIR SIMPEL - Pengecekan Stok",
+                "Ada pengecekan stok baru dari pelanggan."
+            );
+
+            break;
+        }
+    }
+
+    for(const id of currentIds.diproses){
+
+        if(!shopNotifiedStatusIds.diproses.has(id)){
+
+            await notifyShopBrowser(
+                "NGURIR SIMPEL - Pesanan",
+                "Pelanggan memilih PROSES PESANAN SAYA."
+            );
+
+            break;
+        }
+    }
+
+    shopNotifiedStatusIds = currentIds;
+}
+
+function startShopNotifications(){
+
+    stopShopNotifications();
+
+    shopNotificationInitialized = false;
+
+    shopNotifiedStatusIds = {
+        menunggu_stok:new Set(),
+        diproses:new Set()
+    };
+
+    refreshShopNotifications();
+
+    shopNotificationTimer =
+        setInterval(
+            refreshShopNotifications,
+            5000
+        );
+}
 
 /* =========================================================
    SHOP MENU LIST
@@ -4081,19 +4138,14 @@ function showCustomerOrderLocation(){
 
 function getCustomerOrderLocation(){
 
-    if(!navigator.geolocation){
-        alert("GPS tidak tersedia pada perangkat ini.");
-        return;
-    }
-
     navigator.geolocation.getCurrentPosition(
         position=>{
 
             selectedOrderLocation = {
                 latitude:
-                    Number(position.coords.latitude),
+                    position.coords.latitude,
                 longitude:
-                    Number(position.coords.longitude)
+                    position.coords.longitude
             };
 
             document.getElementById(
@@ -4112,8 +4164,7 @@ function getCustomerOrderLocation(){
         },
         {
             enableHighAccuracy:true,
-            timeout:30000,
-            maximumAge:0
+            timeout:15000
         }
     );
 }
@@ -4436,9 +4487,9 @@ function renderCustomerShopMenu(
                                         </div>
                                     </div>
                                     <div class="qty-box">
-                                        <button onclick="changeCartQty('${key}',-1,'${escapeHtml(v.name).replace(/'/g,"\\'")}')">−</button>
+                                        <button onclick='changeCartQty(${JSON.stringify(key)},-1,${JSON.stringify(v.name)})'>−</button>
                                         <div id="qty_${safeId(vkey)}" class="qty-number">${q}</div>
-                                        <button onclick="changeCartQty('${key}',1,'${escapeHtml(v.name).replace(/'/g,"\\'")}')">+</button>
+                                        <button onclick='changeCartQty(${JSON.stringify(key)},1,${JSON.stringify(v.name)})'>+</button>
                                     </div>
                                 </div>
                             `;
@@ -4514,10 +4565,9 @@ function renderCustomerShopMenu(
 
 function safeId(text){
 
-    return btoa(
-        String(text)
-    )
-    .replace(/[^a-zA-Z0-9]/g,"");
+    return String(text)
+        .normalize("NFKD")
+        .replace(/[^a-zA-Z0-9]/g,"_");
 }
 
 function changeCartQty(key,delta,variantName=null){
@@ -4557,7 +4607,6 @@ function changeCartQty(key,delta,variantName=null){
             "qty_" + safeId(key + "_v_" + variantName)
         );
         if(el) el.textContent = next;
-
         return;
     }
 
@@ -4866,48 +4915,8 @@ async function sendCustomerOrder(){
         return;
     }
 
-    if(!navigator.geolocation){
-        alert("GPS tidak tersedia pada perangkat ini.");
-        return;
-    }
-
-    /*
-       Ambil ulang lokasi tepat saat pelanggan menekan
-       KIRIM PESANAN agar lokasi yang diterima kurir
-       merupakan lokasi terbaru, bukan lokasi lama.
-    */
-    app().innerHTML =
-        `<div class="card loading">
-            Mengambil lokasi terbaru...
-        </div>`;
-
-    try{
-        const freshPosition = await new Promise(
-            (resolve,reject)=>{
-                navigator.geolocation.getCurrentPosition(
-                    resolve,
-                    reject,
-                    {
-                        enableHighAccuracy:true,
-                        timeout:30000,
-                        maximumAge:0
-                    }
-                );
-            }
-        );
-
-        selectedOrderLocation = {
-            latitude:
-                Number(freshPosition.coords.latitude),
-            longitude:
-                Number(freshPosition.coords.longitude)
-        };
-    }catch(error){
-        alert(
-            "Lokasi terbaru belum berhasil diambil. " +
-            "Silakan izinkan akses lokasi lalu coba lagi."
-        );
-        showCart();
+    if(!selectedOrderLocation){
+        alert("Lokasi pesanan belum diambil.");
         return;
     }
 
@@ -4926,6 +4935,34 @@ async function sendCustomerOrder(){
         `<div class="card loading">
             Mengirim pesanan...
         </div>`;
+
+    /* Ambil Serlok TERBARU tepat sebelum pesanan dikirim. */
+    try{
+        const freshPosition = await new Promise((resolve,reject)=>{
+            if(!navigator.geolocation){
+                reject(new Error("Perangkat tidak mendukung lokasi."));
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                resolve,
+                reject,
+                {
+                    enableHighAccuracy:true,
+                    timeout:30000,
+                    maximumAge:0
+                }
+            );
+        });
+
+        selectedOrderLocation = {
+            latitude:Number(freshPosition.coords.latitude),
+            longitude:Number(freshPosition.coords.longitude)
+        };
+    }catch(e){
+        alert("Lokasi terbaru belum berhasil diambil. Silakan aktifkan lokasi lalu coba KIRIM PESANAN lagi.");
+        showCart();
+        return;
+    }
 
     const total = calculateCartTotal(lines);
 
@@ -5108,12 +5145,8 @@ function showOrderSent(){
                 Kedai dapat melihat pesanan tersebut pada menu PENGECEKAN STOK.
             </p>
 
-            <button onclick="showCustomerOrderStatus('${currentOrderId}')">
-                LIHAT STATUS PESANAN
-            </button>
-
             <button onclick="showCustomerDashboard()" class="secondary">
-                MENU PELANGGAN
+                MENU PELANGGAN / KEMBALI KE MENU PELANGGAN
             </button>
         </div>
     `;
@@ -6891,11 +6924,6 @@ async function showShopStockChecks(){
         <div class="card">
             <h2>📦 PENGECEKAN STOK</h2>
             <p>Pesanan baru dari pelanggan yang masuk ke kedai ini.</p>
-            ${
-                (shopOrders || []).length > 0
-                ? `<div class="success-box">🔔 Ada ${shopOrders.length} pengecekan stok baru.</div>`
-                : ""
-            }
     `;
 
     if(!shopOrders || shopOrders.length===0){
@@ -7023,6 +7051,7 @@ function renderInternalStockCheck(
                 🏪
                 ${escapeHtml(shop.name)}
             </h3>
+
 
     `;
 
@@ -7261,6 +7290,7 @@ async function sendStockResultInternal(){
                 KEMBALI KE PENGECEKAN STOK
             </button>
 
+
         </div>
     `;
 }
@@ -7290,9 +7320,9 @@ async function showShopOrders(){
             "shop_id",
             currentShop.id
         )
-        .in(
+        .eq(
             "status",
-            ["hasil_stok","diproses"]
+            "diproses"
         )
         .order(
             "created_at",
@@ -7322,10 +7352,6 @@ async function showShopOrders(){
         <div class="card">
 
             <h2>📋 PESANAN</h2>
-
-            <div class="success-box">
-                🔔 Pesanan yang sudah diproses pelanggan akan muncul di sini.
-            </div>
     `;
 
     if(!shopOrders || shopOrders.length===0){
@@ -7394,7 +7420,7 @@ async function showShopOrders(){
                 </div>
         `;
 
-        (items || []).forEach(item=>{
+        (items || []).filter(item=>item.stock_status === "ada").forEach(item=>{
 
             html += `
                 <div class="status-row">
