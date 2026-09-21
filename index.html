@@ -114,6 +114,19 @@ button:disabled{
     cursor:not-allowed;
 }
 
+.notification-badge{
+    display:inline-block;
+    min-width:22px;
+    padding:2px 7px;
+    margin-left:6px;
+    border-radius:12px;
+    background:#c62828;
+    color:white;
+    font-size:12px;
+    line-height:18px;
+    vertical-align:middle;
+}
+
 .hidden{
     display:none!important;
 }
@@ -2169,6 +2182,30 @@ async function submitShopRegistration(){
    SHOP DASHBOARD
 ========================================================= */
 
+async function notifyShopBrowser(title,message){
+
+    try{
+        if(!("Notification" in window)){
+            return;
+        }
+
+        if(Notification.permission === "default"){
+            await Notification.requestPermission();
+        }
+
+        if(Notification.permission === "granted"){
+            new Notification(
+                title,
+                {
+                    body:message
+                }
+            );
+        }
+    }catch(error){
+        /* Notifikasi browser tidak boleh mengganggu alur aplikasi. */
+    }
+}
+
 async function showShopDashboard(){
 
     if(!currentShop){
@@ -2193,6 +2230,40 @@ async function showShopDashboard(){
         .eq("id",currentShop.courier_id)
         .maybeSingle();
 
+    const {count:stockNotificationCount} =
+        await db
+        .from("shop_orders")
+        .select("id",{count:"exact",head:true})
+        .eq("shop_id",currentShop.id)
+        .eq("status","menunggu_stok");
+
+    const {count:processedNotificationCount} =
+        await db
+        .from("shop_orders")
+        .select("id",{count:"exact",head:true})
+        .eq("shop_id",currentShop.id)
+        .eq("status","diproses");
+
+    const stockCount =
+        Number(stockNotificationCount || 0);
+
+    const processedCount =
+        Number(processedNotificationCount || 0);
+
+    if(stockCount > 0){
+        notifyShopBrowser(
+            "NGURIR SIMPEL - Pengecekan Stok Baru",
+            "Ada " + stockCount + " pengecekan stok baru dari pelanggan."
+        );
+    }
+
+    if(processedCount > 0){
+        notifyShopBrowser(
+            "NGURIR SIMPEL - Pesanan Diproses",
+            "Ada " + processedCount + " pesanan yang sudah diproses pelanggan."
+        );
+    }
+
     app().innerHTML = `
         <div class="card">
             <h2>🏪 KEDAI SAYA</h2>
@@ -2207,10 +2278,20 @@ async function showShopDashboard(){
 
             <button onclick="showShopStockChecks()">
                 PENGECEKAN STOK
+                ${
+                    stockCount > 0
+                    ? `<span class="notification-badge">${stockCount}</span>`
+                    : ""
+                }
             </button>
 
             <button onclick="showShopOrders()">
                 PESANAN
+                ${
+                    processedCount > 0
+                    ? `<span class="notification-badge">${processedCount}</span>`
+                    : ""
+                }
             </button>
 
             <button onclick="showShopAddMenu()">
@@ -4000,14 +4081,19 @@ function showCustomerOrderLocation(){
 
 function getCustomerOrderLocation(){
 
+    if(!navigator.geolocation){
+        alert("GPS tidak tersedia pada perangkat ini.");
+        return;
+    }
+
     navigator.geolocation.getCurrentPosition(
         position=>{
 
             selectedOrderLocation = {
                 latitude:
-                    position.coords.latitude,
+                    Number(position.coords.latitude),
                 longitude:
-                    position.coords.longitude
+                    Number(position.coords.longitude)
             };
 
             document.getElementById(
@@ -4026,7 +4112,8 @@ function getCustomerOrderLocation(){
         },
         {
             enableHighAccuracy:true,
-            timeout:15000
+            timeout:30000,
+            maximumAge:0
         }
     );
 }
@@ -4347,9 +4434,6 @@ function renderCustomerShopMenu(
                                         <div class="menu-name">
                                             ${escapeHtml(v.name)}
                                         </div>
-                                        <div class="menu-price">
-                                            ${money(menu.price)}
-                                        </div>
                                     </div>
                                     <div class="qty-box">
                                         <button onclick="changeCartQty('${key}',-1,'${escapeHtml(v.name).replace(/'/g,"\\'")}')">−</button>
@@ -4473,6 +4557,7 @@ function changeCartQty(key,delta,variantName=null){
             "qty_" + safeId(key + "_v_" + variantName)
         );
         if(el) el.textContent = next;
+
         return;
     }
 
@@ -4781,8 +4866,48 @@ async function sendCustomerOrder(){
         return;
     }
 
-    if(!selectedOrderLocation){
-        alert("Lokasi pesanan belum diambil.");
+    if(!navigator.geolocation){
+        alert("GPS tidak tersedia pada perangkat ini.");
+        return;
+    }
+
+    /*
+       Ambil ulang lokasi tepat saat pelanggan menekan
+       KIRIM PESANAN agar lokasi yang diterima kurir
+       merupakan lokasi terbaru, bukan lokasi lama.
+    */
+    app().innerHTML =
+        `<div class="card loading">
+            Mengambil lokasi terbaru...
+        </div>`;
+
+    try{
+        const freshPosition = await new Promise(
+            (resolve,reject)=>{
+                navigator.geolocation.getCurrentPosition(
+                    resolve,
+                    reject,
+                    {
+                        enableHighAccuracy:true,
+                        timeout:30000,
+                        maximumAge:0
+                    }
+                );
+            }
+        );
+
+        selectedOrderLocation = {
+            latitude:
+                Number(freshPosition.coords.latitude),
+            longitude:
+                Number(freshPosition.coords.longitude)
+        };
+    }catch(error){
+        alert(
+            "Lokasi terbaru belum berhasil diambil. " +
+            "Silakan izinkan akses lokasi lalu coba lagi."
+        );
+        showCart();
         return;
     }
 
@@ -6766,6 +6891,11 @@ async function showShopStockChecks(){
         <div class="card">
             <h2>📦 PENGECEKAN STOK</h2>
             <p>Pesanan baru dari pelanggan yang masuk ke kedai ini.</p>
+            ${
+                (shopOrders || []).length > 0
+                ? `<div class="success-box">🔔 Ada ${shopOrders.length} pengecekan stok baru.</div>`
+                : ""
+            }
     `;
 
     if(!shopOrders || shopOrders.length===0){
@@ -6871,45 +7001,17 @@ async function openShopStockOrder(shopOrderId){
     window.currentStockItems =
         items || [];
 
-    const {
-        data:order
-    } =
-        await db
-        .from("orders")
-        .select("customer_id")
-        .eq(
-            "id",
-            shopOrder.order_id
-        )
-        .maybeSingle();
-
-    const {
-        data:customer
-    } =
-        order
-        ? await db
-            .from("customers")
-            .select("name")
-            .eq(
-                "id",
-                order.customer_id
-            )
-            .maybeSingle()
-        : {data:null};
-
     renderInternalStockCheck(
         currentShop,
         shopOrder,
-        items || [],
-        customer?.name || "-"
+        items || []
     );
 }
 
 function renderInternalStockCheck(
     shop,
     shopOrder,
-    items,
-    customerName
+    items
 ){
 
     let html = `
@@ -6922,12 +7024,6 @@ function renderInternalStockCheck(
                 ${escapeHtml(shop.name)}
             </h3>
 
-            <div class="info">
-                Pelanggan:
-                <b>
-                    ${escapeHtml(customerName)}
-                </b>
-            </div>
     `;
 
     items.forEach(item=>{
@@ -7165,11 +7261,6 @@ async function sendStockResultInternal(){
                 KEMBALI KE PENGECEKAN STOK
             </button>
 
-            <button
-                onclick="showShopOrders()">
-                LIHAT PESANAN
-            </button>
-
         </div>
     `;
 }
@@ -7231,6 +7322,10 @@ async function showShopOrders(){
         <div class="card">
 
             <h2>📋 PESANAN</h2>
+
+            <div class="success-box">
+                🔔 Pesanan yang sudah diproses pelanggan akan muncul di sini.
+            </div>
     `;
 
     if(!shopOrders || shopOrders.length===0){
