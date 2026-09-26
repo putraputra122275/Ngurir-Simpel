@@ -2242,6 +2242,25 @@ async function showShopDashboard(){
             <button onclick="showShopEditInfo()">
                 EDIT INFORMASI
             </button>
+
+            ${
+                isShopInAppNotificationEnabled()
+                ? ""
+                : `
+                <div id="shopNotificationSetup" class="info" style="margin-top:12px">
+                    <b>🔔 NOTIFIKASI APLIKASI</b>
+                    <div style="margin-top:6px">
+                        Aktifkan satu kali agar pemberitahuan baru dari pelanggan dapat muncul di dalam aplikasi.
+                    </div>
+                    <button
+                        onclick="enableShopInAppNotifications()"
+                        class="success"
+                        style="margin-top:10px">
+                        AKTIFKAN NOTIFIKASI
+                    </button>
+                </div>
+                `
+            }
         </div>
     `;
 
@@ -2260,21 +2279,191 @@ function stopShopNotifications(){
     }
 }
 
-async function notifyShopBrowser(title,message){
+function shopNotificationStorageKey(){
+    return "ngurir_simpel_shop_notification_enabled_" +
+        String(currentShop?.id || "");
+}
+
+function isShopInAppNotificationEnabled(){
+    if(!currentShop?.id) return false;
+
+    return localStorage.getItem(
+        shopNotificationStorageKey()
+    ) === "1";
+}
+
+function enableShopInAppNotifications(){
+    if(!currentShop?.id) return;
+
+    localStorage.setItem(
+        shopNotificationStorageKey(),
+        "1"
+    );
+
+    /*
+       Tidak meminta izin Notification API browser.
+       Aktivasi cukup disimpan satu kali di perangkat ini.
+    */
+
     try{
-        if(!("Notification" in window)) return;
+        const AudioCtx =
+            window.AudioContext ||
+            window.webkitAudioContext;
 
-        if(Notification.permission === "default"){
-            const permission = await Notification.requestPermission();
-            if(permission !== "granted") return;
-        }
-
-        if(Notification.permission === "granted"){
-            new Notification(title,{
-                body:message
-            });
+        if(AudioCtx){
+            const ctx = new AudioCtx();
+            if(ctx.state === "suspended"){
+                ctx.resume().catch(()=>{});
+            }
+            window.shopNotificationAudioContext = ctx;
         }
     }catch(e){}
+
+    const setup =
+        document.getElementById(
+            "shopNotificationSetup"
+        );
+
+    if(setup){
+        setup.remove();
+    }
+
+    showShopInAppNotification(
+        "NGURIR SIMPEL",
+        "Notifikasi aplikasi sudah diaktifkan."
+    );
+}
+
+function playShopNotificationSound(){
+    try{
+        const AudioCtx =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if(!AudioCtx) return;
+
+        let ctx =
+            window.shopNotificationAudioContext;
+
+        if(!ctx){
+            ctx = new AudioCtx();
+            window.shopNotificationAudioContext = ctx;
+        }
+
+        if(ctx.state === "suspended"){
+            ctx.resume().catch(()=>{});
+        }
+
+        const oscillator =
+            ctx.createOscillator();
+        const gain =
+            ctx.createGain();
+
+        oscillator.type = "sine";
+        oscillator.frequency.value = 880;
+        gain.gain.setValueAtTime(0.0001,ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+            0.12,
+            ctx.currentTime + 0.02
+        );
+        gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            ctx.currentTime + 0.22
+        );
+
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.24);
+    }catch(e){}
+}
+
+function showShopInAppNotification(title,message){
+    let box =
+        document.getElementById(
+            "shopInAppNotification"
+        );
+
+    if(!box){
+        box = document.createElement("div");
+        box.id = "shopInAppNotification";
+        box.style.position = "fixed";
+        box.style.left = "12px";
+        box.style.right = "12px";
+        box.style.bottom = "18px";
+        box.style.zIndex = "99999";
+        box.style.background = "#ffffff";
+        box.style.border = "1px solid #ddd";
+        box.style.borderRadius = "12px";
+        box.style.padding = "14px";
+        box.style.boxShadow = "0 6px 20px rgba(0,0,0,.18)";
+        box.style.fontSize = "14px";
+        document.body.appendChild(box);
+    }
+
+    box.innerHTML = `
+        <div style="font-weight:700;margin-bottom:5px">
+            🔔 ${escapeHtml(title)}
+        </div>
+        <div>${escapeHtml(message)}</div>
+        <button
+            onclick="document.getElementById('shopInAppNotification')?.remove()"
+            class="secondary"
+            style="margin-top:10px">
+            TUTUP
+        </button>
+    `;
+
+    clearTimeout(window.shopInAppNotificationTimer);
+    window.shopInAppNotificationTimer =
+        setTimeout(()=>{
+            document.getElementById(
+                "shopInAppNotification"
+            )?.remove();
+        },6000);
+}
+
+function updateShopNotificationBadges(stockCount,orderCount){
+    const stockBadge =
+        document.getElementById(
+            "shopStockNotificationBadge"
+        );
+
+    const orderBadge =
+        document.getElementById(
+            "shopOrderNotificationBadge"
+        );
+
+    if(stockBadge){
+        stockBadge.textContent =
+            stockCount > 0
+            ? " " + stockCount
+            : "";
+        stockBadge.style.color = "red";
+        stockBadge.style.fontWeight = "700";
+    }
+
+    if(orderBadge){
+        orderBadge.textContent =
+            orderCount > 0
+            ? " " + orderCount
+            : "";
+        orderBadge.style.color = "red";
+        orderBadge.style.fontWeight = "700";
+    }
+}
+
+async function notifyShopBrowser(title,message){
+    /*
+       Nama fungsi tetap dipertahankan agar bagian lain aplikasi
+       tidak perlu diubah. Sekarang fungsinya hanya memakai
+       notifikasi di dalam aplikasi dan TIDAK meminta izin browser.
+    */
+
+    if(!isShopInAppNotificationEnabled()) return;
+
+    showShopInAppNotification(title,message);
+    playShopNotificationSound();
 }
 
 async function refreshShopNotifications(){
@@ -2302,6 +2491,11 @@ async function refreshShopNotifications(){
             .map(row=>String(row.id))
         )
     };
+
+    updateShopNotificationBadges(
+        currentIds.menunggu_stok.size,
+        currentIds.diproses.size
+    );
 
     /*
        Saat pertama kali dashboard dibuka, hanya catat
