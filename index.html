@@ -2,4676 +2,3487 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>KONTROL APLIKASI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>KURIR SIMPLE</title>
 
 <style>
 *{
-    box-sizing:border-box;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f3f5f7;
-    color:#222;
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  font-family:Arial,sans-serif;
+  background:#f3f4f6;
+  color:#222;
 }
 
-.app{
-    width:100%;
-    max-width:520px;
-    min-height:100vh;
-    margin:auto;
-    background:#fff;
-}
-
-.header{
-    background:#111827;
-    color:#fff;
-    padding:18px 16px;
-    text-align:center;
-}
-
-.header h1{
-    margin:0;
-    font-size:21px;
-}
-
-.header p{
-    margin:6px 0 0;
-    font-size:13px;
-}
-
-.container{
-    padding:15px;
-}
-
-.card{
-    border:1px solid #ddd;
-    border-radius:12px;
-    padding:15px;
-    margin-bottom:12px;
-    background:#fff;
-}
-
-.center{
-    text-align:center;
-}
-
-h2{
-    font-size:19px;
-    margin:4px 0 15px;
-}
-
-h3{
-    font-size:16px;
-    margin:5px 0 12px;
-}
-
-label{
-    display:block;
-    font-size:14px;
-    font-weight:bold;
-    margin:12px 0 6px;
-}
-
-input,
-select{
-    width:100%;
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    font-size:15px;
+button,input{
+  font:inherit;
 }
 
 button{
-    width:100%;
-    border:0;
-    border-radius:8px;
-    padding:12px;
-    margin-top:9px;
-    background:#111827;
-    color:#fff;
-    font-size:14px;
-    font-weight:bold;
-    cursor:pointer;
+  cursor:pointer;
 }
 
-button.secondary{
-    background:#e5e7eb;
-    color:#111;
+#app{
+  width:100%;
+  min-height:100vh;
 }
 
-button.success{
-    background:#198754;
+.page{
+  width:100%;
+  max-width:480px;
+  min-height:100vh;
+  margin:auto;
+  background:#fff;
+  position:relative;
 }
 
-button.danger{
-    background:#dc3545;
-}
-
-button.blue{
-    background:#0d6efd;
+.header{
+  padding:10px 14px 5px;
 }
 
 .back{
-    width:auto;
-    background:none;
-    color:#0d6efd;
-    padding:0;
-    margin:0 0 12px;
+  border:0;
+  background:none;
+  padding:3px 0;
+  font-size:13px;
+  font-weight:700;
 }
 
-.list{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding:13px 4px;
-    border-bottom:1px solid #ddd;
-    cursor:pointer;
+.title{
+  text-align:center;
+  font-size:19px;
+  font-weight:800;
+  margin:8px 0 12px;
 }
 
-.list:last-child{
-    border-bottom:0;
+.content{
+  padding:0 13px 14px;
 }
 
-.list-info{
-    min-width:0;
+.field{
+  margin-bottom:9px;
 }
 
-.list-name{
-    font-weight:bold;
-    overflow-wrap:anywhere;
+.label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:4px;
 }
 
-.list-sub{
-    color:#666;
-    font-size:13px;
-    margin-top:4px;
+input{
+  width:100%;
+  height:40px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  padding:0 10px;
+  outline:none;
+  background:#fff;
 }
 
-.arrow{
-    font-size:22px;
+.btn{
+  width:100%;
+  min-height:40px;
+  border:0;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+  font-weight:700;
+  margin-top:5px;
 }
 
-.notice{
-    padding:11px;
-    border-radius:8px;
-    background:#fff3cd;
-    color:#664d03;
-    margin-bottom:10px;
-    font-size:13px;
+.primary{
+  background:#222;
+  color:#fff;
 }
 
-.empty{
-    text-align:center;
-    color:#777;
-    padding:20px 5px;
+.secondary{
+  background:#e9ecef;
+  color:#222;
 }
 
-.total{
-    border-top:1px solid #ccc;
-    margin-top:12px;
-    padding-top:12px;
-    font-size:17px;
-    font-weight:bold;
-    display:flex;
-    justify-content:space-between;
+.success{
+  background:#bfe3c5;
+  color:#175c24;
 }
 
-.date-item{
-    padding:13px 5px;
-    border-bottom:1px solid #ddd;
-    cursor:pointer;
-    display:flex;
-    justify-content:space-between;
+.danger{
+  background:#e7b5b5;
+  color:#6c1515;
 }
 
-.transaction{
-    border-bottom:1px solid #ddd;
-    padding:11px 0;
+.warning{
+  background:#f0d58f;
+  color:#5b4300;
 }
 
-.transaction:last-child{
-    border-bottom:0;
+.small{
+  min-height:33px;
+  font-size:11px;
+  padding:6px 8px;
 }
 
-.transaction-top{
-    display:flex;
-    justify-content:space-between;
-    gap:8px;
+.dashboard{
+  padding:12px 13px;
 }
 
-.amount{
-    font-weight:bold;
+.logo{
+  text-align:center;
+  font-size:18px;
+  font-weight:900;
+  margin:5px 0 2px;
 }
 
-.variant{
-    font-size:13px;
-    color:#666;
-    margin-top:3px;
+.dashboard-sub{
+  text-align:center;
+  color:#777;
+  font-size:11px;
+  margin-bottom:14px;
 }
 
-.status-row{
-    margin-top:5px;
+.dashboard-buttons{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.dashboard-buttons .btn{
+  margin:0;
+  min-height:46px;
+}
+
+.card{
+  border:1px solid #ddd;
+  border-radius:9px;
+  padding:9px;
+  margin-bottom:7px;
+  background:#fff;
+}
+
+.clickable{
+  cursor:pointer;
+}
+
+.item-title{
+  font-size:14px;
+  font-weight:800;
+}
+
+.item-sub{
+  color:#707070;
+  font-size:11px;
+  margin-top:3px;
+}
+
+.section-title{
+  font-size:13px;
+  font-weight:900;
+  margin:10px 0 6px;
 }
 
 .status{
-    display:inline-block;
-    padding:4px 8px;
-    border-radius:12px;
-    font-size:11px;
-    font-weight:bold;
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:10px;
+  font-weight:800;
 }
 
 .status.open{
-    background:#d1e7dd;
-    color:#0f5132;
+  background:#bfe3c5;
+  color:#175c24;
 }
 
 .status.closed{
-    background:#e5e7eb;
-    color:#555;
+  background:#e7b5b5;
+  color:#6c1515;
 }
 
-.menu{
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:12px;
-    margin-top:9px;
+.status.available{
+  background:#bfe3c5;
+  color:#175c24;
 }
 
-.menu-name{
-    font-weight:bold;
+.status.empty{
+  background:#e7b5b5;
+  color:#6c1515;
 }
 
-.menu-price{
-    margin-top:4px;
-    color:#555;
+.action-row{
+  display:flex;
+  gap:7px;
+  margin-top:7px;
 }
 
-.menu-status{
-    margin-top:8px;
-}
-
-.radio-row{
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-    margin-top:7px;
-}
-
-.radio-row label{
-    display:flex;
-    align-items:center;
-    gap:5px;
-    margin:0;
-    font-weight:normal;
-}
-
-.radio-row input{
-    width:auto;
-}
-
-.variant-row{
-    display:flex;
-    gap:7px;
-    margin-top:7px;
-}
-
-.variant-row input{
-    flex:1;
-}
-
-.order-group{
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:12px;
-    margin-top:12px;
-}
-
-.order-group h3{
-    margin-bottom:8px;
-}
-
-.order-item{
-    padding:8px 0;
-    border-bottom:1px solid #eee;
-}
-
-.order-item:last-child{
-    border-bottom:0;
-}
-
-.order-item-line{
-    display:flex;
-    justify-content:space-between;
-    gap:8px;
+.action-row .btn{
+  flex:1;
 }
 
 .link-box{
-    background:#f5f5f5;
-    border:1px dashed #aaa;
-    padding:10px;
-    border-radius:8px;
-    word-break:break-all;
-    font-size:13px;
+  background:#f4f4f4;
+  border:1px dashed #bbb;
+  border-radius:7px;
+  padding:7px;
+  font-size:10px;
+  word-break:break-all;
+  margin-top:6px;
 }
 
-.footer{
-    text-align:center;
-    color:#777;
-    font-size:12px;
-    padding:20px;
+.address-box{
+  width:100%;
+  border:1px solid #ccc;
+  border-radius:8px;
+  padding:9px 10px;
+  background:#f7f7f7;
+  font-size:12px;
+  line-height:1.45;
+}
+
+.address-box strong{
+  display:block;
+  margin-bottom:2px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.notice{
+  background:#f2f2f2;
+  border-radius:8px;
+  padding:8px;
+  font-size:11px;
+  line-height:1.4;
+  margin-bottom:8px;
+}
+
+.menu-line{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.menu-info{
+  flex:1;
+  min-width:0;
+}
+
+.price{
+  font-size:12px;
+  font-weight:800;
+}
+
+.qty{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-shrink:0;
+}
+
+.qty button{
+  width:30px;
+  height:30px;
+  border:1px solid #ccc;
+  border-radius:7px;
+  background:#fff;
+  font-weight:900;
+}
+
+.qty-number{
+  min-width:18px;
+  text-align:center;
+  font-size:12px;
+  font-weight:800;
+}
+
+.variant-list{
+  margin-top:7px;
+  padding-top:5px;
+  border-top:1px solid #eee;
+}
+
+.variant-order{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  padding:4px 0;
+  font-size:11px;
+}
+
+.variant-editor{
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:7px;
+  margin-top:6px;
+}
+
+.variant-edit-line{
+  display:grid;
+  grid-template-columns:1fr 95px 32px;
+  gap:5px;
+  margin-bottom:5px;
+}
+
+.variant-edit-line input{
+  height:36px;
+}
+
+.remove{
+  border:0;
+  border-radius:7px;
+  background:#e7b5b5;
+  font-weight:900;
+}
+
+.radio-list{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.radio-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+}
+
+.radio-row input{
+  width:auto;
+  height:auto;
+}
+
+.order-page{
+  height:100vh;
+  overflow:hidden;
+}
+
+.order-scroll{
+  position:absolute;
+  top:94px;
+  bottom:84px;
+  left:0;
+  right:0;
+  overflow-y:auto;
+  padding:0 13px;
+}
+
+.order-fixed{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#fff;
+  border-top:1px solid #ddd;
+  padding:6px 13px 8px;
+}
+
+.total-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+  font-weight:900;
+  margin-bottom:3px;
+}
+
+.order-fixed .btn{
+  margin-top:3px;
+}
+
+.check-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+}
+
+.check-actions{
+  display:flex;
+  gap:5px;
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+  font-size:12px;
+  padding:18px 5px;
+}
+
+.customer-data{
+  font-size:11px;
+  line-height:1.45;
+}
+
+.money{
+  font-weight:900;
+}
+
+.history{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #eee;
+  padding:7px 0;
+  font-size:11px;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:17px;
+  transform:translateX(-50%);
+  z-index:9999;
+  background:#222;
+  color:#fff;
+  border-radius:8px;
+  padding:9px 12px;
+  font-size:11px;
+  max-width:90%;
+  text-align:center;
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
-
-<div class="app">
-
-<div class="header">
-    <h1>KONTROL APLIKASI</h1>
-    <p>Pengelolaan KURIR SIMPLE dan KEUANGAN PENGUSAHA</p>
-</div>
-
-<div id="app" class="container"></div>
-
-<div class="footer">
-    KONTROL APLIKASI
-</div>
-
-</div>
+<div id="app"></div>
 
 <script>
+"use strict";
+
+
+/* =========================================================
+   SUPABASE
+   Tambahan koneksi database. Bagian lain dipertahankan.
+========================================================= */
+
+const SUPABASE_URL="https://xkysusfemehvdaqkyzhg.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_JDmN5TndzBue7Rsmeiphtw_K2MzPcbA";
+const sb=window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+let supabaseReady=false;
+let loadingSharedData=false;
+
+async function syncToSupabase(){
+  try{
+    if(!data.courier?.id)return;
+    const payload={
+      courier_id:data.courier.id,
+      data:data,
+      updated_at:new Date().toISOString()
+    };
+    const {error}=await sb
+      .from("kurir_app_state")
+      .upsert(payload,{onConflict:"courier_id"});
+    if(error)throw error;
+    supabaseReady=true;
+  }catch(e){
+    console.warn("Supabase sync gagal:",e);
+  }
+}
+
+async function loadSharedByCourier(courierId){
+  try{
+    const {data:row,error}=await sb
+      .from("kurir_app_state")
+      .select("data")
+      .eq("courier_id",courierId)
+      .maybeSingle();
+    if(error)throw error;
+    if(row?.data){
+      data={
+        courier:row.data.courier||null,
+        partners:Array.isArray(row.data.partners)?row.data.partners:[],
+        customers:Array.isArray(row.data.customers)?row.data.customers:[],
+        orders:Array.isArray(row.data.orders)?row.data.orders:[],
+        incomes:Array.isArray(row.data.incomes)?row.data.incomes:[]
+      };
+      localStorage.setItem(KEY,JSON.stringify(data));
+      return true;
+    }
+  }catch(e){
+    console.warn("Supabase load gagal:",e);
+  }
+  return false;
+}
+
+async function loadSharedByPartner(partnerId){
+  try{
+    const {data:rows,error}=await sb
+      .from("kurir_app_state")
+      .select("data")
+      .contains("data",{partners:[{id:partnerId}]})
+      .limit(1);
+    if(error)throw error;
+    const row=rows?.[0];
+    if(row?.data){
+      data={
+        courier:row.data.courier||null,
+        partners:Array.isArray(row.data.partners)?row.data.partners:[],
+        customers:Array.isArray(row.data.customers)?row.data.customers:[],
+        orders:Array.isArray(row.data.orders)?row.data.orders:[],
+        incomes:Array.isArray(row.data.incomes)?row.data.incomes:[]
+      };
+      localStorage.setItem(KEY,JSON.stringify(data));
+      return true;
+    }
+  }catch(e){
+    console.warn("Supabase partner load gagal:",e);
+  }
+  return false;
+}
+
+async function refreshSharedData(){
+  const h=location.hash;
+  if(loadingSharedData)return;
+  loadingSharedData=true;
+  try{
+    if(h.startsWith("#mitra=")){
+      const pid=decodeURIComponent(h.substring(7));
+      const ok=await loadSharedByPartner(pid);
+      if(ok){
+        currentPartnerId=pid;
+        render("partnerPublic");
+        return;
+      }
+    }
+    if(h.startsWith("#pelanggan=")){
+      const cid=decodeURIComponent(h.substring(11));
+      const ok=await loadSharedByCourier(cid);
+      if(ok){
+        render("customerRegister");
+        return;
+      }
+    }
+  }finally{
+    loadingSharedData=false;
+  }
+}
 
 /* =========================================================
    DATA
 ========================================================= */
 
-const state = {
-    appNameCourier:"KURIR SIMPLE",
-    appCodeCourier:"123",
+const KEY="KURIR_SIMPLE_DATA";
 
-    appNameFinance:"KEUANGAN PENGUSAHA",
-    appCodeFinance:"456",
-
-    couriers:[],
-    shops:[],
-    customers:[],
-    orders:[],
-    incomes:[],
-    expenses:[],
-
-    courierLink:null,
-    customerLink:null,
-    shopLink:null,
-
-    selectedCourier:null,
-    selectedShop:null,
-    selectedCustomer:null,
-    selectedOrder:null
+const kosong={
+  courier:null,
+  partners:[],
+  customers:[],
+  orders:[],
+  incomes:[]
 };
 
+let data=load();
+
+let currentPartnerId=null;
+let currentCustomerId=null;
+let currentOrderId=null;
+let editingMenuId=null;
+let localCustomerId=localStorage.getItem("KURIR_SIMPLE_CUSTOMER_ID")||null;
+
+function load(){
+  try{
+    const x=JSON.parse(localStorage.getItem(KEY));
+    if(!x)return structuredClone(kosong);
+
+    return{
+      courier:x.courier||null,
+      partners:Array.isArray(x.partners)?x.partners:[],
+      customers:Array.isArray(x.customers)?x.customers:[],
+      orders:Array.isArray(x.orders)?x.orders:[],
+      incomes:Array.isArray(x.incomes)?x.incomes:[]
+    };
+  }catch(e){
+    return structuredClone(kosong);
+  }
+}
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(data));
+  syncToSupabase();
+}
+
+function id(prefix){
+  return prefix+"-"+Date.now()+"-"+Math.random()
+    .toString(36).substring(2,8);
+}
+
+function esc(v){
+  return String(v??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function rupiah(v){
+  return new Intl.NumberFormat("id-ID",{
+    style:"currency",
+    currency:"IDR",
+    maximumFractionDigits:0
+  }).format(Number(v)||0);
+}
+
+function partner(id){
+  return data.partners.find(x=>x.id===id);
+}
+
+function menu(id){
+  const p=partner(currentPartnerId);
+  return p?.menus?.find(x=>x.id===id);
+}
+
+function order(id){
+  return data.orders.find(x=>x.id===id);
+}
+
+function toast(text){
+  const old=document.querySelector(".toast");
+  if(old)old.remove();
+
+  const x=document.createElement("div");
+  x.className="toast";
+  x.textContent=text;
+  document.body.appendChild(x);
+
+  setTimeout(()=>x.remove(),2300);
+}
 
 /* =========================================================
-   SAMPLE DATA
+   ROUTING
 ========================================================= */
 
-function createSampleData(){
+function go(page){
+  render(page);
+  window.scrollTo(0,0);
+}
 
-    if(localStorage.getItem("moderator_state")){
-        try{
-            Object.assign(
-                state,
-                JSON.parse(
-                    localStorage.getItem("moderator_state")
-                )
-            );
-            return;
-        }catch(e){}
+function baseURL(){
+  return window.location.href.split("#")[0];
+}
+
+function partnerLink(id){
+  return baseURL()+"#mitra="+encodeURIComponent(id);
+}
+
+function customerLink(){
+  const courierId=data.courier?.id||"";
+  return baseURL()+"#pelanggan="+encodeURIComponent(courierId);
+}
+
+async function start(){
+  const h=location.hash;
+
+  if(h.startsWith("#mitra=")){
+    const id=decodeURIComponent(h.substring(7));
+    if(partner(id)){
+      currentPartnerId=id;
+      render("partnerPublic");
+      return;
     }
+    const ok=await loadSharedByPartner(id);
+    if(ok && partner(id)){
+      currentPartnerId=id;
+      render("partnerPublic");
+      return;
+    }
+    document.getElementById("app").innerHTML=
+      `<div class="page"><div class="empty">
+        Mitra Usaha tidak ditemukan.
+      </div></div>`;
+    return;
+  }
 
-    state.couriers = [];
-    state.shops = [];
-    state.customers = [];
-    state.orders = [];
-    state.incomes = [];
-    state.expenses = [];
+  if(h.startsWith("#pelanggan=")){
+    const courierId=decodeURIComponent(h.substring(11));
+    if(!data.courier || data.courier.id!==courierId){
+      await loadSharedByCourier(courierId);
+    }
+    render("customerRegister");
+    return;
+  }
 
-    saveState();
+  if(h==="#pelanggan"){
+    render("customerRegister");
+    return;
+  }
+
+  if(data.courier){
+    render("dashboard");
+  }else{
+    render("register");
+  }
 }
-
 
 /* =========================================================
-   STORAGE
+   LOCATION
 ========================================================= */
 
-function saveState(){
-    localStorage.setItem(
-        "moderator_state",
-        JSON.stringify(state)
-    );
+let courierLocation=null;
+let customerLocation=null;
+
+/*
+  Tidak ada halaman izin lokasi di aplikasi.
+  Kode langsung memanggil geolocation.
+  Jika Android/browser membutuhkan izin sistem,
+  dialog tersebut berasal dari sistem/browser.
+*/
+
+function getLocation(callback){
+  if(!navigator.geolocation){
+    toast("Lokasi tidak tersedia pada browser ini.");
+    return;
+  }
+
+  if(!window.isSecureContext){
+    toast("Buka aplikasi melalui HTTPS agar lokasi dapat digunakan.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async pos=>{
+      const lat=pos.coords.latitude;
+      const lon=pos.coords.longitude;
+
+      const address=await reverseGeocode(lat,lon);
+
+      callback({
+        lat,
+        lon,
+        address,
+        capturedAt:new Date().toISOString()
+      });
+    },
+    err=>{
+      if(err.code===1){
+        toast("Izin lokasi ditolak. Izinkan lokasi pada browser.");
+      }else if(err.code===2){
+        toast("Lokasi perangkat belum tersedia.");
+      }else if(err.code===3){
+        toast("Pengambilan lokasi terlalu lama. Coba lagi.");
+      }else{
+        toast("Lokasi belum berhasil diperoleh.");
+      }
+    },
+    {
+      enableHighAccuracy:true,
+      timeout:20000,
+      maximumAge:0
+    }
+  );
 }
 
+async function reverseGeocode(lat,lon){
+  try{
+    const url=
+      "https://nominatim.openstreetmap.org/reverse"+
+      "?format=jsonv2"+
+      "&lat="+encodeURIComponent(lat)+
+      "&lon="+encodeURIComponent(lon)+
+      "&zoom=18"+
+      "&addressdetails=1";
 
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function app(){
-    return document.getElementById("app");
-}
-
-function money(value){
-    return new Intl.NumberFormat("id-ID",{
-        style:"currency",
-        currency:"IDR",
-        maximumFractionDigits:0
-    }).format(Number(value)||0);
-}
-
-function esc(value){
-    return String(value ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-}
-
-function uid(prefix){
-    return prefix+"_"+Date.now()+"_"+Math.random()
-        .toString(36)
-        .substring(2,8);
-}
-
-function today(){
-    return new Date().toISOString().slice(0,10);
-}
-
-function formatDate(date){
-    if(!date)return "-";
-
-    const d = new Date(date+"T00:00:00");
-
-    return d.toLocaleDateString("id-ID",{
-        day:"2-digit",
-        month:"long",
-        year:"numeric"
+    const r=await fetch(url,{
+      headers:{
+        "Accept":"application/json"
+      }
     });
+
+    if(!r.ok)throw new Error();
+
+    const d=await r.json();
+    const a=d.address||{};
+
+    return{
+      province:a.state||a.province||"",
+      regency:a.county||a.city||a.town||"",
+      district:a.municipality||a.city_district||a.suburb||"",
+      village:a.village||a.town||a.suburb||a.neighbourhood||"",
+      display:d.display_name||""
+    };
+  }catch(e){
+    return{
+      province:"",
+      regency:"",
+      district:"",
+      village:"",
+      display:"Alamat lengkap belum tersedia."
+    };
+  }
 }
 
-function notify(text){
-    alert(text);
+function addressHTML(a){
+  return `
+    <div class="address-box">
+      <strong>Alamat</strong>
+      ${esc(a?.province||"Provinsi belum tersedia")}<br>
+      ${esc(a?.regency||"Kabupaten belum tersedia")}<br>
+      ${esc(a?.district||"Kecamatan belum tersedia")}<br>
+      ${esc(a?.village||"Desa belum tersedia")}
+    </div>
+  `;
 }
-
-function copyText(text){
-    navigator.clipboard?.writeText(text)
-        .then(()=>notify("Berhasil disalin."))
-        .catch(()=>notify(text));
-}
-
 
 /* =========================================================
-   NAVIGATION
+   COPY
 ========================================================= */
 
-function back(){
-    if(history.length>1){
-        history.back();
+async function copyLink(text){
+  try{
+    if(navigator.clipboard&&window.isSecureContext){
+      await navigator.clipboard.writeText(text);
     }else{
-        showControlHome();
-    }
-}
-
-
-/* =========================================================
-   A1
-   HALAMAN AWAL KONTROL APLIKASI
-========================================================= */
-
-function showControlHome(){
-
-    app().innerHTML=`
-        <div class="card center">
-
-            <h2>KONTROL APLIKASI</h2>
-
-            <label>Kode Aplikasi</label>
-
-            <input
-                id="controlCode"
-                inputmode="numeric"
-                placeholder="Masukkan kode aplikasi">
-
-            <button onclick="controlLogin()">
-                MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-function controlLogin(){
-
-    const code =
-        document.getElementById("controlCode")
-        .value.trim();
-
-    if(code===state.appCodeCourier){
-        showCourierControl();
-        return;
+      const t=document.createElement("textarea");
+      t.value=text;
+      t.style.position="fixed";
+      t.style.opacity="0";
+      document.body.appendChild(t);
+      t.focus();
+      t.select();
+      document.execCommand("copy");
+      t.remove();
     }
 
-    if(code===state.appCodeFinance){
-        showFinanceControl();
-        return;
-    }
-
-    notify("Kode aplikasi salah.");
+    toast("Link berhasil disalin ke clipboard.");
+  }catch(e){
+    toast("Link tidak berhasil disalin.");
+  }
 }
 
-
 /* =========================================================
-   A2
-   HALAMAN KURIR SIMPLE
+   SHELL
 ========================================================= */
 
-function showCourierControl(){
+function shell(title,body,back){
+  return `
+  <div class="page">
+    <div class="header">
+      ${back?
+      `<button class="back" onclick="go('${back}')">
+        ← KEMBALI
+      </button>`:""}
 
-    app().innerHTML=`
+      <div class="title">${title}</div>
+    </div>
 
-        <button class="back" onclick="showControlHome()">
-            ← KEMBALI
+    ${body}
+  </div>`;
+}
+
+/* =========================================================
+   A1 - DAFTAR KURIR
+========================================================= */
+
+function renderRegister(){
+  document.getElementById("app").innerHTML=`
+  <div class="page">
+
+    <div class="header">
+      <div class="title">DAFTAR AKUN KURIR</div>
+    </div>
+
+    <div class="content">
+
+      <div class="field">
+        <label class="label">Nama</label>
+        <input id="regName" placeholder="Nama">
+      </div>
+
+      <div class="field">
+        <label class="label">Nomor Telepon</label>
+        <input id="regPhone"
+               inputmode="numeric"
+               maxlength="12"
+               placeholder="Nomor Telepon">
+      </div>
+
+      <div class="field">
+        <label class="label">Alamat</label>
+
+        <button
+          id="courierLocationButton"
+          class="btn secondary"
+          onclick="shareCourierLocation()">
+          BAGIKAN LOKASI
         </button>
 
-        <div class="card center">
-
-            <h2>${esc(state.appNameCourier)}</h2>
-
-            <button onclick="showCourierUsers()">
-                LIHAT PENGGUNA APLIKASI
-            </button>
-
-            <button
-                class="blue"
-                onclick="showCourierLink()">
-                SALIN LINK UNTUK KURIR
-            </button>
-
-            <button
-                class="secondary"
-                onclick="showEditCourierApplication()">
-                EDIT APLIKASI
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A3
-   EDIT APLIKASI KURIR
-========================================================= */
-
-function showEditCourierApplication(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierControl()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>EDIT APLIKASI — KURIR SIMPLE</h2>
-
-            <label>Nama Aplikasi</label>
-
-            <input
-                id="editCourierName"
-                value="${esc(state.appNameCourier)}">
-
-            <label>Kode Aplikasi</label>
-
-            <input
-                id="editCourierCode"
-                inputmode="numeric"
-                value="${esc(state.appCodeCourier)}">
-
-            <button onclick="saveCourierApplication()">
-                SIMPAN PERUBAHAN
-            </button>
-
-        </div>
-    `;
-}
-
-function saveCourierApplication(){
-
-    const name =
-        document.getElementById("editCourierName")
-        .value.trim();
-
-    const code =
-        document.getElementById("editCourierCode")
-        .value.trim();
-
-    if(!name || !code){
-        notify("Nama aplikasi dan kode wajib diisi.");
-        return;
-    }
-
-    state.appNameCourier=name;
-    state.appCodeCourier=code;
-
-    saveState();
-
-    notify("Perubahan berhasil disimpan.");
-
-    showCourierControl();
-}
-
-
-/* =========================================================
-   A4
-   PENGGUNA KURIR SIMPLE
-========================================================= */
-
-function showCourierUsers(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierControl()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>PENGGUNA KURIR SIMPLE</h2>
-
-            ${
-                state.couriers.length
-                ?
-                state.couriers.map(c=>`
-                    <div class="list"
-                        onclick="showCourierData('${c.id}')">
-
-                        <div class="list-info">
-                            <div class="list-name">
-                                ${esc(c.name)}
-                            </div>
-
-                            <div class="list-sub">
-                                ${esc(c.address)}
-                            </div>
-                        </div>
-
-                        <div class="arrow">›</div>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada akun kurir.
-                </div>`
-            }
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A5
-   DATA KURIR
-========================================================= */
-
-function showCourierData(id){
-
-    state.selectedCourier =
-        state.couriers.find(c=>c.id===id);
-
-    if(!state.selectedCourier){
-        showCourierUsers();
-        return;
-    }
-
-    const dates=[
-        ...new Set(
-            state.incomes
-            .filter(x=>x.courierId===id)
-            .map(x=>x.date)
-        )
-    ].sort().reverse();
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierUsers()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DATA KURIR</h2>
-
-            <p>
-                <b>${esc(state.selectedCourier.name)}</b>
-            </p>
-
-            <p>
-                ${esc(state.selectedCourier.address)}
-            </p>
-
-            <button onclick="showCourierIncomeHistory('${id}')">
-                RIWAYAT PEMASUKAN
-            </button>
-
-        </div>
-
-        <div class="card">
-
-            ${
-                dates.length
-                ?
-                dates.map(d=>`
-                    <div class="date-item"
-                        onclick="showCourierIncomeDetail(
-                            '${id}',
-                            '${d}'
-                        )">
-
-                        <span>${formatDate(d)}</span>
-                        <span>›</span>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada riwayat pemasukan.
-                </div>`
-            }
-
-        </div>
-    `;
-}
-
-function showCourierIncomeHistory(id){
-    showCourierData(id);
-}
-
-
-/* =========================================================
-   A6
-   DETAIL PEMASUKAN KURIR
-========================================================= */
-
-function showCourierIncomeDetail(id,date){
-
-    const courier =
-        state.couriers.find(c=>c.id===id);
-
-    const rows =
-        state.incomes.filter(
-            x=>x.courierId===id && x.date===date
-        );
-
-    const total =
-        rows.reduce(
-            (sum,x)=>sum+(Number(x.amount)||0),
-            0
-        );
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierData('${id}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DETAIL PEMASUKAN KURIR</h2>
-
-            <p>
-                <b>${formatDate(date)}</b>
-            </p>
-
-            <p>
-                ${esc(courier?.name||"")}
-            </p>
-
-            ${
-                rows.length
-                ?
-                rows.map(x=>`
-                    <div class="transaction">
-
-                        <div class="transaction-top">
-
-                            <span>
-                                ${esc(x.time||"-")}
-                            </span>
-
-                            <span class="amount">
-                                ${money(x.amount)}
-                            </span>
-
-                        </div>
-
-                        <div class="variant">
-                            ${esc(x.area||x.address||"-")}
-                        </div>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Tidak ada transaksi.
-                </div>`
-            }
-
-            <div class="total">
-                <span>TOTAL</span>
-                <span>${money(total)}</span>
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   LINK KURIR
-========================================================= */
-
-function showCourierLink(){
-
-    const link =
-        location.origin+
-        location.pathname+
-        "?kurir=daftar";
-
-    state.courierLink=link;
-    saveState();
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierControl()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>SALIN LINK UNTUK KURIR</h2>
-
-            <div class="link-box">
-                ${esc(link)}
-            </div>
-
-            <button onclick="copyText('${esc(link)}')">
-                SALIN LINK
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A7
-   HALAMAN KEUANGAN PENGUSAHA
-========================================================= */
-
-function showFinanceControl(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showControlHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card center">
-
-            <h2>${esc(state.appNameFinance)}</h2>
-
-            <button onclick="showFinanceUsers()">
-                LIHAT PENGGUNA APLIKASI
-            </button>
-
-            <button
-                class="blue"
-                onclick="showFinanceLink()">
-                SALIN LINK APLIKASI
-            </button>
-
-            <button
-                class="secondary"
-                onclick="showEditFinanceApplication()">
-                EDIT APLIKASI
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A8
-========================================================= */
-
-function showEditFinanceApplication(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showFinanceControl()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>EDIT APLIKASI — KEUANGAN PENGUSAHA</h2>
-
-            <label>Nama Aplikasi</label>
-
-            <input
-                id="editFinanceName"
-                value="${esc(state.appNameFinance)}">
-
-            <label>Kode Aplikasi</label>
-
-            <input
-                id="editFinanceCode"
-                inputmode="numeric"
-                value="${esc(state.appCodeFinance)}">
-
-            <button onclick="saveFinanceApplication()">
-                SIMPAN PERUBAHAN
-            </button>
-
-        </div>
-    `;
-}
-
-function saveFinanceApplication(){
-
-    const name =
-        document.getElementById("editFinanceName")
-        .value.trim();
-
-    const code =
-        document.getElementById("editFinanceCode")
-        .value.trim();
-
-    if(!name || !code){
-        notify("Nama aplikasi dan kode wajib diisi.");
-        return;
-    }
-
-    state.appNameFinance=name;
-    state.appCodeFinance=code;
-
-    saveState();
-
-    notify("Perubahan berhasil disimpan.");
-
-    showFinanceControl();
-}
-
-
-/* =========================================================
-   A9
-========================================================= */
-
-function showFinanceUsers(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showFinanceControl()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>PENGGUNA KEUANGAN PENGUSAHA</h2>
-
-            ${
-                state.businessUsers?.length
-                ?
-                state.businessUsers.map(u=>`
-                    <div class="list"
-                        onclick="showBusinessUser('${u.id}')">
-
-                        <div class="list-info">
-
-                            <div class="list-name">
-                                ${esc(u.ownerName)}
-                            </div>
-
-                            <div class="list-sub">
-                                ${esc(u.businessName)}
-                                <br>
-                                ${esc(u.address)}
-                            </div>
-
-                        </div>
-
-                        <div class="arrow">›</div>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada pengguna keuangan pengusaha.
-                </div>`
-            }
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A10
-========================================================= */
-
-function showBusinessUser(id){
-
-    const user =
-        (state.businessUsers||[])
-        .find(x=>x.id===id);
-
-    if(!user){
-        showFinanceUsers();
-        return;
-    }
-
-    state.selectedBusiness=user;
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showFinanceUsers()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>MEMILIH PENGUSAHA</h2>
-
-            <p>
-                <b>${esc(user.ownerName)}</b>
-            </p>
-
-            <p>
-                ${esc(user.businessName)}
-            </p>
-
-            <button
-                onclick="showBusinessIncome('${id}')">
-                PEMASUKAN PENGUSAHA
-            </button>
-
-            <button
-                onclick="showBusinessExpense('${id}')">
-                PENGELUARAN PENGUSAHA
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A11
-========================================================= */
-
-function showBusinessIncome(id){
-
-    const rows =
-        state.incomes.filter(
-            x=>x.businessId===id
-        );
-
-    const dates=[
-        ...new Set(rows.map(x=>x.date))
-    ].sort().reverse();
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showBusinessUser('${id}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>PEMASUKAN PENGUSAHA</h2>
-
-            ${
-                dates.length
-                ?
-                dates.map(d=>`
-                    <div class="date-item"
-                        onclick="showBusinessIncomeDetail(
-                            '${id}',
-                            '${d}'
-                        )">
-
-                        <span>${formatDate(d)}</span>
-                        <span>›</span>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada pemasukan.
-                </div>`
-            }
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A12
-========================================================= */
-
-function showBusinessIncomeDetail(id,date){
-
-    const user =
-        (state.businessUsers||[])
-        .find(x=>x.id===id);
-
-    const rows =
-        state.incomes.filter(
-            x=>x.businessId===id &&
-            x.date===date
-        );
-
-    const total =
-        rows.reduce(
-            (sum,x)=>sum+(Number(x.amount)||0),
-            0
-        );
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showBusinessIncome('${id}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DETAIL PEMASUKAN PENGUSAHA</h2>
-
-            <p><b>${formatDate(date)}</b></p>
-
-            <p>${esc(user?.businessName||"")}</p>
-
-            ${
-                rows.length
-                ?
-                rows.map(x=>`
-                    <div class="transaction">
-
-                        <div class="transaction-top">
-
-                            <span>${esc(x.time||"-")}</span>
-
-                            <span class="amount">
-                                ${money(x.amount)}
-                            </span>
-
-                        </div>
-
-                        <div class="variant">
-                            ${esc(x.description||"-")}
-                        </div>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Tidak ada transaksi.
-                </div>`
-            }
-
-            <div class="total">
-                <span>TOTAL</span>
-                <span>${money(total)}</span>
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A13
-========================================================= */
-
-function showBusinessExpense(id){
-
-    const rows =
-        state.expenses.filter(
-            x=>x.businessId===id
-        );
-
-    const dates=[
-        ...new Set(rows.map(x=>x.date))
-    ].sort().reverse();
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showBusinessUser('${id}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>PENGELUARAN PENGUSAHA</h2>
-
-            ${
-                dates.length
-                ?
-                dates.map(d=>`
-                    <div class="date-item"
-                        onclick="showBusinessExpenseDetail(
-                            '${id}',
-                            '${d}'
-                        )">
-
-                        <span>${formatDate(d)}</span>
-                        <span>›</span>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada pengeluaran.
-                </div>`
-            }
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   A14
-========================================================= */
-
-function showBusinessExpenseDetail(id,date){
-
-    const user =
-        (state.businessUsers||[])
-        .find(x=>x.id===id);
-
-    const rows =
-        state.expenses.filter(
-            x=>x.businessId===id &&
-            x.date===date
-        );
-
-    const total =
-        rows.reduce(
-            (sum,x)=>sum+(Number(x.amount)||0),
-            0
-        );
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showBusinessExpense('${id}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DETAIL PENGELUARAN PENGUSAHA</h2>
-
-            <p><b>${formatDate(date)}</b></p>
-
-            <p>${esc(user?.businessName||"")}</p>
-
-            ${
-                rows.length
-                ?
-                rows.map(x=>`
-                    <div class="transaction">
-
-                        <div class="transaction-top">
-
-                            <span>${esc(x.time||"-")}</span>
-
-                            <span class="amount">
-                                ${money(x.amount)}
-                            </span>
-
-                        </div>
-
-                        <div class="variant">
-                            ${esc(x.description||"-")}
-                        </div>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Tidak ada transaksi.
-                </div>`
-            }
-
-            <div class="total">
-                <span>TOTAL</span>
-                <span>${money(total)}</span>
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   LINK APLIKASI KEUANGAN
-========================================================= */
-
-function showFinanceLink(){
-
-    const link =
-        location.origin+
-        location.pathname+
-        "?keuangan=daftar";
-
-    state.financeLink=link;
-    saveState();
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showFinanceControl()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>SALIN LINK APLIKASI</h2>
-
-            <div class="link-box">
-                ${esc(link)}
-            </div>
-
-            <button onclick="copyText('${esc(link)}')">
-                SALIN LINK
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   B1
-   LINK KURIR DIBUKA
-========================================================= */
-
-function showCourierPublicHome(){
-
-    app().innerHTML=`
-
-        <div class="card center">
-
-            <h2>KURIR SIMPLE</h2>
-
-            <button onclick="showCourierRegister()">
-                DAFTAR AKUN
-            </button>
-
-            <button
-                class="secondary"
-                onclick="showCourierLogin()">
-                MASUK KE AKUN YANG SUDAH ADA
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   B2
-   DAFTAR AKUN KURIR
-========================================================= */
-
-function showCourierRegister(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierPublicHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DAFTAR AKUN KURIR</h2>
-
-            <label>Nama Kurir</label>
-            <input id="regCourierName">
-
-            <label>Nomor Telepon</label>
-            <input id="regCourierPhone">
-
-            <label>Alamat Lengkap</label>
-            <input id="regCourierAddress">
-
-            <button
-                class="blue"
-                onclick="shareCourierLocation()">
-                BAGIKAN LOKASI
-            </button>
-
-            <button onclick="showCourierServiceAreas()">
-                MASUK
-            </button>
-
-        </div>
-    `;
+        <div id="courierAddress"
+             class="hidden"></div>
+      </div>
+
+      <button class="btn primary"
+        onclick="registerCourier()">
+        SELESAI
+      </button>
+
+    </div>
+  </div>`;
 }
 
 function shareCourierLocation(){
+  getLocation(location=>{
+    courierLocation=location;
 
-    const address =
-        document.getElementById("regCourierAddress");
-
-    if(address.value.trim()){
-        return;
-    }
-
-    address.value="Lokasi berhasil dibagikan";
-}
-
-
-/* =========================================================
-   B3
-========================================================= */
-
-function showCourierServiceAreas(){
-
-    const name =
-        document.getElementById("regCourierName")
-        .value.trim();
-
-    const phone =
-        document.getElementById("regCourierPhone")
-        .value.trim();
-
-    const address =
-        document.getElementById("regCourierAddress")
-        .value.trim();
-
-    if(!name || !phone || !address){
-        notify("Lengkapi data kurir dan bagikan lokasi.");
-        return;
-    }
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierRegister()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>HASIL SETELAH LOKASI DIBAGIKAN</h2>
-
-            <p><b>Nama Kurir</b><br>${esc(name)}</p>
-
-            <p><b>Nomor Telepon</b><br>${esc(phone)}</p>
-
-            <p><b>Alamat Lengkap</b><br>${esc(address)}</p>
-
-            <h3>WILAYAH YANG DIJANGKAU</h3>
-
-            <div id="serviceAreas">
-
-                ${[
-                    "Kecamatan 1",
-                    "Kecamatan 2",
-                    "Kecamatan 3",
-                    "Kecamatan 4",
-                    "Dusun 1",
-                    "Dusun 2",
-                    "Dusun 3",
-                    "Dusun 4"
-                ].map((x,i)=>`
-                    <label>
-                        <input
-                            type="checkbox"
-                            value="${x}"
-                            class="areaCheck">
-                        ${x}
-                    </label>
-                `).join("")}
-
-            </div>
-
-            <button
-                onclick="finishCourierRegistration(
-                    '${esc(name)}',
-                    '${esc(phone)}',
-                    '${esc(address)}'
-                )">
-                MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   B4
-========================================================= */
-
-function finishCourierRegistration(name,phone,address){
-
-    const areas =
-        [...document.querySelectorAll(".areaCheck:checked")]
-        .map(x=>x.value);
-
-    if(!areas.length){
-        notify("Pilih wilayah yang dijangkau.");
-        return;
-    }
-
-    let code;
-
-    do{
-        code=String(
-            Math.floor(
-                100+Math.random()*900
-            )
-        );
-    }while(
-        state.couriers.some(
-            c=>c.code===code
-        )
+    const btn=document.getElementById(
+      "courierLocationButton"
     );
 
-    const courier={
-        id:uid("courier"),
-        code,
-        name,
-        phone,
-        address,
-        serviceAreas:areas
-    };
-
-    state.couriers.push(courier);
-
-    saveState();
-
-    showCourierRegistrationResult(courier);
-}
-
-function showCourierRegistrationResult(c){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierPublicHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>HASIL PENDAFTARAN KURIR</h2>
-
-            <p>Nama: <b>${esc(c.name)}</b></p>
-            <p>Nomor Telepon: ${esc(c.phone)}</p>
-            <p>Alamat: ${esc(c.address)}</p>
-
-            <p>
-                Wilayah:
-                ${c.serviceAreas.map(esc).join(", ")}
-            </p>
-
-            <p>
-                Kode Kurir:
-                <b>${esc(c.code)}</b>
-            </p>
-
-            <button onclick="showCourierDashboard('${c.id}')">
-                MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   B5
-========================================================= */
-
-function showCourierLogin(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierPublicHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>MASUK AKUN KURIR</h2>
-
-            <label>KODE KURIR</label>
-
-            <input
-                id="courierLoginCode"
-                inputmode="numeric">
-
-            <button onclick="loginCourier()">
-                MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-function loginCourier(){
-
-    const code =
-        document.getElementById("courierLoginCode")
-        .value.trim();
-
-    const courier =
-        state.couriers.find(
-            c=>c.code===code
-        );
-
-    if(!courier){
-        notify("Kode Kurir tidak ditemukan.");
-        return;
-    }
-
-    showCourierDashboard(courier.id);
-}
-
-
-/* =========================================================
-   B6
-========================================================= */
-
-function showCourierDashboard(id){
-
-    state.selectedCourier =
-        state.couriers.find(c=>c.id===id);
-
-    app().innerHTML=`
-
-        <div class="card center">
-
-            <h2>KURIR SIMPLE</h2>
-
-            <p>
-                ${esc(state.selectedCourier?.name||"")}
-            </p>
-
-            <button onclick="showEditCourier('${id}')">
-                EDIT AKUN
-            </button>
-
-            <button onclick="showCourierPartners('${id}')">
-                MITRA USAHA
-            </button>
-
-            <button
-                class="blue"
-                onclick="showCustomerLink('${id}')">
-                SALIN LINK PELANGGAN
-            </button>
-
-            <button onclick="showCourierOrders('${id}')">
-                PESANAN MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   B7
-========================================================= */
-
-function showEditCourier(id){
-
-    const c =
-        state.couriers.find(x=>x.id===id);
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierDashboard('${id}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>EDIT AKUN KURIR</h2>
-
-            <label>Nama Kurir</label>
-            <input id="editCName" value="${esc(c.name)}">
-
-            <label>Nomor Telepon</label>
-            <input id="editCPhone" value="${esc(c.phone)}">
-
-            <label>Kode Kurir</label>
-            <input id="editCCode" value="${esc(c.code)}">
-
-            <label>Wilayah yang Dijangkau</label>
-
-            ${[
-                "Kecamatan 1",
-                "Kecamatan 2",
-                "Kecamatan 3",
-                "Kecamatan 4",
-                "Dusun 1",
-                "Dusun 2",
-                "Dusun 3",
-                "Dusun 4"
-            ].map(x=>`
-                <label>
-                    <input
-                        type="checkbox"
-                        class="editArea"
-                        value="${x}"
-                        ${c.serviceAreas?.includes(x)?"checked":""}>
-                    ${x}
-                </label>
-            `).join("")}
-
-            <button onclick="saveEditCourier('${id}')">
-                SIMPAN PERUBAHAN
-            </button>
-
-        </div>
-    `;
-}
-
-function saveEditCourier(id){
-
-    const c =
-        state.couriers.find(x=>x.id===id);
-
-    c.name=document.getElementById("editCName").value.trim();
-    c.phone=document.getElementById("editCPhone").value.trim();
-    c.code=document.getElementById("editCCode").value.trim();
-
-    c.serviceAreas=
-        [...document.querySelectorAll(".editArea:checked")]
-        .map(x=>x.value);
-
-    saveState();
-
-    notify("Perubahan berhasil disimpan.");
-
-    showCourierDashboard(id);
-}
-
-
-/* =========================================================
-   B8
-========================================================= */
-
-function showCourierPartners(id){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierDashboard('${id}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>MITRA USAHA</h2>
-
-            <button
-                onclick="showPartnerLink('${id}')">
-                SALIN LINK PENDAFTAR MITRA USAHA
-            </button>
-
-            <button onclick="showCourierPartnerList('${id}')">
-                LIHAT MITRA USAHA
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   C1
-========================================================= */
-
-function showPartnerPublicHome(){
-
-    app().innerHTML=`
-
-        <div class="card center">
-
-            <h2>MITRA USAHA</h2>
-
-            <button onclick="showPartnerRegister()">
-                DAFTAR AKUN
-            </button>
-
-            <button
-                class="secondary"
-                onclick="showPartnerLogin()">
-                MASUK KE AKUN YANG SUDAH ADA
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   C2
-========================================================= */
-
-function showPartnerRegister(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showPartnerPublicHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DAFTAR AKUN MITRA USAHA</h2>
-
-            <label>Nama Mitra Usaha</label>
-            <input id="shopName">
-
-            <label>Nomor Telepon</label>
-            <input id="shopPhone">
-
-            <button
-                class="blue"
-                onclick="shareShopLocation()">
-                BAGIKAN LOKASI
-            </button>
-
-            <label>Alamat Lengkap</label>
-            <input
-                id="shopAddress"
-                placeholder="Alamat dari lokasi">
-
-            <button onclick="registerShop()">
-                MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-function shareShopLocation(){
-
-    document.getElementById("shopAddress").value =
-        "Lokasi berhasil dibagikan";
-}
-
-function registerShop(){
-
-    const name =
-        document.getElementById("shopName").value.trim();
-
-    const phone =
-        document.getElementById("shopPhone").value.trim();
-
-    const address =
-        document.getElementById("shopAddress").value.trim();
-
-    if(!name || !phone || !address){
-        notify("Lengkapi data dan bagikan lokasi.");
-        return;
-    }
-
-    let code;
-
-    do{
-        code=String(
-            Math.floor(
-                100+Math.random()*900
-            )
-        );
-    }while(
-        state.shops.some(
-            x=>x.code===code
-        )
+    const box=document.getElementById(
+      "courierAddress"
     );
 
-    const shop={
-        id:uid("shop"),
-        code,
-        name,
-        phone,
-        address,
-        kecamatan:"Kecamatan 1",
-        status:"OPEN",
-        menus:[]
-    };
+    if(btn)btn.classList.add("hidden");
 
-    state.shops.push(shop);
+    if(box){
+      box.classList.remove("hidden");
+      box.innerHTML=addressHTML(location.address);
+    }
 
-    saveState();
-
-    showShopDashboard(shop.id);
+    toast("Lokasi berhasil dibagikan.");
+  });
 }
 
+function registerCourier(){
+  const name=document.getElementById("regName").value.trim();
+  const phone=document.getElementById("regPhone").value.trim();
+
+  if(!name){
+    toast("Nama harus diisi.");
+    return;
+  }
+
+  if(!/^\d{12}$/.test(phone)){
+    toast("Nomor telepon harus 12 digit.");
+    return;
+  }
+
+  if(!courierLocation){
+    toast("Bagikan lokasi terlebih dahulu.");
+    return;
+  }
+
+  data.courier={
+    id:id("KURIR"),
+    name,
+    phone,
+    location:courierLocation
+  };
+
+  save();
+
+  courierLocation=null;
+
+  go("dashboard");
+}
 
 /* =========================================================
-   C3
+   B1 - DASHBOARD KURIR
 ========================================================= */
 
-function showPartnerLogin(){
+function renderDashboard(){
+  document.getElementById("app").innerHTML=`
+  <div class="page">
 
-    app().innerHTML=`
+    <div class="dashboard">
 
-        <button class="back"
-            onclick="showPartnerPublicHome()">
-            ← KEMBALI
+      <div class="logo">KURIR SIMPLE</div>
+      <div class="dashboard-sub">
+        DASHBOARD UTAMA
+      </div>
+
+      <div class="dashboard-buttons">
+
+        <button class="btn primary"
+          onclick="go('partners')">
+          MITRA USAHA
         </button>
 
-        <div class="card">
-
-            <h2>MASUK AKUN MITRA USAHA</h2>
-
-            <label>KODE MITRA USAHA</label>
-
-            <input
-                id="shopLoginCode"
-                inputmode="numeric">
-
-            <button onclick="loginShop()">
-                MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-function loginShop(){
-
-    const code =
-        document.getElementById("shopLoginCode")
-        .value.trim();
-
-    const shop =
-        state.shops.find(x=>x.code===code);
-
-    if(!shop){
-        notify("Kode Mitra Usaha tidak ditemukan.");
-        return;
-    }
-
-    showShopDashboard(shop.id);
-}
-
-
-/* =========================================================
-   C4
-========================================================= */
-
-function showShopDashboard(id){
-
-    const shop =
-        state.shops.find(x=>x.id===id);
-
-    state.selectedShop=shop;
-
-    app().innerHTML=`
-
-        <div class="card center">
-
-            <h2>KURIR SIMPLE</h2>
-
-            <p>
-                <b>${esc(shop.name)}</b>
-            </p>
-
-            <button onclick="showEditShop('${id}')">
-                EDIT AKUN
-            </button>
-
-            <button onclick="showShopMenus('${id}')">
-                DAFTAR MENU
-            </button>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   C5
-========================================================= */
-
-function showEditShop(id){
-
-    const s =
-        state.shops.find(x=>x.id===id);
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showShopDashboard('${id}')">
-            ← KEMBALI
+        <button class="btn primary"
+          onclick="go('customers')">
+          PELANGGAN
         </button>
 
-        <div class="card">
-
-            <h2>EDIT AKUN MITRA USAHA</h2>
-
-            <label>Nama Mitra Usaha</label>
-            <input id="esName" value="${esc(s.name)}">
-
-            <label>Nomor Telepon</label>
-            <input id="esPhone" value="${esc(s.phone)}">
-
-            <label>Kode Mitra Usaha</label>
-            <input id="esCode" value="${esc(s.code)}">
-
-            <label>Alamat Lengkap</label>
-            <input id="esAddress" value="${esc(s.address)}">
-
-            <button
-                class="blue"
-                onclick="shareEditShopLocation()">
-                BAGIKAN LOKASI
-            </button>
-
-            <button onclick="saveEditShop('${id}')">
-                SIMPAN PERUBAHAN
-            </button>
-
-        </div>
-    `;
-}
-
-function shareEditShopLocation(){
-    document.getElementById("esAddress").value =
-        "Lokasi berhasil dibagikan";
-}
-
-function saveEditShop(id){
-
-    const s =
-        state.shops.find(x=>x.id===id);
-
-    s.name=document.getElementById("esName").value.trim();
-    s.phone=document.getElementById("esPhone").value.trim();
-    s.code=document.getElementById("esCode").value.trim();
-    s.address=document.getElementById("esAddress").value.trim();
-
-    saveState();
-
-    notify("Perubahan berhasil disimpan.");
-
-    showShopDashboard(id);
-}
-
-
-/* =========================================================
-   C6
-========================================================= */
-
-function showShopMenus(id){
-
-    const shop =
-        state.shops.find(x=>x.id===id);
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showShopDashboard('${id}')">
-            ← KEMBALI
+        <button class="btn primary"
+          onclick="go('orders')">
+          PESANAN
         </button>
 
-        <div class="card">
-
-            <h2>DAFTAR MENU</h2>
-
-            ${
-                shop.menus.length
-                ?
-                shop.menus.map(m=>`
-                    <div class="menu">
-
-                        <div class="menu-name">
-                            ${esc(m.name)}
-                        </div>
-
-                        ${
-                            m.priceRule==="different"
-                            ?
-                            ""
-                            :
-                            `<div class="menu-price">
-                                ${money(m.price)}
-                            </div>`
-                        }
-
-                        <div class="menu-status">
-
-                            ${
-                                m.status==="TERSEDIA"
-                                ?
-                                `<span class="status open">
-                                    TERSEDIA
-                                </span>`
-                                :
-                                `<span class="status closed">
-                                    HABIS
-                                </span>`
-                            }
-
-                        </div>
-
-                        <button
-                            class="secondary"
-                            onclick="showEditMenu(
-                                '${id}',
-                                '${m.id}'
-                            )">
-                            EDIT
-                        </button>
-
-                        <button
-                            class="danger"
-                            onclick="deleteMenu(
-                                '${id}',
-                                '${m.id}'
-                            )">
-                            HAPUS
-                        </button>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada menu.
-                </div>`
-            }
-
-            <button
-                onclick="showAddMenu('${id}')">
-                TAMBAH MENU
-            </button>
-
-        </div>
-    `;
-}
-
-function deleteMenu(shopId,menuId){
-
-    const shop =
-        state.shops.find(x=>x.id===shopId);
-
-    shop.menus =
-        shop.menus.filter(
-            x=>x.id!==menuId
-        );
-
-    saveState();
-
-    showShopMenus(shopId);
-}
-
-
-/* =========================================================
-   C7
-   TAMBAH MENU
-========================================================= */
-
-function showAddMenu(id){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showShopMenus('${id}')">
-            ← KEMBALI
+        <button class="btn primary"
+          onclick="go('income')">
+          PEMASUKAN
         </button>
 
-        <div class="card">
-
-            <h2>TAMBAH MENU</h2>
-
-            <label>Nama Menu</label>
-
-            <input id="newMenuName">
-
-            <label>Harga Menu</label>
-
-            <input
-                id="newMenuPrice"
-                type="number">
-
-            <button
-                class="secondary"
-                onclick="showVariantForm('${id}')">
-                TAMBAH VARIAN
-            </button>
-
-            <button onclick="saveSimpleMenu('${id}')">
-                SIMPAN
-            </button>
-
-        </div>
-    `;
-}
-
-function saveSimpleMenu(shopId){
-
-    const name =
-        document.getElementById("newMenuName")
-        .value.trim();
-
-    const price =
-        Number(
-            document.getElementById("newMenuPrice")
-            .value
-        );
-
-    if(!name || !price){
-        notify("Nama menu dan harga wajib diisi.");
-        return;
-    }
-
-    const shop =
-        state.shops.find(x=>x.id===shopId);
-
-    shop.menus.push({
-        id:uid("menu"),
-        name,
-        price,
-        priceRule:"same",
-        selectionRule:"one",
-        variants:[],
-        status:"TERSEDIA"
-    });
-
-    saveState();
-
-    showShopMenus(shopId);
-}
-
-
-/* =========================================================
-   VARIAN
-========================================================= */
-
-function showVariantForm(shopId){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showAddMenu('${shopId}')">
-            ← KEMBALI
+        <button class="btn secondary"
+          onclick="go('account')">
+          AKUN
         </button>
 
-        <div class="card">
+      </div>
 
-            <h2>TAMBAH MENU</h2>
-
-            <label>Nama Menu</label>
-            <input id="variantMenuName">
-
-            <label>Harga Menu</label>
-            <input
-                id="variantBasePrice"
-                type="number">
-
-            <h3>JENIS VARIAN MENU</h3>
-
-            <div class="radio-row">
-
-                <label>
-                    <input
-                        type="radio"
-                        name="selectionRule"
-                        value="one">
-                    Hanya pilih satu
-                </label>
-
-                <label>
-                    <input
-                        type="radio"
-                        name="selectionRule"
-                        value="many">
-                    Bisa pilih lebih dari satu
-                </label>
-
-            </div>
-
-            <h3>ATURAN HARGA MENU</h3>
-
-            <div class="radio-row">
-
-                <label>
-                    <input
-                        type="radio"
-                        name="priceRule"
-                        value="different"
-                        onchange="toggleVariantPrices()">
-                    Harga tiap varian beda
-                </label>
-
-                <label>
-                    <input
-                        type="radio"
-                        name="priceRule"
-                        value="same"
-                        onchange="toggleVariantPrices()">
-                    Harga tiap varian sama
-                </label>
-
-            </div>
-
-            <div id="variantInputs"></div>
-
-            <button
-                class="secondary"
-                onclick="addVariantInput()">
-                TAMBAH VARIAN
-            </button>
-
-            <button onclick="saveVariantMenu('${shopId}')">
-                SIMPAN
-            </button>
-
-        </div>
-    `;
-
-    addVariantInput();
+    </div>
+  </div>`;
 }
-
-function addVariantInput(){
-
-    const box =
-        document.getElementById("variantInputs");
-
-    const div =
-        document.createElement("div");
-
-    div.className="variant-row";
-
-    div.innerHTML=`
-        <input
-            class="variantName"
-            placeholder="Nama Varian">
-
-        <input
-            class="variantPrice"
-            type="number"
-            placeholder="Harga Varian"
-            style="display:none">
-    `;
-
-    box.appendChild(div);
-
-    toggleVariantPrices();
-}
-
-function toggleVariantPrices(){
-
-    const rule =
-        document.querySelector(
-            'input[name="priceRule"]:checked'
-        )?.value;
-
-    document.querySelectorAll(".variantPrice")
-        .forEach(x=>{
-            x.style.display =
-                rule==="different"
-                ? "block"
-                : "none";
-        });
-}
-
-function saveVariantMenu(shopId){
-
-    const name =
-        document.getElementById("variantMenuName")
-        .value.trim();
-
-    const basePrice =
-        Number(
-            document.getElementById("variantBasePrice")
-            .value
-        );
-
-    const selectionRule =
-        document.querySelector(
-            'input[name="selectionRule"]:checked'
-        )?.value;
-
-    const priceRule =
-        document.querySelector(
-            'input[name="priceRule"]:checked'
-        )?.value;
-
-    if(!name || !basePrice){
-        notify("Nama menu dan harga wajib diisi.");
-        return;
-    }
-
-    if(!selectionRule){
-        notify("Pilih jenis pemilihan varian.");
-        return;
-    }
-
-    if(!priceRule){
-        notify("Pilih aturan harga menu.");
-        return;
-    }
-
-    const names =
-        [...document.querySelectorAll(".variantName")]
-        .map(x=>x.value.trim())
-        .filter(Boolean);
-
-    if(!names.length){
-        notify("Tambahkan minimal satu varian.");
-        return;
-    }
-
-    const prices =
-        [...document.querySelectorAll(".variantPrice")];
-
-    const variants =
-        names.map((name,i)=>({
-
-            name,
-
-            price:
-                priceRule==="different"
-                ?
-                Number(prices[i]?.value||0)
-                :
-                basePrice
-
-        }));
-
-    if(
-        priceRule==="different" &&
-        variants.some(x=>!x.price)
-    ){
-        notify("Semua harga varian wajib diisi.");
-        return;
-    }
-
-    const shop =
-        state.shops.find(x=>x.id===shopId);
-
-    shop.menus.push({
-
-        id:uid("menu"),
-
-        name,
-
-        price:
-            priceRule==="same"
-            ? basePrice
-            : 0,
-
-        priceRule,
-
-        selectionRule,
-
-        variants,
-
-        status:"TERSEDIA"
-    });
-
-    saveState();
-
-    showShopMenus(shopId);
-}
-
 
 /* =========================================================
-   C8
+   B2 - MITRA USAHA
 ========================================================= */
 
-function showEditMenu(shopId,menuId){
+function renderPartners(){
+  const list=data.partners.map(p=>`
+    <div class="card clickable"
+      onclick="openPartner('${p.id}')">
 
-    const shop =
-        state.shops.find(x=>x.id===shopId);
+      <div class="item-title">
+        ${esc(p.name)}
+      </div>
 
-    const menu =
-        shop.menus.find(x=>x.id===menuId);
+      <div class="item-sub">
+        ${esc(p.phone)}
+      </div>
 
-    app().innerHTML=`
+      <div style="margin-top:5px">
+        <span class="status ${p.status}">
+          ${p.status==="open"?"OPEN":"CLOSED"}
+        </span>
+      </div>
 
-        <button class="back"
-            onclick="showShopMenus('${shopId}')">
-            ← KEMBALI
+      <div
+        class="action-row"
+        onclick="event.stopPropagation()">
+
+        <button
+          class="btn small ${
+            p.status==="open"?"success":"secondary"
+          }"
+          onclick="setStatus('${p.id}','open')">
+          OPEN
         </button>
 
-        <div class="card">
+        <button
+          class="btn small ${
+            p.status==="closed"?"danger":"secondary"
+          }"
+          onclick="setStatus('${p.id}','closed')">
+          CLOSED
+        </button>
+      </div>
 
-            <h2>EDIT MENU</h2>
+      <button
+        class="btn secondary small"
+        onclick="
+          event.stopPropagation();
+          copyLink(partnerLink('${p.id}'));
+        ">
+        SALIN LINK MITRA USAHA
+      </button>
 
-            <label>Nama Menu</label>
+    </div>
+  `).join("");
 
-            <input
-                id="editMenuName"
-                value="${esc(menu.name)}">
+  document.getElementById("app").innerHTML=shell(
+    "MITRA USAHA",
+    `
+    <div class="content">
 
-            <label>Harga Menu</label>
+      <div class="section-title">
+        DAFTAR MITRA USAHA DI DESA
+      </div>
 
-            <input
-                id="editMenuPrice"
-                type="number"
-                value="${menu.price||0}"
-                ${menu.priceRule==="different"?"style='display:none'":""}>
+      ${
+        list||
+        `<div class="empty">
+          Belum ada Mitra Usaha.
+        </div>`
+      }
 
-            <h3>JENIS VARIAN MENU</h3>
+      <button class="btn primary"
+        onclick="go('addPartner')">
+        TAMBAH MITRA USAHA
+      </button>
 
-            <div class="radio-row">
+    </div>
+    `,
+    "dashboard"
+  );
+}
 
-                <label>
-                    <input
-                        type="radio"
-                        name="editSelection"
-                        value="one"
-                        ${menu.selectionRule==="one"?"checked":""}>
-                    Hanya pilih satu
-                </label>
+function setStatus(id,status){
+  const p=partner(id);
+  if(!p)return;
 
-                <label>
-                    <input
-                        type="radio"
-                        name="editSelection"
-                        value="many"
-                        ${menu.selectionRule==="many"?"checked":""}>
-                    Bisa pilih lebih dari satu
-                </label>
+  p.status=status;
+  save();
 
-            </div>
+  render("partners");
+  toast(
+    "Status berubah menjadi "+
+    status.toUpperCase()+"."
+  );
+}
 
-            <h3>ATURAN HARGA MENU</h3>
+/* =========================================================
+   B3 - TAMBAH MITRA
+========================================================= */
 
-            <div class="radio-row">
+function renderAddPartner(){
+  document.getElementById("app").innerHTML=shell(
+    "TAMBAH MITRA USAHA",
+    `
+    <div class="content">
 
-                <label>
-                    <input
-                        type="radio"
-                        name="editPriceRule"
-                        value="different"
-                        ${menu.priceRule==="different"?"checked":""}
-                        onchange="editTogglePrice()">
-                    Harga tiap varian beda
-                </label>
+      <div class="field">
+        <label class="label">Nama Mitra Usaha</label>
+        <input id="partnerName"
+          placeholder="Nama Mitra Usaha">
+      </div>
 
-                <label>
-                    <input
-                        type="radio"
-                        name="editPriceRule"
-                        value="same"
-                        ${menu.priceRule==="same"?"checked":""}
-                        onchange="editTogglePrice()">
-                    Harga tiap varian sama
-                </label>
+      <div class="field">
+        <label class="label">Nomor Telepon</label>
+        <input id="partnerPhone"
+          inputmode="numeric"
+          maxlength="12"
+          placeholder="Nomor Telepon">
+      </div>
 
-            </div>
+      <button class="btn primary"
+        onclick="savePartner()">
+        SIMPAN
+      </button>
 
-            <div id="editVariants">
+    </div>
+    `,
+    "partners"
+  );
+}
+
+function savePartner(){
+  const name=document.getElementById("partnerName").value.trim();
+  const phone=document.getElementById("partnerPhone").value.trim();
+
+  if(!name){
+    toast("Nama Mitra harus diisi.");
+    return;
+  }
+
+  if(!/^\d{12}$/.test(phone)){
+    toast("Nomor telepon harus 12 digit.");
+    return;
+  }
+
+  data.partners.push({
+    id:id("MITRA"),
+    courierId:data.courier?.id||null,
+    name,
+    phone,
+    status:"closed",
+    menus:[]
+  });
+
+  save();
+
+  go("partners");
+  toast("Mitra Usaha berhasil disimpan.");
+}
+
+/* =========================================================
+   B4 - DETAIL MITRA
+========================================================= */
+
+function openPartner(id){
+  currentPartnerId=id;
+  render("partnerDetail");
+}
+
+function renderPartnerDetail(){
+  const p=partner(currentPartnerId);
+
+  if(!p){
+    go("partners");
+    return;
+  }
+
+  document.getElementById("app").innerHTML=shell(
+    p.name,
+    `
+    <div class="content">
+
+      <div class="card">
+
+        <div class="item-title">
+          ${esc(p.name)}
+        </div>
+
+        <div class="item-sub">
+          ${esc(p.phone)}
+        </div>
+
+        <div style="margin-top:5px">
+          <span class="status ${p.status}">
+            ${p.status==="open"?"OPEN":"CLOSED"}
+          </span>
+        </div>
+
+      </div>
+
+      <div class="section-title">
+        DAFTAR MENU
+      </div>
+
+      ${
+        p.menus.length
+        ?p.menus.map(m=>`
+          <div class="card clickable"
+            onclick="editMenu('${m.id}')">
+
+            <div class="menu-line">
+
+              <div class="menu-info">
+
+                <div class="item-title">
+                  ${esc(m.name)}
+                </div>
 
                 ${
-                    menu.variants.map(v=>`
-                        <div class="variant-row">
-
-                            <input
-                                class="editVariantName"
-                                value="${esc(v.name)}">
-
-                            <input
-                                class="editVariantPrice"
-                                type="number"
-                                value="${v.price||0}"
-                                ${
-                                    menu.priceRule==="different"
-                                    ? ""
-                                    : "style='display:none'"
-                                }>
-
-                        </div>
-                    `).join("")
+                  m.variants.length
+                  ?`
+                    <div class="item-sub">
+                      ${m.variants.length}
+                      varian
+                    </div>
+                  `
+                  :`
+                    <div class="price">
+                      ${rupiah(m.price)}
+                    </div>
+                  `
                 }
 
+              </div>
+
             </div>
 
-            <button
-                class="secondary"
-                onclick="addEditVariant()">
-                TAMBAH VARIAN
-            </button>
-
-            <button
-                onclick="saveEditedMenu(
-                    '${shopId}',
-                    '${menuId}'
-                )">
-                SIMPAN PERUBAHAN
-            </button>
-
-        </div>
-    `;
-}
-
-function editTogglePrice(){
-
-    const rule =
-        document.querySelector(
-            'input[name="editPriceRule"]:checked'
-        )?.value;
-
-    document.getElementById("editMenuPrice")
-        .style.display =
-        rule==="different"
-        ? "none"
-        : "block";
-
-    document.querySelectorAll(".editVariantPrice")
-        .forEach(x=>{
-            x.style.display =
-                rule==="different"
-                ? "block"
-                : "none";
-        });
-}
-
-function addEditVariant(){
-
-    const box =
-        document.getElementById("editVariants");
-
-    const div =
-        document.createElement("div");
-
-    div.className="variant-row";
-
-    div.innerHTML=`
-        <input
-            class="editVariantName"
-            placeholder="Nama Varian">
-
-        <input
-            class="editVariantPrice"
-            type="number"
-            placeholder="Harga Varian">
-    `;
-
-    box.appendChild(div);
-
-    editTogglePrice();
-}
-
-function saveEditedMenu(shopId,menuId){
-
-    const shop =
-        state.shops.find(x=>x.id===shopId);
-
-    const menu =
-        shop.menus.find(x=>x.id===menuId);
-
-    const name =
-        document.getElementById("editMenuName")
-        .value.trim();
-
-    const price =
-        Number(
-            document.getElementById("editMenuPrice")
-            .value
-        );
-
-    const selectionRule =
-        document.querySelector(
-            'input[name="editSelection"]:checked'
-        )?.value;
-
-    const priceRule =
-        document.querySelector(
-            'input[name="editPriceRule"]:checked'
-        )?.value;
-
-    if(!name || !selectionRule || !priceRule){
-        notify("Lengkapi seluruh pilihan menu.");
-        return;
-    }
-
-    const names =
-        [...document.querySelectorAll(".editVariantName")]
-        .map(x=>x.value.trim())
-        .filter(Boolean);
-
-    const prices =
-        [...document.querySelectorAll(".editVariantPrice")];
-
-    if(names.length){
-
-        const variants =
-            names.map((n,i)=>({
-
-                name:n,
-
-                price:
-                    priceRule==="different"
-                    ?
-                    Number(prices[i]?.value||0)
-                    :
-                    price
-
-            }));
-
-        if(
-            priceRule==="different" &&
-            variants.some(x=>!x.price)
-        ){
-            notify("Semua harga varian wajib diisi.");
-            return;
-        }
-
-        menu.variants=variants;
-
-    }else{
-
-        menu.variants=[];
-
-    }
-
-    menu.name=name;
-    menu.selectionRule=selectionRule;
-    menu.priceRule=priceRule;
-
-    menu.price =
-        priceRule==="same"
-        ? price
-        : 0;
-
-    saveState();
-
-    showShopMenus(shopId);
-}
-
-
-/* =========================================================
-   B8 / MITRA DILIHAT KURIR
-========================================================= */
-
-function showCourierPartnerList(courierId){
-
-    const courier =
-        state.couriers.find(x=>x.id===courierId);
-
-    const shops =
-        state.shops.filter(shop=>
-            !shop.kecamatan ||
-            courier.serviceAreas.includes(shop.kecamatan)
-        );
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierPartners('${courierId}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>MITRA USAHA SAYA</h2>
-
-            ${
-                shops.length
-                ?
-                shops.map(s=>`
-                    <div class="list"
-                        onclick="showCourierShopDetail(
-                            '${courierId}',
-                            '${s.id}'
-                        )">
-
-                        <div class="list-info">
-
-                            <div class="list-name">
-                                ${esc(s.name)}
-                            </div>
-
-                            <div class="status-row">
-
-                                <span
-                                    class="status ${
-                                        s.status==="OPEN"
-                                        ? "open"
-                                        : "closed"
-                                    }">
-
-                                    ${
-                                        s.status==="OPEN"
-                                        ? "OPEN"
-                                        : "CLOSED"
-                                    }
-
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <div class="arrow">›</div>
-
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada Mitra Usaha.
-                </div>`
-            }
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   STATUS MITRA
-========================================================= */
-
-function showCourierShopDetail(courierId,shopId){
-
-    const shop =
-        state.shops.find(x=>x.id===shopId);
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierPartnerList('${courierId}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DETAIL MITRA USAHA — MENU</h2>
-
-            <p>
-                <b>${esc(shop.name)}</b>
-            </p>
-
-            <button
-                onclick="toggleShopStatus(
-                    '${courierId}',
-                    '${shopId}'
-                )">
-
-                ${
-                    shop.status==="OPEN"
-                    ? "TERSEDIA"
-                    : "HABIS"
-                }
-
-            </button>
-
-            ${
-                shop.menus.map(m=>`
-                    <div class="menu">
-
-                        <div class="menu-name">
-                            ${esc(m.name)}
-                        </div>
-
-                        ${
-                            m.priceRule==="same"
-                            ?
-                            `<div class="menu-price">
-                                ${money(m.price)}
-                            </div>`
-                            :
-                            ""
-                        }
-
-                        ${
-                            m.variants.map(v=>`
-                                <div class="variant">
-                                    ${esc(v.name)}
-                                    ${
-                                        m.priceRule==="different"
-                                        ? " — "+money(v.price)
-                                        : ""
-                                    }
-                                </div>
-                            `).join("")
-                        }
-
-                        <div class="menu-status">
-
-                            <span class="status ${
-                                m.status==="HABIS"
-                                ? "closed"
-                                : "open"
-                            }">
-
-                                ${
-                                    m.status==="HABIS"
-                                    ? "HABIS"
-                                    : "TERSEDIA"
-                                }
-
-                            </span>
-
-                        </div>
-
-                        <button
-                            onclick="toggleMenuStatus(
-                                '${courierId}',
-                                '${shopId}',
-                                '${m.id}'
-                            )">
-
-                            UBAH STATUS
-
-                        </button>
-
-                    </div>
-                `).join("")
-            }
-
-        </div>
-    `;
-}
-
-function toggleShopStatus(courierId,shopId){
-
-    const shop =
-        state.shops.find(x=>x.id===shopId);
-
-    shop.status =
-        shop.status==="OPEN"
-        ? "CLOSED"
-        : "OPEN";
-
-    saveState();
-
-    showCourierShopDetail(courierId,shopId);
-}
-
-function toggleMenuStatus(courierId,shopId,menuId){
-
-    const shop =
-        state.shops.find(x=>x.id===shopId);
-
-    const menu =
-        shop.menus.find(x=>x.id===menuId);
-
-    menu.status =
-        menu.status==="HABIS"
-        ? "TERSEDIA"
-        : "HABIS";
-
-    saveState();
-
-    showCourierShopDetail(courierId,shopId);
-}
-
-
-/* =========================================================
-   B11
-========================================================= */
-
-function showCustomerLink(courierId){
-
-    const link =
-        location.origin+
-        location.pathname+
-        "?pelanggan=daftar&kurir="+
-        encodeURIComponent(courierId);
-
-    state.customerLink=link;
-    saveState();
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierDashboard('${courierId}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>SALIN LINK PELANGGAN</h2>
-
-            <div class="link-box">
-                ${esc(link)}
+            <div class="item-sub">
+              Tekan bagian menu untuk edit.
             </div>
 
-            <button onclick="copyText('${esc(link)}')">
-                SALIN LINK
-            </button>
+          </div>
+        `).join("")
+        :`
+          <div class="empty">
+            Belum ada menu.
+          </div>
+        `
+      }
 
-            <button
-                class="success"
-                onclick="window.open(
-                    'https://wa.me/?text='+
-                    encodeURIComponent('${esc(link)}'),
-                    '_blank'
-                )">
-                BAGIKAN VIA WHATSAPP
-            </button>
+      <button class="btn primary"
+        onclick="newMenu()">
+        TAMBAH MENU
+      </button>
 
-        </div>
-    `;
+      <button class="btn danger"
+        onclick="deletePartner()">
+        HAPUS MITRA USAHA
+      </button>
+
+    </div>
+    `,
+    "partners"
+  );
 }
 
+function deletePartner(){
+  if(!confirm("Hapus Mitra Usaha ini?"))return;
+
+  data.partners=data.partners.filter(
+    x=>x.id!==currentPartnerId
+  );
+
+  save();
+
+  currentPartnerId=null;
+
+  go("partners");
+}
 
 /* =========================================================
-   B12
+   B5 - EDIT / TAMBAH MENU
 ========================================================= */
 
-function showCourierOrders(courierId){
+function newMenu(){
+  editingMenuId=null;
+  render("menuEditor");
+}
 
-    const orders =
-        state.orders
-        .filter(x=>x.courierId===courierId)
-        .sort((a,b)=>b.createdAt-a.createdAt);
+function editMenu(idMenu){
+  editingMenuId=idMenu;
+  render("menuEditor");
+}
 
-    app().innerHTML=`
+function renderMenuEditor(){
+  const p=partner(currentPartnerId);
+  const m=editingMenuId
+    ?p.menus.find(x=>x.id===editingMenuId)
+    :null;
 
-        <button class="back"
-            onclick="showCourierDashboard('${courierId}')">
-            ← KEMBALI
-        </button>
+  document.getElementById("app").innerHTML=shell(
+    m?"EDIT MENU":"TAMBAH MENU",
+    `
+    <div class="content">
 
-        <div class="card">
+      <div class="field">
+        <label class="label">Nama Menu</label>
+        <input id="menuName"
+          value="${esc(m?.name||"")}"
+          placeholder="Nama Menu">
+      </div>
 
-            <h2>PESANAN MASUK</h2>
+      <div class="field">
+        <label class="label">Harga Menu</label>
+        <input id="menuPrice"
+          inputmode="numeric"
+          value="${m?.price||""}"
+          placeholder="Harga">
+      </div>
 
-            ${
-                orders.length
-                ?
-                orders.map(o=>`
+      <div class="card">
 
-                    <div class="list"
-                        onclick="showCourierOrderDetail(
-                            '${courierId}',
-                            '${o.id}'
-                        )">
-
-                        <div class="list-info">
-
-                            <div class="list-name">
-                                ${esc(o.customerName)}
-                            </div>
-
-                            <div class="list-sub">
-                                ${new Date(
-                                    o.createdAt
-                                ).toLocaleTimeString("id-ID",{
-                                    hour:"2-digit",
-                                    minute:"2-digit"
-                                })}
-                            </div>
-
-                        </div>
-
-                        <div class="arrow">›</div>
-
-                    </div>
-
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada pesanan masuk.
-                </div>`
-            }
-
+        <div class="label">
+          JENIS VARIAN
         </div>
-    `;
-}
 
+        <div class="radio-list">
 
-/* =========================================================
-   B13
-========================================================= */
-
-function showCourierOrderDetail(courierId,orderId){
-
-    const order =
-        state.orders.find(x=>x.id===orderId);
-
-    if(!order){
-        showCourierOrders(courierId);
-        return;
-    }
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierOrders('${courierId}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DETAIL PESANAN PELANGGAN</h2>
-
-            <p>
-                <b>${esc(order.customerName)}</b>
-            </p>
-
-            ${
-                order.groups.map(group=>`
-
-                    <div class="order-group">
-
-                        <h3>
-                            ${esc(group.shopName)}
-                        </h3>
-
-                        ${
-                            group.items.map((item,index)=>`
-                                <div class="order-item">
-
-                                    <div class="order-item-line">
-
-                                        <span>
-                                            ${esc(item.name)}
-                                            ${
-                                                item.variant
-                                                ? " "+esc(item.variant)
-                                                : ""
-                                            }
-                                            × ${item.qty}
-                                        </span>
-
-                                        <span>
-                                            ${money(
-                                                item.qty*
-                                                item.price
-                                            )}
-                                        </span>
-
-                                    </div>
-
-                                    <button
-                                        class="danger"
-                                        onclick="deleteOrderItem(
-                                            '${order.id}',
-                                            '${group.shopId}',
-                                            ${index}
-                                        )">
-                                        HAPUS
-                                    </button>
-
-                                </div>
-                            `).join("")
-                        }
-
-                        <div class="total">
-                            <span>TOTAL ${esc(group.shopName)}</span>
-                            <span>${money(groupTotal(group))}</span>
-                        </div>
-
-                        <button
-                            onclick="sendShopOrderWhatsApp(
-                                '${order.id}',
-                                '${group.shopId}'
-                            )">
-                            KIRIM VIA WHATSAPP
-                        </button>
-
-                    </div>
-
-                `).join("")
-            }
-
-            <div class="total">
-                <span>TOTAL KESELURUHAN</span>
-                <span>${money(orderTotal(order))}</span>
-            </div>
-
-            <button
-                onclick="showCustomerDisplay(
-                    '${courierId}',
-                    '${order.id}'
-                )">
-                TAMPILAN PELANGGAN
-            </button>
-
-        </div>
-    `;
-}
-
-function groupTotal(group){
-
-    return group.items.reduce(
-        (sum,item)=>
-            sum+
-            Number(item.price||0)*
-            Number(item.qty||0),
-        0
-    );
-}
-
-function orderTotal(order){
-
-    return order.groups.reduce(
-        (sum,g)=>sum+groupTotal(g),
-        0
-    );
-}
-
-function deleteOrderItem(orderId,shopId,index){
-
-    const order =
-        state.orders.find(x=>x.id===orderId);
-
-    const group =
-        order.groups.find(x=>x.shopId===shopId);
-
-    group.items.splice(index,1);
-
-    order.groups =
-        order.groups.filter(
-            x=>x.items.length
-        );
-
-    saveState();
-
-    showCourierOrderDetail(
-        order.courierId,
-        order.id
-    );
-}
-
-
-/* =========================================================
-   B14
-========================================================= */
-
-function showCustomerDisplay(courierId,orderId){
-
-    const order =
-        state.orders.find(x=>x.id===orderId);
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCourierOrderDetail(
-                '${courierId}',
-                '${orderId}'
-            )">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>TAMPILAN PELANGGAN</h2>
-
-            <p>
-                ${esc(order.customerName)}
-            </p>
-
-            ${
-                order.groups.map(g=>`
-                    <div class="order-group">
-
-                        <h3>${esc(g.shopName)}</h3>
-
-                        ${
-                            g.items.map(i=>`
-                                <div class="order-item-line">
-                                    <span>
-                                        ${esc(i.name)}
-                                        ${
-                                            i.variant
-                                            ? " "+esc(i.variant)
-                                            : ""
-                                        }
-                                        × ${i.qty}
-                                    </span>
-
-                                    <span>
-                                        ${money(
-                                            i.qty*i.price
-                                        )}
-                                    </span>
-                                </div>
-                            `).join("")
-                        }
-
-                        <div class="total">
-                            <span>TOTAL</span>
-                            <span>${money(groupTotal(g))}</span>
-                        </div>
-
-                    </div>
-                `).join("")
-            }
-
-            <div class="total">
-                <span>TOTAL BELANJA</span>
-                <span>${money(orderTotal(order))}</span>
-            </div>
-
-            <label>ONGKIR</label>
-
+          <label class="radio-row">
             <input
-                id="shippingCost"
-                type="number"
-                value="${order.shipping||""}"
-                oninput="calculateShipping('${order.id}')">
+              type="radio"
+              name="selection"
+              value="none"
+              ${!m||m.selection==="none"?"checked":""}>
+            Tidak memiliki varian
+          </label>
 
-            <div class="total">
+          <label class="radio-row">
+            <input
+              type="radio"
+              name="selection"
+              value="one"
+              ${m?.selection==="one"?"checked":""}>
+            Hanya pilih satu varian
+          </label>
 
-                <span>TOTAL PEMBAYARAN</span>
-
-                <span id="paymentTotal">
-
-                    ${
-                        order.shipping
-                        ? money(
-                            orderTotal(order)+
-                            Number(order.shipping)
-                        )
-                        : "BELUM DIHITUNG"
-                    }
-
-                </span>
-
-            </div>
-
-            <button onclick="sendCustomerWhatsApp('${order.id}')">
-                KIRIM VIA WHATSAPP
-            </button>
+          <label class="radio-row">
+            <input
+              type="radio"
+              name="selection"
+              value="many"
+              ${m?.selection==="many"?"checked":""}>
+            Bisa pilih beberapa varian
+          </label>
 
         </div>
-    `;
+
+        <div style="height:9px"></div>
+
+        <div class="label">
+          HARGA VARIAN
+        </div>
+
+        <div class="radio-list">
+
+          <label class="radio-row">
+            <input
+              type="radio"
+              name="variantPrice"
+              value="different"
+              ${!m||m.variantPrice==="different"?"checked":""}>
+            Setiap varian memiliki harga berbeda
+          </label>
+
+          <label class="radio-row">
+            <input
+              type="radio"
+              name="variantPrice"
+              value="same"
+              ${m?.variantPrice==="same"?"checked":""}>
+            Harga varian sama
+          </label>
+
+        </div>
+
+        <div id="variants">
+          ${(m?.variants||[])
+            .map(v=>variantHTML(v))
+            .join("")}
+        </div>
+
+        <button class="btn secondary"
+          onclick="addVariant()">
+          TAMBAH VARIAN
+        </button>
+
+      </div>
+
+      <button class="btn primary"
+        onclick="saveMenuData()">
+        SIMPAN
+      </button>
+
+      ${
+        m
+        ?`
+        <button class="btn danger"
+          onclick="deleteCurrentMenu()">
+          HAPUS MENU
+        </button>`
+        :""
+      }
+
+    </div>
+    `,
+    "partnerDetail"
+  );
 }
 
-function calculateShipping(orderId){
+function variantHTML(v={}){
+  return `
+    <div class="variant-editor variant-row">
 
-    const value =
-        Number(
-            document.getElementById("shippingCost")
-            .value
-        );
+      <div class="variant-edit-line">
 
-    const order =
-        state.orders.find(x=>x.id===orderId);
+        <input
+          class="v-name"
+          placeholder="Nama varian"
+          value="${esc(v.name||"")}">
 
-    order.shipping=value;
+        <input
+          class="v-price"
+          inputmode="numeric"
+          placeholder="Harga"
+          value="${v.price||""}">
 
-    document.getElementById("paymentTotal")
-        .textContent =
-        money(
-            orderTotal(order)+value
-        );
+        <button
+          class="remove"
+          onclick="
+            this.closest('.variant-row').remove()
+          ">
+          ×
+        </button>
 
-    saveState();
+      </div>
+
+    </div>
+  `;
 }
 
-function sendShopOrderWhatsApp(orderId,shopId){
-
-    const order =
-        state.orders.find(x=>x.id===orderId);
-
-    const group =
-        order.groups.find(
-            x=>x.shopId===shopId
-        );
-
-    const shop =
-        state.shops.find(
-            x=>x.id===shopId
-        );
-
-    let text=
-        "PESANAN PELANGGAN\n\n"+
-        "Pelanggan: "+order.customerName+"\n"+
-        "Mitra Usaha: "+group.shopName+"\n\n";
-
-    group.items.forEach(item=>{
-        text +=
-            item.name+
-            (item.variant?" "+item.variant:"")+
-            " x "+item.qty+
-            " = "+money(item.qty*item.price)+
-            "\n";
-    });
-
-    text +=
-        "\nTOTAL: "+
-        money(groupTotal(group));
-
-    if(shop?.phone){
-        window.open(
-            "https://wa.me/"+
-            shop.phone.replace(/\D/g,"")+
-            "?text="+
-            encodeURIComponent(text),
-            "_blank"
-        );
-    }else{
-        notify(text);
-    }
-}
-
-function sendCustomerWhatsApp(orderId){
-
-    const order =
-        state.orders.find(x=>x.id===orderId);
-
-    let text=
-        "PESANAN PELANGGAN\n\n";
-
-    order.groups.forEach(g=>{
-
-        text +=
-            g.shopName+"\n";
-
-        g.items.forEach(i=>{
-            text +=
-                i.name+
-                (i.variant?" "+i.variant:"")+
-                " x "+i.qty+
-                " = "+money(i.qty*i.price)+
-                "\n";
-        });
-
-        text +=
-            "Total: "+
-            money(groupTotal(g))+
-            "\n\n";
-    });
-
-    text +=
-        "TOTAL BELANJA: "+
-        money(orderTotal(order))+
-        "\nONGKIR: "+
-        money(order.shipping||0)+
-        "\nTOTAL PEMBAYARAN: "+
-        money(
-            orderTotal(order)+
-            Number(order.shipping||0)
-        );
-
-    window.open(
-        "https://wa.me/?text="+
-        encodeURIComponent(text),
-        "_blank"
+function addVariant(){
+  document.getElementById("variants")
+    .insertAdjacentHTML(
+      "beforeend",
+      variantHTML({})
     );
 }
 
+function saveMenuData(){
+  const p=partner(currentPartnerId);
 
-/* =========================================================
-   D1
-========================================================= */
+  const name=document.getElementById("menuName")
+    .value.trim();
 
-function showCustomerPublicHome(){
+  const price=Number(
+    document.getElementById("menuPrice").value
+  )||0;
 
-    app().innerHTML=`
+  const selection=document.querySelector(
+    'input[name="selection"]:checked'
+  )?.value||"none";
 
-        <div class="card center">
+  const variantPrice=document.querySelector(
+    'input[name="variantPrice"]:checked'
+  )?.value||"different";
 
-            <h2>KURIR SIMPLE</h2>
+  if(!name){
+    toast("Nama menu harus diisi.");
+    return;
+  }
 
-            <h3>PELANGGAN</h3>
+  const variants=[];
 
-            <button onclick="showCustomerRegister()">
-                DAFTAR AKUN
-            </button>
+  document.querySelectorAll(".variant-row")
+    .forEach(row=>{
+      const n=row.querySelector(".v-name")
+        ?.value.trim();
 
-            <button
-                class="secondary"
-                onclick="showCustomerLogin()">
-                MASUK KE AKUN YANG SUDAH ADA
-            </button>
+      const pr=Number(
+        row.querySelector(".v-price")?.value
+      )||0;
 
-        </div>
-    `;
+      if(n){
+        variants.push({
+          id:id("VARIAN"),
+          name:n,
+          price:variantPrice==="same"
+            ?price
+            :pr
+        });
+      }
+    });
+
+  if(editingMenuId){
+    const m=p.menus.find(
+      x=>x.id===editingMenuId
+    );
+
+    m.name=name;
+    m.price=price;
+    m.selection=selection;
+    m.variantPrice=variantPrice;
+    m.variants=variants;
+  }else{
+    p.menus.push({
+      id:id("MENU"),
+      name,
+      price,
+      selection,
+      variantPrice,
+      variants
+    });
+  }
+
+  save();
+
+  go("partnerDetail");
 }
 
+function deleteCurrentMenu(){
+  const p=partner(currentPartnerId);
+
+  if(!confirm("Hapus menu ini?"))return;
+
+  p.menus=p.menus.filter(
+    x=>x.id!==editingMenuId
+  );
+
+  save();
+
+  editingMenuId=null;
+
+  go("partnerDetail");
+}
 
 /* =========================================================
-   D2
+   C. LINK MITRA UNTUK PELANGGAN
 ========================================================= */
 
-function showCustomerRegister(){
+function renderPartnerPublic(){
+  const p=partner(currentPartnerId);
 
-    app().innerHTML=`
+  if(!p){
+    document.getElementById("app").innerHTML=
+      `<div class="page">
+        <div class="empty">
+          Mitra Usaha tidak ditemukan.
+        </div>
+      </div>`;
+    return;
+  }
 
-        <button class="back"
-            onclick="showCustomerPublicHome()">
-            ← KEMBALI
+  document.getElementById("app").innerHTML=`
+  <div class="page">
+
+    <div class="header">
+      <div class="title">
+        ${esc(p.name)}
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="card">
+        <div class="item-title">
+          ${esc(p.name)}
+        </div>
+
+        <div style="margin-top:5px">
+          <span class="status ${p.status}">
+            ${p.status==="open"?"OPEN":"CLOSED"}
+          </span>
+        </div>
+      </div>
+
+      ${
+        p.status==="closed"
+        ?`
+        <div class="notice">
+          Mitra Usaha sedang CLOSED.
+          Pesanan belum dapat dibuat.
+        </div>
+        `
+        :""
+      }
+
+      ${
+        p.status==="open"
+        ?`
+        <button class="btn primary"
+          onclick="customerEnter('${p.id}')">
+          PESAN
+        </button>
+        `
+        :""
+      }
+
+    </div>
+  </div>`;
+}
+
+function customerEnter(id){
+  currentPartnerId=id;
+
+  /*
+    Gunakan akun pelanggan yang memang tersimpan
+    pada perangkat ini, bukan pelanggan milik orang lain
+    yang ikut tersimpan di data online Kurir.
+  */
+  const localCustomer=data.customers.find(
+    x=>x.id===localCustomerId
+  );
+
+  if(localCustomer){
+    currentCustomerId=localCustomer.id;
+    render("customerPartnerMenu");
+  }else{
+    render("customerRegister");
+  }
+}
+
+/* =========================================================
+   D. DAFTAR PELANGGAN
+========================================================= */
+
+function renderCustomers(){
+  document.getElementById("app").innerHTML=shell(
+    "PELANGGAN",
+    `
+    <div class="content">
+
+      <div class="card">
+        <div class="item-title">
+          LINK PELANGGAN
+        </div>
+
+        <div class="item-sub">
+          Bagikan link ini kepada pelanggan.
+        </div>
+
+        <button class="btn secondary"
+          onclick="copyLink(customerLink())">
+          SALIN LINK PELANGGAN
+        </button>
+      </div>
+
+      <div class="section-title">
+        DAFTAR PELANGGAN
+      </div>
+
+      ${
+        data.customers.length
+        ?data.customers.map(c=>`
+          <div class="card clickable"
+            onclick="openCustomer('${c.id}')">
+
+            <div class="item-title">
+              ${esc(c.name)}
+            </div>
+
+            <div class="customer-data">
+              ${esc(c.phone)}<br>
+              ${addressText(c.location?.address)}
+            </div>
+
+          </div>
+        `).join("")
+        :`
+        <div class="empty">
+          Belum ada pelanggan.
+        </div>
+        `
+      }
+
+    </div>
+    `,
+    "dashboard"
+  );
+}
+
+function openCustomer(id){
+  currentCustomerId=id;
+  render("customerDashboard");
+}
+
+function addressText(a){
+  if(!a)return "Alamat belum tersedia.";
+
+  return [
+    a.province,
+    a.regency,
+    a.district,
+    a.village
+  ].filter(Boolean).join(", ");
+}
+
+/* =========================================================
+   E. DAFTAR PELANGGAN DARI LINK
+========================================================= */
+
+function renderCustomerRegister(){
+  document.getElementById("app").innerHTML=`
+  <div class="page">
+
+    <div class="header">
+      <div class="title">
+        DAFTAR AKUN PELANGGAN
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="field">
+        <label class="label">Nama</label>
+        <input id="customerName"
+          placeholder="Nama">
+      </div>
+
+      <div class="field">
+        <label class="label">Nomor Telepon</label>
+        <input id="customerPhone"
+          inputmode="numeric"
+          maxlength="12"
+          placeholder="Nomor Telepon">
+      </div>
+
+      <div class="field">
+
+        <label class="label">Alamat</label>
+
+        <button
+          id="customerLocationButton"
+          class="btn secondary"
+          onclick="shareCustomerLocation()">
+          BAGIKAN LOKASI
         </button>
 
-        <div class="card">
+        <div id="customerAddress"
+          class="hidden"></div>
 
-            <h2>DAFTAR AKUN PELANGGAN</h2>
+      </div>
 
-            <label>Nama Pelanggan</label>
-            <input id="customerName">
+      <button class="btn primary"
+        onclick="registerCustomer()">
+        SELESAI
+      </button>
 
-            <label>Nomor WhatsApp</label>
-            <input id="customerPhone">
-
-            <label>Alamat Lengkap</label>
-            <input id="customerAddress">
-
-            <button
-                class="blue"
-                onclick="shareCustomerLocation()">
-                BAGIKAN LOKASI
-            </button>
-
-            <button onclick="registerCustomer()">
-                MASUK
-            </button>
-
-        </div>
-    `;
+    </div>
+  </div>`;
 }
 
 function shareCustomerLocation(){
+  getLocation(location=>{
+    customerLocation=location;
 
-    document.getElementById("customerAddress").value =
-        "Lokasi berhasil dibagikan";
+    const button=document.getElementById(
+      "customerLocationButton"
+    );
+
+    const box=document.getElementById(
+      "customerAddress"
+    );
+
+    if(button)button.classList.add("hidden");
+
+    if(box){
+      box.classList.remove("hidden");
+      box.innerHTML=addressHTML(
+        location.address
+      );
+    }
+
+    toast("Lokasi berhasil dibagikan.");
+  });
 }
 
 function registerCustomer(){
+  const name=document.getElementById(
+    "customerName"
+  ).value.trim();
 
-    const name =
-        document.getElementById("customerName").value.trim();
+  const phone=document.getElementById(
+    "customerPhone"
+  ).value.trim();
 
-    const phone =
-        document.getElementById("customerPhone").value.trim();
+  if(!name){
+    toast("Nama harus diisi.");
+    return;
+  }
 
-    const address =
-        document.getElementById("customerAddress").value.trim();
+  if(!/^\d{12}$/.test(phone)){
+    toast("Nomor telepon harus 12 digit.");
+    return;
+  }
 
-    if(!name || !phone || !address){
-        notify("Lengkapi seluruh data pelanggan.");
-        return;
+  if(!customerLocation){
+    toast("Bagikan lokasi terlebih dahulu.");
+    return;
+  }
+
+  const c={
+    id:id("PELANGGAN"),
+    courierId:data.courier?.id||decodeURIComponent(
+      location.hash.startsWith("#pelanggan=")
+        ?location.hash.substring(11)
+        :""
+    ),
+    name,
+    phone,
+    location:customerLocation
+  };
+
+  data.customers.push(c);
+
+  save();
+
+  currentCustomerId=c.id;
+  localCustomerId=c.id;
+  localStorage.setItem("KURIR_SIMPLE_CUSTOMER_ID",c.id);
+  customerLocation=null;
+
+  render("customerDashboard");
+}
+
+/* =========================================================
+   F. DASHBOARD PELANGGAN
+========================================================= */
+
+function renderCustomerDashboard(){
+  const c=data.customers.find(
+    x=>x.id===currentCustomerId
+  );
+
+  document.getElementById("app").innerHTML=`
+  <div class="page">
+
+    <div class="header">
+      <div class="title">
+        AKUN PELANGGAN
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="card">
+        <div class="item-title">
+          ${esc(c?.name||"Pelanggan")}
+        </div>
+
+        <div class="customer-data">
+          ${esc(c?.phone||"")}<br>
+          ${addressText(c?.location?.address)}
+        </div>
+      </div>
+
+      <div class="dashboard-buttons">
+
+        <button class="btn primary"
+          onclick="go('customerPartnerList')">
+          BUAT PESANAN
+        </button>
+
+        <button class="btn secondary"
+          onclick="go('customerResults')">
+          HASIL PENGECEKAN STOK
+        </button>
+
+      </div>
+
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   G. PILIH MITRA UNTUK PESANAN
+========================================================= */
+
+function renderCustomerPartnerList(){
+  document.getElementById("app").innerHTML=shell(
+    "MITRA USAHA",
+    `
+    <div class="content">
+
+      ${
+        data.partners.filter(p=>
+          !data.courier?.id ||
+          p.courierId===data.courier.id ||
+          data.partners.length===1
+        ).length
+        ?data.partners.filter(p=>
+          !data.courier?.id ||
+          p.courierId===data.courier.id ||
+          data.partners.length===1
+        ).map(p=>`
+          <div class="card clickable"
+            onclick="
+              currentPartnerId='${p.id}';
+              render('customerPartnerMenu');
+            ">
+
+            <div class="item-title">
+              ${esc(p.name)}
+            </div>
+
+            <div style="margin-top:5px">
+              <span class="status ${p.status}">
+                ${p.status==="open"?"OPEN":"CLOSED"}
+              </span>
+            </div>
+
+          </div>
+        `).join("")
+        :`
+        <div class="empty">
+          Belum ada Mitra Usaha.
+        </div>
+        `
+      }
+
+    </div>
+    `,
+    "customerDashboard"
+  );
+}
+
+/* =========================================================
+   H. MENU PELANGGAN
+========================================================= */
+
+let cart={};
+
+function renderCustomerPartnerMenu(){
+  const p=partner(currentPartnerId);
+
+  if(!p){
+    go("customerPartnerList");
+    return;
+  }
+
+  if(p.status==="closed"){
+    render("partnerPublic");
+    return;
+  }
+
+  if(!cart[currentPartnerId]){
+    cart[currentPartnerId]={};
+  }
+
+  document.getElementById("app").innerHTML=`
+  <div class="page order-page">
+
+    <div class="header">
+      <button class="back"
+        onclick="go('customerPartnerList')">
+        ← KEMBALI
+      </button>
+
+      <div class="title">
+        ${esc(p.name)}
+      </div>
+    </div>
+
+    <div class="order-scroll">
+
+      <div class="card">
+        <div class="item-title">
+          DATA PELANGGAN
+        </div>
+
+        <div class="customer-data">
+          ${esc(
+            data.customers.find(
+              x=>x.id===currentCustomerId
+            )?.name||""
+          )}
+        </div>
+      </div>
+
+      ${p.menus.map(m=>
+        customerMenuHTML(m)
+      ).join("")}
+
+      <div style="height:10px"></div>
+
+    </div>
+
+    <div class="order-fixed">
+
+      <div class="total-line">
+        <span>TOTAL PESANAN</span>
+        <span id="orderTotal">
+          ${rupiah(cartTotal())}
+        </span>
+      </div>
+
+      <button class="btn primary"
+        onclick="finishCustomerOrder()">
+        SELESAI
+      </button>
+
+    </div>
+
+  </div>`;
+}
+
+function customerMenuHTML(m){
+  const item=cart[currentPartnerId]?.[m.id]||{
+    qty:0,
+    variants:{}
+  };
+
+  if(m.selection==="none"){
+    return `
+    <div class="card">
+
+      <div class="menu-line">
+
+        <div class="menu-info">
+
+          <div class="item-title">
+            ${esc(m.name)}
+          </div>
+
+          <div class="price">
+            ${rupiah(m.price)}
+          </div>
+
+        </div>
+
+        ${quantityHTML(
+          m.id,
+          item.qty
+        )}
+
+      </div>
+
+    </div>`;
+  }
+
+  /*
+    Varian langsung ditampilkan.
+    Tidak perlu menekan tombol TAMBAH VARIAN
+    terlebih dahulu.
+  */
+
+  return `
+  <div class="card">
+
+    <div class="item-title">
+      ${esc(m.name)}
+    </div>
+
+    <div class="variant-list">
+
+      ${m.variants.map(v=>
+        variantCustomerHTML(m,v,item)
+      ).join("")}
+
+    </div>
+
+  </div>`;
+}
+
+function quantityHTML(menuId,qty){
+  return `
+    <div class="qty">
+
+      <button
+        onclick="changeSimpleQty(
+          '${menuId}',-1
+        )">
+        −
+      </button>
+
+      <span class="qty-number"
+        id="qty-${menuId}">
+        ${qty}
+      </span>
+
+      <button
+        onclick="changeSimpleQty(
+          '${menuId}',1
+        )">
+        +
+      </button>
+
+    </div>
+  `;
+}
+
+function variantCustomerHTML(m,v,item){
+  const q=item.variants?.[v.id]||0;
+
+  return `
+  <div class="variant-order">
+
+    <div>
+      ${esc(v.name)}
+      <span class="price">
+        ${rupiah(v.price)}
+      </span>
+    </div>
+
+    <div class="qty">
+
+      <button
+        onclick="
+          changeVariantQty(
+            '${m.id}',
+            '${v.id}',
+            -1
+          )
+        ">
+        −
+      </button>
+
+      <span class="qty-number">
+        ${q}
+      </span>
+
+      <button
+        onclick="
+          changeVariantQty(
+            '${m.id}',
+            '${v.id}',
+            1
+          )
+        ">
+        +
+      </button>
+
+    </div>
+
+  </div>`;
+}
+
+function changeSimpleQty(menuId,delta){
+  if(!cart[currentPartnerId])
+    cart[currentPartnerId]={};
+
+  if(!cart[currentPartnerId][menuId]){
+    cart[currentPartnerId][menuId]={
+      qty:0,
+      variants:{}
+    };
+  }
+
+  const x=cart[currentPartnerId][menuId];
+
+  x.qty=Math.max(0,x.qty+delta);
+
+  renderCustomerPartnerMenu();
+}
+
+function changeVariantQty(menuId,variantId,delta){
+  if(!cart[currentPartnerId])
+    cart[currentPartnerId]={};
+
+  if(!cart[currentPartnerId][menuId]){
+    cart[currentPartnerId][menuId]={
+      qty:0,
+      variants:{}
+    };
+  }
+
+  const x=cart[currentPartnerId][menuId];
+
+  if(!x.variants)
+    x.variants={};
+
+  const q=x.variants[variantId]||0;
+
+  x.variants[variantId]=
+    Math.max(0,q+delta);
+
+  renderCustomerPartnerMenu();
+}
+
+/* =========================================================
+   TOTAL OTOMATIS
+========================================================= */
+
+function cartTotal(){
+  const p=partner(currentPartnerId);
+  if(!p)return 0;
+
+  const c=cart[currentPartnerId]||{};
+
+  let total=0;
+
+  p.menus.forEach(m=>{
+    const item=c[m.id];
+    if(!item)return;
+
+    if(m.selection==="none"){
+      total+=m.price*(item.qty||0);
+      return;
     }
 
-    let code;
+    m.variants.forEach(v=>{
+      const q=item.variants?.[v.id]||0;
+      total+=v.price*q;
+    });
+  });
 
-    do{
-        code=String(
-            Math.floor(
-                100+Math.random()*900
-            )
-        );
-    }while(
-        state.customers.some(
-            x=>x.code===code
-        )
+  return total;
+}
+
+/* =========================================================
+   I. SELESAI PESANAN
+========================================================= */
+
+async function finishCustomerOrder(){
+  const p=partner(currentPartnerId);
+  const c=data.customers.find(
+    x=>x.id===currentCustomerId
+  );
+
+  if(!p||!c)return;
+
+  const items=[];
+
+  p.menus.forEach(m=>{
+    const x=cart[currentPartnerId]?.[m.id];
+    if(!x)return;
+
+    if(m.selection==="none"){
+      if(x.qty>0){
+        items.push({
+          menuId:m.id,
+          menuName:m.name,
+          qty:x.qty,
+          price:m.price,
+          variants:[]
+        });
+      }
+    }else{
+      const vars=[];
+
+      m.variants.forEach(v=>{
+        const q=x.variants?.[v.id]||0;
+
+        if(q>0){
+          vars.push({
+            variantId:v.id,
+            variantName:v.name,
+            qty:q,
+            price:v.price
+          });
+        }
+      });
+
+      if(vars.length){
+        items.push({
+          menuId:m.id,
+          menuName:m.name,
+          qty:0,
+          price:0,
+          variants:vars
+        });
+      }
+    }
+  });
+
+  if(!items.length){
+    toast("Belum ada menu yang dipilih.");
+    return;
+  }
+
+  /* Ambil lokasi terbaru tepat sebelum pesanan dikirim. */
+  getLocation(async latestLocation=>{
+    c.location=latestLocation;
+
+    const newOrder={
+    id:id("PESANAN"),
+    partnerId:p.id,
+    partnerName:p.name,
+    customerId:c.id,
+    customerName:c.name,
+    customerPhone:c.phone,
+    customerLocation:c.location,
+    items,
+    subtotal:cartTotal(),
+    shipping:0,
+    total:cartTotal(),
+    stockChecked:false,
+    stockResult:null,
+    status:"menunggu_pengecekan",
+    createdAt:new Date().toISOString()
+  };
+
+    data.orders.push(newOrder);
+
+    save();
+
+    currentOrderId=newOrder.id;
+
+    cart[currentPartnerId]={};
+
+    go("customerOrderResult");
+  });
+}
+
+/* =========================================================
+   J. HASIL PESANAN PELANGGAN
+========================================================= */
+
+function renderCustomerOrderResult(){
+  const o=order(currentOrderId);
+
+  if(!o)return;
+
+  document.getElementById("app").innerHTML=shell(
+    "HASIL PESANAN",
+    `
+    <div class="content">
+
+      <div class="card">
+        <div class="item-title">
+          ${esc(o.partnerName)}
+        </div>
+
+        <div class="item-sub">
+          Status:
+          ${
+            o.status==="menunggu_pengecekan"
+            ?"MENUNGGU PENGECEKAN STOK"
+            :o.status==="stok_diperiksa"
+            ?"HASIL PENGECEKAN TERSEDIA"
+            :o.status==="diproses"
+            ?"PROSES PESANAN"
+            :"SELESAI"
+          }
+        </div>
+      </div>
+
+      ${orderItemsHTML(o)}
+
+      <div class="card">
+
+        <div class="total-line">
+          <span>SUBTOTAL</span>
+          <span>${rupiah(o.subtotal)}</span>
+        </div>
+
+        <div class="total-line">
+          <span>ONGKIR</span>
+          <span>${rupiah(o.shipping)}</span>
+        </div>
+
+        <div class="total-line">
+          <span>TOTAL</span>
+          <span>${rupiah(o.total)}</span>
+        </div>
+
+      </div>
+
+      ${
+        o.status==="stok_diperiksa"
+        ?`
+        <button class="btn primary"
+          onclick="processCustomerOrder()">
+          PROSES PESANAN SAYA
+        </button>
+
+        <button class="btn danger"
+          onclick="cancelOrder()">
+          BATALKAN
+        </button>
+        `
+        :""
+      }
+
+      ${
+        o.status==="diproses"
+        ?`
+        <div class="notice">
+          Pesanan sedang diproses oleh
+          Mitra Usaha dan Kurir.
+        </div>
+        `
+        :""
+      }
+
+    </div>
+    `,
+    "customerDashboard"
+  );
+}
+
+function orderItemsHTML(o){
+  return `
+  <div class="section-title">
+    PESANAN
+  </div>
+
+  ${o.items.map(item=>`
+    <div class="card">
+
+      <div class="item-title">
+        ${esc(item.menuName)}
+      </div>
+
+      ${
+        item.qty
+        ?`
+          <div class="item-sub">
+            ${item.qty} × ${rupiah(item.price)}
+          </div>
+        `
+        :""
+      }
+
+      ${
+        item.variants?.length
+        ?item.variants.map(v=>`
+          <div class="variant-order">
+            <span>
+              ${esc(v.variantName)}
+            </span>
+            <span>
+              ${v.qty} × ${rupiah(v.price)}
+            </span>
+          </div>
+        `).join("")
+        :""
+      }
+
+    </div>
+  `).join("")}
+  `;
+}
+
+/* =========================================================
+   K. HASIL PENGECEKAN STOK
+========================================================= */
+
+function renderCustomerResults(){
+  const list=data.orders
+    .filter(o=>o.customerId===currentCustomerId);
+
+  document.getElementById("app").innerHTML=shell(
+    "HASIL PENGECEKAN STOK",
+    `
+    <div class="content">
+
+      ${
+        list.length
+        ?list.map(o=>`
+          <div class="card clickable"
+            onclick="
+              currentOrderId='${o.id}';
+              render('customerOrderResult');
+            ">
+
+            <div class="item-title">
+              ${esc(o.partnerName)}
+            </div>
+
+            <div class="item-sub">
+              ${
+                o.status==="menunggu_pengecekan"
+                ?"MENUNGGU PENGECEKAN"
+                :o.status==="stok_diperiksa"
+                ?"HASIL PENGECEKAN SUDAH ADA"
+                :o.status==="diproses"
+                ?"SEDANG DIPROSES"
+                :"SELESAI"
+              }
+            </div>
+
+          </div>
+        `).join("")
+        :`
+        <div class="empty">
+          Belum ada hasil pengecekan.
+        </div>
+        `
+      }
+
+    </div>
+    `,
+    "customerDashboard"
+  );
+}
+
+/* =========================================================
+   L. PROSES / BATALKAN
+========================================================= */
+
+function processCustomerOrder(){
+  const o=order(currentOrderId);
+  if(!o)return;
+
+  if(!o.stockResult){
+    toast("Hasil pengecekan belum tersedia.");
+    return;
+  }
+
+  const ada=o.stockResult.filter(x=>x.available);
+
+  if(!ada.length){
+    toast("Tidak ada menu yang tersedia.");
+    return;
+  }
+
+  o.status="diproses";
+
+  /*
+    Hanya item ADA yang diteruskan.
+  */
+  o.items=o.items.filter(item=>{
+    const result=o.stockResult.find(
+      x=>x.menuId===item.menuId
     );
 
-    const customer={
-        id:uid("customer"),
-        code,
-        name,
-        phone,
-        address,
-        courierId:
-            new URLSearchParams(
-                location.search
-            ).get("kurir")
-            ||null
-    };
+    return result?.available;
+  });
 
-    state.customers.push(customer);
+  o.subtotal=calculateOrderSubtotal(o);
+  o.total=o.subtotal+o.shipping;
 
-    saveState();
+  save();
 
-    showCustomerDashboard(customer.id);
+  render("customerOrderResult");
 }
 
+function cancelOrder(){
+  const o=order(currentOrderId);
+  if(!o)return;
 
-/* =========================================================
-   D3
-========================================================= */
+  o.status="dibatalkan";
 
-function showCustomerLogin(){
+  save();
 
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showCustomerPublicHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>MASUK AKUN PELANGGAN</h2>
-
-            <label>KODE PELANGGAN</label>
-
-            <input
-                id="customerLoginCode"
-                inputmode="numeric">
-
-            <button onclick="loginCustomer()">
-                MASUK
-            </button>
-
-        </div>
-    `;
+  render("customerOrderResult");
 }
 
-function loginCustomer(){
+function calculateOrderSubtotal(o){
+  let total=0;
 
-    const code =
-        document.getElementById("customerLoginCode")
-        .value.trim();
-
-    const customer =
-        state.customers.find(
-            x=>x.code===code
-        );
-
-    if(!customer){
-        notify("Kode Pelanggan tidak ditemukan.");
-        return;
+  o.items.forEach(item=>{
+    if(item.qty){
+      total+=item.qty*item.price;
     }
 
-    showCustomerDashboard(customer.id);
+    item.variants?.forEach(v=>{
+      total+=v.qty*v.price;
+    });
+  });
+
+  return total;
 }
 
-
 /* =========================================================
-   D4
+   M. PESANAN MITRA USAHA
 ========================================================= */
 
-function showCustomerDashboard(id){
+function renderPartnerOrders(){
+  const orders=data.orders.filter(
+    o=>o.partnerId===currentPartnerId
+  );
 
-    const customer =
-        state.customers.find(x=>x.id===id);
+  document.getElementById("app").innerHTML=shell(
+    "PESANAN MASUK",
+    `
+    <div class="content">
 
-    state.selectedCustomer=customer;
+      ${
+        orders.length
+        ?orders.map(o=>`
+          <div class="card clickable"
+            onclick="
+              currentOrderId='${o.id}';
+              render('stockCheck');
+            ">
 
-    app().innerHTML=`
+            <div class="item-title">
+              PESANAN
+            </div>
 
-        <div class="card center">
+            <div class="item-sub">
+              ${esc(o.status)}
+            </div>
 
-            <h2>KURIR SIMPLE</h2>
-
-            <h3>PELANGGAN</h3>
-
-            <button onclick="startOrdering('${id}')">
-                MULAI MEMESAN
-            </button>
-
-            <button onclick="showEditCustomer('${id}')">
-                EDIT AKUN
-            </button>
-
-            <button onclick="showCustomerStatus('${id}')">
-                STATUS PESANAN
-            </button>
-
+          </div>
+        `).join("")
+        :`
+        <div class="empty">
+          Belum ada pesanan.
         </div>
-    `;
+        `
+      }
+
+    </div>
+    `,
+    "partnerDashboard"
+  );
 }
 
-
 /* =========================================================
-   D5
+   N. DASHBOARD MITRA VIA LINK
 ========================================================= */
 
-function startOrdering(customerId){
+function renderPartnerDashboard(){
+  const p=partner(currentPartnerId);
 
-    const customer =
-        state.customers.find(
-            x=>x.id===customerId
-        );
+  document.getElementById("app").innerHTML=shell(
+    p?.name||"MITRA USAHA",
+    `
+    <div class="content">
 
-    app().innerHTML=`
+      <div class="card">
 
-        <button class="back"
-            onclick="showCustomerDashboard('${customerId}')">
-            ← KEMBALI
+        <div class="item-title">
+          ${esc(p?.name||"")}
+        </div>
+
+        <div style="margin-top:5px">
+          <span class="status ${p?.status}">
+            ${p?.status==="open"?"OPEN":"CLOSED"}
+          </span>
+        </div>
+
+      </div>
+
+      <div class="dashboard-buttons">
+
+        <button class="btn primary"
+          onclick="render('partnerOrders')">
+          PESANAN MASUK
         </button>
 
-        <div class="card">
+        <button class="btn primary"
+          onclick="render('stockCheckList')">
+          PENGECEKAN PRODUK
+        </button>
 
-            <h2>MULAI MEMESAN</h2>
+      </div>
 
-            <h3>PILIH MITRA USAHA</h3>
-
-            <p>
-                Bagikan lokasi Anda sebelum memilih
-                Mitra Usaha.
-            </p>
-
-            <button
-                class="blue"
-                onclick="shareOrderingLocation()">
-                BAGIKAN LOKASI
-            </button>
-
-            <div id="customerLocationStatus"
-                 class="notice">
-
-                Lokasi belum dibagikan.
-
-            </div>
-
-            <div id="availableShops">
-
-                ${
-                    getAvailableShops(customer)
-                    .map(shop=>`
-
-                        <div
-                            class="list"
-                            style="${
-                                shop.status!=="OPEN"
-                                ? "opacity:.5"
-                                : ""
-                            }">
-
-                            <div class="list-info">
-
-                                <div class="list-name">
-                                    ${esc(shop.name)}
-                                </div>
-
-                                ${
-                                    shop.status!=="OPEN"
-                                    ?
-                                    `<div class="list-sub">
-                                        CLOSE/TUTUP
-                                    </div>`
-                                    :
-                                    ""
-                                }
-
-                            </div>
-
-                            ${
-                                shop.status==="OPEN"
-                                ?
-                                `<button
-                                    style="width:auto;margin:0"
-                                    onclick="openCustomerShop(
-                                        '${customerId}',
-                                        '${shop.id}'
-                                    )">
-                                    PILIH
-                                </button>`
-                                :
-                                `<span
-                                    class="status closed">
-                                    CLOSE/TUTUP
-                                </span>`
-                            }
-
-                        </div>
-
-                    `).join("")
-                }
-
-            </div>
-
-            <button
-                onclick="showCustomerCart('${customerId}')">
-                LIHAT PESANAN
-            </button>
-
-        </div>
-    `;
+    </div>
+    `,
+    "partnerPublic"
+  );
 }
 
-function getAvailableShops(customer){
+/* =========================================================
+   O. PENGECEKAN STOK
+========================================================= */
 
-    return state.shops.filter(shop=>{
+function renderStockCheckList(){
+  const list=data.orders.filter(
+    o=>o.partnerId===currentPartnerId &&
+       o.status==="menunggu_pengecekan"
+  );
 
-        if(!customer.courierId){
-            return true;
+  document.getElementById("app").innerHTML=shell(
+    "PENGECEKAN PRODUK",
+    `
+    <div class="content">
+
+      ${
+        list.length
+        ?list.map(o=>`
+          <div class="card clickable"
+            onclick="
+              currentOrderId='${o.id}';
+              render('stockCheck');
+            ">
+
+            <div class="item-title">
+              PESANAN
+            </div>
+
+            <div class="item-sub">
+              ${o.items.length} menu
+            </div>
+
+          </div>
+        `).join("")
+        :`
+        <div class="empty">
+          Tidak ada pesanan yang perlu dicek.
+        </div>
+        `
+      }
+
+    </div>
+    `,
+    "partnerDashboard"
+  );
+}
+
+function renderStockCheck(){
+  const o=order(currentOrderId);
+
+  if(!o)return;
+
+  document.getElementById("app").innerHTML=shell(
+    "PENGECEKAN PRODUK",
+    `
+    <div class="content">
+
+      <div class="notice">
+        Tampilkan menu yang dipesan.
+        Data pelanggan tidak ditampilkan
+        pada bagian pengecekan stok.
+      </div>
+
+      ${o.items.map(item=>{
+        const result=
+          o.stockResult?.find(
+            x=>x.menuId===item.menuId
+          );
+
+        return `
+        <div class="card">
+
+          <div class="item-title">
+            ${esc(item.menuName)}
+          </div>
+
+          ${
+            item.qty
+            ?`
+              <div class="item-sub">
+                Jumlah: ${item.qty}
+              </div>
+            `
+            :""
+          }
+
+          ${
+            item.variants?.length
+            ?item.variants.map(v=>`
+              <div class="item-sub">
+                ${esc(v.variantName)}
+                × ${v.qty}
+              </div>
+            `).join("")
+            :""
+          }
+
+          <div class="action-row">
+
+            <button
+              class="btn small ${
+                result?.available
+                ?"success"
+                :"secondary"
+              }"
+              onclick="
+                setStock(
+                  '${item.menuId}',
+                  true
+                )
+              ">
+              ADA
+            </button>
+
+            <button
+              class="btn small ${
+                result && !result.available
+                ?"danger"
+                :"secondary"
+              }"
+              onclick="
+                setStock(
+                  '${item.menuId}',
+                  false
+                )
+              ">
+              KOSONG
+            </button>
+
+          </div>
+
+        </div>
+        `;
+      }).join("")}
+
+      <button class="btn primary"
+        onclick="sendStockResult()">
+        KIRIM HASIL PENGECEKAN
+      </button>
+
+    </div>
+    `,
+    "stockCheckList"
+  );
+}
+
+function setStock(menuId,available){
+  const o=order(currentOrderId);
+
+  if(!o.stockResult)
+    o.stockResult=[];
+
+  const old=o.stockResult.find(
+    x=>x.menuId===menuId
+  );
+
+  if(old){
+    old.available=available;
+  }else{
+    o.stockResult.push({
+      menuId,
+      available
+    });
+  }
+
+  render("stockCheck");
+}
+
+function sendStockResult(){
+  const o=order(currentOrderId);
+
+  if(!o)return;
+
+  if(!o.stockResult ||
+     o.stockResult.length!==o.items.length){
+    toast("Tentukan ADA atau KOSONG untuk semua menu.");
+    return;
+  }
+
+  o.status="stok_diperiksa";
+
+  save();
+
+  toast("Hasil pengecekan berhasil dikirim.");
+
+  render("partnerDashboard");
+}
+
+/* =========================================================
+   P. PESANAN KURIR
+========================================================= */
+
+function renderOrders(){
+  const list=data.orders.filter(
+    o=>o.status==="diproses"
+  );
+
+  document.getElementById("app").innerHTML=shell(
+    "PESANAN",
+    `
+    <div class="content">
+
+      ${
+        list.length
+        ?list.map(o=>`
+          <div class="card clickable"
+            onclick="
+              currentOrderId='${o.id}';
+              render('courierOrder');
+            ">
+
+            <div class="item-title">
+              ${esc(o.customerName)}
+            </div>
+
+            <div class="item-sub">
+              ${esc(o.partnerName)}
+            </div>
+
+          </div>
+        `).join("")
+        :`
+        <div class="empty">
+          Belum ada pesanan yang diproses.
+        </div>
+        `
+      }
+
+    </div>
+    `,
+    "dashboard"
+  );
+}
+
+/* =========================================================
+   Q. DETAIL PESANAN KURIR
+========================================================= */
+
+function renderCourierOrder(){
+  const o=order(currentOrderId);
+
+  if(!o)return;
+
+  document.getElementById("app").innerHTML=shell(
+    "DETAIL PESANAN",
+    `
+    <div class="content">
+
+      <div class="card">
+
+        <div class="item-title">
+          DATA PELANGGAN
+        </div>
+
+        <div class="customer-data">
+          ${esc(o.customerName)}<br>
+          ${esc(o.customerPhone)}
+        </div>
+
+        ${
+          o.customerLocation?.lat
+          ?`
+          <a
+            class="map-link"
+            target="_blank"
+            href="https://www.google.com/maps?q=${
+              encodeURIComponent(
+                o.customerLocation.lat+
+                ","+
+                o.customerLocation.lon
+              )
+            }">
+            LIHAT LOKASI PELANGGAN
+          </a>
+          `
+          :""
         }
 
-        const courier =
-            state.couriers.find(
-                x=>x.id===customer.courierId
-            );
+      </div>
 
-        if(!courier)return false;
+      <div class="card">
 
-        return !shop.kecamatan ||
-            courier.serviceAreas.includes(
-                shop.kecamatan
-            );
-    });
-}
-
-function shareOrderingLocation(){
-
-    document.getElementById(
-        "customerLocationStatus"
-    ).textContent=
-        "Lokasi sudah dibagikan.";
-}
-
-
-/* =========================================================
-   D6
-========================================================= */
-
-function openCustomerShop(customerId,shopId){
-
-    const shop =
-        state.shops.find(
-            x=>x.id===shopId
-        );
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="startOrdering('${customerId}')">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DAFTAR MENU MITRA USAHA</h2>
-
-            <h3>${esc(shop.name)}</h3>
-
-            ${
-                shop.menus.map(menu=>{
-
-                    const unavailable =
-                        menu.status==="HABIS";
-
-                    return `
-                        <div class="menu"
-                            style="${
-                                unavailable
-                                ? "opacity:.45"
-                                : ""
-                            }">
-
-                            <div class="menu-name">
-                                ${esc(menu.name)}
-                            </div>
-
-                            ${
-                                menu.priceRule==="same"
-                                ?
-                                `<div class="menu-price">
-                                    ${money(menu.price)}
-                                </div>`
-                                :
-                                ""
-                            }
-
-                            ${
-                                menu.variants.length
-                                ?
-                                menu.variants.map(v=>`
-                                    <div
-                                        class="variant-row">
-
-                                        <div style="flex:1">
-                                            ${esc(v.name)}
-
-                                            ${
-                                                menu.priceRule==="different"
-                                                ?
-                                                `<div class="menu-price">
-                                                    ${money(v.price)}
-                                                </div>`
-                                                :
-                                                ""
-                                            }
-                                        </div>
-
-                                        <button
-                                            style="width:38px"
-                                            ${
-                                                unavailable
-                                                ? "disabled"
-                                                : ""
-                                            }
-                                            onclick="changeCustomerQty(
-                                                '${shopId}',
-                                                '${menu.id}',
-                                                '${esc(v.name)}',
-                                                -1,
-                                                ${v.price}
-                                            )">
-                                            −
-                                        </button>
-
-                                        <span
-                                            id="qty_${menu.id}_${encodeURIComponent(v.name)}"
-                                            style="padding:12px 4px">
-                                            ${getCartQty(
-                                                shopId,
-                                                menu.id,
-                                                v.name
-                                            )}
-                                        </span>
-
-                                        <button
-                                            style="width:38px"
-                                            ${
-                                                unavailable
-                                                ? "disabled"
-                                                : ""
-                                            }
-                                            onclick="changeCustomerQty(
-                                                '${shopId}',
-                                                '${menu.id}',
-                                                '${esc(v.name)}',
-                                                1,
-                                                ${v.price}
-                                            )">
-                                            +
-                                        </button>
-
-                                    </div>
-                                `).join("")
-                                :
-                                `
-                                <div
-                                    class="variant-row">
-
-                                    <div style="flex:1">
-                                        ${money(menu.price)}
-                                    </div>
-
-                                    <button
-                                        style="width:38px"
-                                        ${
-                                            unavailable
-                                            ? "disabled"
-                                            : ""
-                                        }
-                                        onclick="changeCustomerQty(
-                                            '${shopId}',
-                                            '${menu.id}',
-                                            '',
-                                            -1,
-                                            ${menu.price}
-                                        )">
-                                        −
-                                    </button>
-
-                                    <span
-                                        id="qty_${menu.id}_none"
-                                        style="padding:12px 4px">
-                                        ${getCartQty(
-                                            shopId,
-                                            menu.id,
-                                            ""
-                                        )}
-                                    </span>
-
-                                    <button
-                                        style="width:38px"
-                                        ${
-                                            unavailable
-                                            ? "disabled"
-                                            : ""
-                                        }
-                                        onclick="changeCustomerQty(
-                                            '${shopId}',
-                                            '${menu.id}',
-                                            '',
-                                            1,
-                                            ${menu.price}
-                                        )">
-                                        +
-                                    </button>
-
-                                </div>
-                                `
-                            }
-
-                            ${
-                                unavailable
-                                ?
-                                `<div class="status closed">
-                                    HABIS
-                                </div>`
-                                :
-                                ""
-                            }
-
-                        </div>
-                    `;
-                }).join("")
-            }
-
-            <button
-                onclick="startOrdering('${customerId}')">
-                SELESAI
-            </button>
-
+        <div class="item-title">
+          MITRA USAHA
         </div>
-    `;
-}
 
-let customerCart={};
+        <div class="item-sub">
+          ${esc(o.partnerName)}
+        </div>
 
-function cartKey(shopId,menuId,variant){
-    return shopId+"|"+menuId+"|"+variant;
-}
+      </div>
 
-function getCartQty(shopId,menuId,variant){
+      <div class="card">
 
-    return Number(
-        customerCart[
-            cartKey(shopId,menuId,variant)
-        ]?.qty||0
-    );
-}
+        <label class="label">
+          ONGKIR
+        </label>
 
-function changeCustomerQty(
-    shopId,
-    menuId,
-    variant,
-    change,
-    price
-){
+        <input
+          id="shipping"
+          inputmode="numeric"
+          value="${o.shipping||""}"
+          placeholder="Masukkan ongkir">
 
-    const key =
-        cartKey(
-            shopId,
-            menuId,
-            variant
-        );
-
-    if(!customerCart[key]){
-        customerCart[key]={
-            shopId,
-            menuId,
-            variant,
-            qty:0,
-            price
-        };
-    }
-
-    customerCart[key].qty =
-        Math.max(
-            0,
-            customerCart[key].qty+
-            change
-        );
-
-    const el =
-        document.getElementById(
-            "qty_"+
-            menuId+
-            "_"+
-            encodeURIComponent(variant||"none")
-        );
-
-    if(el){
-        el.textContent=
-            customerCart[key].qty;
-    }
-}
-
-
-/* =========================================================
-   D7 / D8
-========================================================= */
-
-function showCustomerCart(customerId){
-
-    const groups={};
-
-    Object.values(customerCart)
-        .filter(x=>x.qty>0)
-        .forEach(item=>{
-
-            if(!groups[item.shopId]){
-                const shop =
-                    state.shops.find(
-                        x=>x.id===item.shopId
-                    );
-
-                groups[item.shopId]={
-                    shopId:item.shopId,
-                    shopName:shop?.name||"",
-                    items:[]
-                };
-            }
-
-            const shop =
-                state.shops.find(
-                    x=>x.id===item.shopId
-                );
-
-            const menu =
-                shop?.menus.find(
-                    x=>x.id===item.menuId
-                );
-
-            groups[item.shopId].items.push({
-
-                name:menu?.name||"",
-
-                variant:item.variant,
-
-                qty:item.qty,
-
-                price:item.price
-            });
-        });
-
-    const list=
-        Object.values(groups);
-
-    const total =
-        list.reduce(
-            (sum,g)=>sum+groupTotal(g),
-            0
-        );
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="startOrdering('${customerId}')">
-            ← KEMBALI
+        <button class="btn primary"
+          onclick="saveShipping()">
+          SIMPAN ONGKIR
         </button>
 
-        <div class="card">
+      </div>
 
-            <h2>PESANAN SAYA</h2>
+      <div class="card">
 
-            ${
-                list.length
-                ?
-                list.map(g=>`
+        <div class="total-line">
+          <span>SUBTOTAL</span>
+          <span>${rupiah(o.subtotal)}</span>
+        </div>
 
-                    <div class="order-group">
+        <div class="total-line">
+          <span>ONGKIR</span>
+          <span>${rupiah(o.shipping)}</span>
+        </div>
 
-                        <h3>
-                            ${esc(g.shopName)}
-                        </h3>
+        <div class="total-line">
+          <span>TOTAL</span>
+          <span>${rupiah(o.total)}</span>
+        </div>
 
-                        ${
-                            g.items.map(i=>`
-                                <div class="order-item-line">
+      </div>
 
-                                    <span>
-                                        ${esc(i.name)}
-                                        ${
-                                            i.variant
-                                            ? " "+esc(i.variant)
-                                            : ""
-                                        }
-                                        ${i.qty}
-                                        ×
-                                        ${money(i.price)}
-                                    </span>
+    </div>
+    `,
+    "orders"
+  );
+}
 
-                                    <span>
-                                        ${money(
-                                            i.qty*i.price
-                                        )}
-                                    </span>
+function saveShipping(){
+  const o=order(currentOrderId);
 
-                                </div>
-                            `).join("")
-                        }
+  const shipping=Number(
+    document.getElementById("shipping").value
+  )||0;
 
-                        <div class="total">
+  o.shipping=shipping;
+  o.total=o.subtotal+shipping;
 
-                            <span>TOTAL</span>
+  save();
 
-                            <span>
-                                ${money(groupTotal(g))}
-                            </span>
+  render("courierOrder");
+}
 
-                        </div>
+/* =========================================================
+   R. PEMASUKAN
+========================================================= */
 
-                    </div>
+function renderIncome(){
+  const total=data.incomes.reduce(
+    (sum,x)=>sum+Number(x.amount||0),
+    0
+  );
 
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada pesanan.
-                </div>`
-            }
+  document.getElementById("app").innerHTML=shell(
+    "PEMASUKAN",
+    `
+    <div class="content">
 
-            <div class="total">
+      <div class="card">
 
-                <span>TOTAL KESELURUHAN</span>
+        <div class="item-title">
+          TOTAL PEMASUKAN
+        </div>
 
-                <span>
-                    ${money(total)}
+        <div
+          style="
+            font-size:20px;
+            font-weight:900;
+            margin-top:5px;
+          ">
+          ${rupiah(total)}
+        </div>
+
+      </div>
+
+      <button class="btn primary"
+        onclick="go('addIncome')">
+        TAMBAH PEMASUKAN
+      </button>
+
+      <div class="section-title">
+        RIWAYAT PEMASUKAN
+      </div>
+
+      ${
+        data.incomes.length
+        ?data.incomes.slice().reverse()
+          .map(x=>`
+            <div class="history">
+
+              <div>
+                ${esc(x.description)}
+                <br>
+                <span class="item-sub">
+                  ${esc(x.date)}
                 </span>
+              </div>
+
+              <div class="money">
+                ${rupiah(x.amount)}
+              </div>
 
             </div>
+          `).join("")
+        :`
+          <div class="empty">
+            Belum ada pemasukan.
+          </div>
+        `
+      }
 
-            <button
-                onclick="sendCustomerOrder('${customerId}')">
-                KIRIM
-            </button>
-
-        </div>
-    `;
+    </div>
+    `,
+    "dashboard"
+  );
 }
 
-function sendCustomerOrder(customerId){
+function renderAddIncome(){
+  document.getElementById("app").innerHTML=shell(
+    "TAMBAH PEMASUKAN",
+    `
+    <div class="content">
 
-    const customer =
-        state.customers.find(
-            x=>x.id===customerId
-        );
+      <div class="field">
+        <label class="label">
+          Keterangan
+        </label>
 
-    const groups={};
+        <input
+          id="incomeDescription"
+          placeholder="Keterangan">
+      </div>
 
-    Object.values(customerCart)
-        .filter(x=>x.qty>0)
-        .forEach(item=>{
+      <div class="field">
+        <label class="label">
+          Harga
+        </label>
 
-            if(!groups[item.shopId]){
+        <input
+          id="incomeAmount"
+          inputmode="numeric"
+          placeholder="Harga">
+      </div>
 
-                const shop =
-                    state.shops.find(
-                        x=>x.id===item.shopId
-                    );
+      <button class="btn primary"
+        onclick="addIncome()">
+        TAMBAH PEMASUKAN
+      </button>
 
-                groups[item.shopId]={
-                    shopId:item.shopId,
-                    shopName:shop?.name||"",
-                    items:[]
-                };
-            }
-
-            const shop =
-                state.shops.find(
-                    x=>x.id===item.shopId
-                );
-
-            const menu =
-                shop.menus.find(
-                    x=>x.id===item.menuId
-                );
-
-            groups[item.shopId].items.push({
-
-                name:menu.name,
-
-                variant:item.variant,
-
-                qty:item.qty,
-
-                price:item.price
-            });
-        });
-
-    const list=
-        Object.values(groups);
-
-    if(!list.length){
-        notify("Belum ada menu yang dipilih.");
-        return;
-    }
-
-    const order={
-
-        id:uid("order"),
-
-        courierId:
-            customer.courierId,
-
-        customerId,
-
-        customerName:
-            customer.name,
-
-        createdAt:Date.now(),
-
-        groups:list,
-
-        shipping:0,
-
-        status:"TERKIRIM"
-    };
-
-    state.orders.push(order);
-
-    saveState();
-
-    customerCart={};
-
-    showOrderSent(customerId);
+    </div>
+    `,
+    "income"
+  );
 }
 
+function addIncome(){
+  const description=document
+    .getElementById("incomeDescription")
+    .value.trim();
+
+  const amount=Number(
+    document.getElementById("incomeAmount").value
+  )||0;
+
+  if(!description||amount<=0){
+    toast("Isi pemasukan dengan benar.");
+    return;
+  }
+
+  data.incomes.push({
+    id:id("PEMASUKAN"),
+    description,
+    amount,
+    date:new Date().toLocaleDateString("id-ID")
+  });
+
+  save();
+
+  go("income");
+}
 
 /* =========================================================
-   D9
+   S. AKUN KURIR
 ========================================================= */
 
-function showOrderSent(customerId){
+function renderAccount(){
+  const c=data.courier;
 
-    app().innerHTML=`
+  document.getElementById("app").innerHTML=shell(
+    "AKUN",
+    `
+    <div class="content">
 
-        <div class="card center">
+      <div class="card">
 
-            <h2>PESANAN TERKIRIM</h2>
+        <div class="field">
+          <label class="label">Nama</label>
+          <input
+            value="${esc(c.name)}"
+            disabled>
+        </div>
 
-            <p>
-                Pesanan berhasil dikirim ke Kurir.
-            </p>
+        <div class="field">
+          <label class="label">Nomor Telepon</label>
+          <input
+            value="${esc(c.phone)}"
+            disabled>
+        </div>
 
-            <button
-                onclick="showCustomerStatus('${customerId}')">
-                STATUS PESANAN
-            </button>
+        <div class="field">
+          <label class="label">Alamat</label>
+
+          ${addressHTML(
+            c.location?.address
+          )}
 
         </div>
-    `;
+
+      </div>
+
+      <button class="btn primary"
+        onclick="editCourier()">
+        EDIT AKUN
+      </button>
+
+    </div>
+    `,
+    "dashboard"
+  );
 }
 
-
 /* =========================================================
-   EDIT PELANGGAN
+   T. EDIT AKUN KURIR
 ========================================================= */
 
-function showEditCustomer(id){
+function editCourier(){
+  const c=data.courier;
 
-    const c =
-        state.customers.find(
-            x=>x.id===id
-        );
+  document.getElementById("app").innerHTML=shell(
+    "EDIT AKUN",
+    `
+    <div class="content">
 
-    app().innerHTML=`
+      <div class="field">
+        <label class="label">Nama</label>
 
-        <button class="back"
-            onclick="showCustomerDashboard('${id}')">
-            ← KEMBALI
+        <input id="editName"
+          value="${esc(c.name)}">
+      </div>
+
+      <div class="field">
+        <label class="label">
+          Nomor Telepon
+        </label>
+
+        <input id="editPhone"
+          inputmode="numeric"
+          maxlength="12"
+          value="${esc(c.phone)}">
+      </div>
+
+      <div class="field">
+
+        <label class="label">
+          Alamat
+        </label>
+
+        ${addressHTML(
+          c.location?.address
+        )}
+
+        <button class="btn secondary"
+          onclick="changeCourierLocation()">
+          BAGIKAN LOKASI BARU
         </button>
 
-        <div class="card">
+      </div>
 
-            <h2>EDIT AKUN</h2>
+      <button class="btn primary"
+        onclick="saveCourierEdit()">
+        SIMPAN
+      </button>
 
-            <label>Nama Pelanggan</label>
-            <input id="ecName" value="${esc(c.name)}">
-
-            <label>Nomor WhatsApp</label>
-            <input id="ecPhone" value="${esc(c.phone)}">
-
-            <label>Alamat Lengkap</label>
-            <input id="ecAddress" value="${esc(c.address)}">
-
-            <button onclick="saveCustomerEdit('${id}')">
-                SIMPAN PERUBAHAN
-            </button>
-
-        </div>
-    `;
+    </div>
+    `,
+    "account"
+  );
 }
 
-function saveCustomerEdit(id){
+let editCourierLocationData=null;
 
-    const c =
-        state.customers.find(
-            x=>x.id===id
-        );
+function changeCourierLocation(){
+  getLocation(location=>{
+    editCourierLocationData=location;
 
-    c.name=document.getElementById("ecName").value.trim();
-    c.phone=document.getElementById("ecPhone").value.trim();
-    c.address=document.getElementById("ecAddress").value.trim();
+    const field=document.querySelector(
+      ".field .address-box"
+    );
 
-    saveState();
+    if(field){
+      field.outerHTML=addressHTML(
+        location.address
+      );
+    }
 
-    showCustomerDashboard(id);
+    toast("Lokasi berhasil diperbarui.");
+  });
 }
 
+function saveCourierEdit(){
+  const name=document.getElementById(
+    "editName"
+  ).value.trim();
+
+  const phone=document.getElementById(
+    "editPhone"
+  ).value.trim();
+
+  if(!name){
+    toast("Nama harus diisi.");
+    return;
+  }
+
+  if(!/^\d{12}$/.test(phone)){
+    toast("Nomor telepon harus 12 digit.");
+    return;
+  }
+
+  data.courier.name=name;
+  data.courier.phone=phone;
+
+  if(editCourierLocationData){
+    data.courier.location=
+      editCourierLocationData;
+  }
+
+  editCourierLocationData=null;
+
+  save();
+
+  go("account");
+}
 
 /* =========================================================
-   STATUS PESANAN PELANGGAN
+   ROUTER RENDER
 ========================================================= */
 
-function showCustomerStatus(customerId){
+function render(page){
 
-    const orders =
-        state.orders
-        .filter(
-            x=>x.customerId===customerId
-        )
-        .sort(
-            (a,b)=>b.createdAt-a.createdAt
-        );
+  switch(page){
 
-    app().innerHTML=`
+    case"register":
+      renderRegister();
+      break;
 
-        <button class="back"
-            onclick="showCustomerDashboard('${customerId}')">
-            ← KEMBALI
-        </button>
+    case"dashboard":
+      renderDashboard();
+      break;
 
-        <div class="card">
+    case"partners":
+      renderPartners();
+      break;
 
-            <h2>STATUS PESANAN</h2>
+    case"addPartner":
+      renderAddPartner();
+      break;
 
-            ${
-                orders.length
-                ?
-                orders.map(o=>`
-                    <div class="order-group">
+    case"partnerDetail":
+      renderPartnerDetail();
+      break;
 
-                        <h3>PESANAN PELANGGAN</h3>
+    case"menuEditor":
+      renderMenuEditor();
+      break;
 
-                        ${
-                            o.groups.map(g=>`
-                                <p>
-                                    <b>${esc(g.shopName)}</b>
-                                </p>
-                            `).join("")
-                        }
+    case"partnerPublic":
+      renderPartnerPublic();
+      break;
 
-                        <p>
-                            Status:
-                            <b>${esc(o.status)}</b>
-                        </p>
+    case"customers":
+      renderCustomers();
+      break;
 
-                    </div>
-                `).join("")
-                :
-                `<div class="empty">
-                    Belum ada pesanan.
-                </div>`
-            }
+    case"customerRegister":
+      renderCustomerRegister();
+      break;
 
-        </div>
-    `;
+    case"customerDashboard":
+      renderCustomerDashboard();
+      break;
+
+    case"customerPartnerList":
+      renderCustomerPartnerList();
+      break;
+
+    case"customerPartnerMenu":
+      renderCustomerPartnerMenu();
+      break;
+
+    case"customerOrderResult":
+      renderCustomerOrderResult();
+      break;
+
+    case"customerResults":
+      renderCustomerResults();
+      break;
+
+    case"partnerDashboard":
+      renderPartnerDashboard();
+      break;
+
+    case"partnerOrders":
+      renderPartnerOrders();
+      break;
+
+    case"stockCheckList":
+      renderStockCheckList();
+      break;
+
+    case"stockCheck":
+      renderStockCheck();
+      break;
+
+    case"orders":
+      renderOrders();
+      break;
+
+    case"courierOrder":
+      renderCourierOrder();
+      break;
+
+    case"income":
+      renderIncome();
+      break;
+
+    case"addIncome":
+      renderAddIncome();
+      break;
+
+    case"account":
+      renderAccount();
+      break;
+
+    default:
+      renderDashboard();
+  }
 }
-
 
 /* =========================================================
-   LINK ROUTER
+   REFRESH DATA ONLINE
 ========================================================= */
 
-function route(){
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    if(params.get("kurir")==="daftar"){
-        showCourierPublicHome();
-        return;
+setInterval(async()=>{
+  if(location.hash.startsWith("#mitra=")){
+    const pid=decodeURIComponent(location.hash.substring(7));
+    const ok=await loadSharedByPartner(pid);
+    if(ok && partner(pid)){
+      currentPartnerId=pid;
+      render("partnerPublic");
     }
+    return;
+  }
 
-    if(params.get("keuangan")==="daftar"){
-        showFinancePublicHome();
-        return;
-    }
+  if(location.hash.startsWith("#pelanggan=")){
+    const cid=decodeURIComponent(location.hash.substring(11));
+    await loadSharedByCourier(cid);
+    return;
+  }
 
-    if(params.get("mitra")==="daftar"){
-        showPartnerPublicHome();
-        return;
-    }
-
-    if(params.get("pelanggan")==="daftar"){
-        showCustomerPublicHome();
-        return;
-    }
-
-    showControlHome();
-}
-
+  if(data.courier?.id){
+    await loadSharedByCourier(data.courier.id);
+  }
+},15000);
 
 /* =========================================================
-   KEUANGAN PUBLIC
+   START
 ========================================================= */
 
-function showFinancePublicHome(){
-
-    app().innerHTML=`
-
-        <div class="card center">
-
-            <h2>KEUANGAN PENGUSAHA</h2>
-
-            <button onclick="showFinanceRegister()">
-                DAFTAR AKUN
-            </button>
-
-            <button
-                class="secondary"
-                onclick="showFinanceLogin()">
-                MASUK KE AKUN YANG SUDAH ADA
-            </button>
-
-        </div>
-    `;
-}
-
-function showFinanceRegister(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showFinancePublicHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>DAFTAR AKUN PENGUSAHA</h2>
-
-            <label>Nama Pemilik</label>
-            <input id="ownerName">
-
-            <label>Nama Usaha</label>
-            <input id="businessName">
-
-            <label>Alamat</label>
-            <input id="businessAddress">
-
-            <button onclick="registerBusiness()">
-                MASUK
-            </button>
-
-        </div>
-    `;
-}
-
-function registerBusiness(){
-
-    const user={
-
-        id:uid("business"),
-
-        ownerName:
-            document.getElementById("ownerName")
-            .value.trim(),
-
-        businessName:
-            document.getElementById("businessName")
-            .value.trim(),
-
-        address:
-            document.getElementById("businessAddress")
-            .value.trim()
-
-    };
-
-    if(
-        !user.ownerName ||
-        !user.businessName ||
-        !user.address
-    ){
-        notify("Lengkapi data pengusaha.");
-        return;
-    }
-
-    if(!state.businessUsers){
-        state.businessUsers=[];
-    }
-
-    state.businessUsers.push(user);
-
-    saveState();
-
-    showBusinessUser(user.id);
-}
-
-function showFinanceLogin(){
-
-    app().innerHTML=`
-
-        <button class="back"
-            onclick="showFinancePublicHome()">
-            ← KEMBALI
-        </button>
-
-        <div class="card">
-
-            <h2>MASUK AKUN PENGUSAHA</h2>
-
-            <div class="notice">
-                Gunakan akun yang sudah terdaftar.
-            </div>
-
-            ${
-                (state.businessUsers||[]).map(u=>`
-                    <div class="list"
-                        onclick="showBusinessUser('${u.id}')">
-
-                        <div class="list-info">
-                            <div class="list-name">
-                                ${esc(u.businessName)}
-                            </div>
-
-                            <div class="list-sub">
-                                ${esc(u.ownerName)}
-                            </div>
-                        </div>
-
-                        <div class="arrow">›</div>
-
-                    </div>
-                `).join("")
-                ||
-                `<div class="empty">
-                    Belum ada akun.
-                </div>`
-            }
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   INIT
-========================================================= */
-
-createSampleData();
-
-route();
+start();
 
 </script>
-
 </body>
     </html>
