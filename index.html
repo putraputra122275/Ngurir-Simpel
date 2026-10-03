@@ -4,3485 +4,1051 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>KURIR SIMPLE</title>
-
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-  font-family:Arial,sans-serif;
-  background:#f3f4f6;
-  color:#222;
-}
-
-button,input{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-#app{
-  width:100%;
-  min-height:100vh;
-}
-
-.page{
-  width:100%;
-  max-width:480px;
-  min-height:100vh;
-  margin:auto;
-  background:#fff;
-  position:relative;
-}
-
-.header{
-  padding:10px 14px 5px;
-}
-
-.back{
-  border:0;
-  background:none;
-  padding:3px 0;
-  font-size:13px;
-  font-weight:700;
-}
-
-.title{
-  text-align:center;
-  font-size:19px;
-  font-weight:800;
-  margin:8px 0 12px;
-}
-
-.content{
-  padding:0 13px 14px;
-}
-
-.field{
-  margin-bottom:9px;
-}
-
-.label{
-  display:block;
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:4px;
-}
-
-input{
-  width:100%;
-  height:40px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  padding:0 10px;
-  outline:none;
-  background:#fff;
-}
-
-.btn{
-  width:100%;
-  min-height:40px;
-  border:0;
-  border-radius:8px;
-  padding:8px 10px;
-  font-size:13px;
-  font-weight:700;
-  margin-top:5px;
-}
-
-.primary{
-  background:#222;
-  color:#fff;
-}
-
-.secondary{
-  background:#e9ecef;
-  color:#222;
-}
-
-.success{
-  background:#bfe3c5;
-  color:#175c24;
-}
-
-.danger{
-  background:#e7b5b5;
-  color:#6c1515;
-}
-
-.warning{
-  background:#f0d58f;
-  color:#5b4300;
-}
-
-.small{
-  min-height:33px;
-  font-size:11px;
-  padding:6px 8px;
-}
-
-.dashboard{
-  padding:12px 13px;
-}
-
-.logo{
-  text-align:center;
-  font-size:18px;
-  font-weight:900;
-  margin:5px 0 2px;
-}
-
-.dashboard-sub{
-  text-align:center;
-  color:#777;
-  font-size:11px;
-  margin-bottom:14px;
-}
-
-.dashboard-buttons{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.dashboard-buttons .btn{
-  margin:0;
-  min-height:46px;
-}
-
-.card{
-  border:1px solid #ddd;
-  border-radius:9px;
-  padding:9px;
-  margin-bottom:7px;
-  background:#fff;
-}
-
-.clickable{
-  cursor:pointer;
-}
-
-.item-title{
-  font-size:14px;
-  font-weight:800;
-}
-
-.item-sub{
-  color:#707070;
-  font-size:11px;
-  margin-top:3px;
-}
-
-.section-title{
-  font-size:13px;
-  font-weight:900;
-  margin:10px 0 6px;
-}
-
-.status{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:6px;
-  font-size:10px;
-  font-weight:800;
-}
-
-.status.open{
-  background:#bfe3c5;
-  color:#175c24;
-}
-
-.status.closed{
-  background:#e7b5b5;
-  color:#6c1515;
-}
-
-.status.available{
-  background:#bfe3c5;
-  color:#175c24;
-}
-
-.status.empty{
-  background:#e7b5b5;
-  color:#6c1515;
-}
-
-.action-row{
-  display:flex;
-  gap:7px;
-  margin-top:7px;
-}
-
-.action-row .btn{
-  flex:1;
-}
-
-.link-box{
-  background:#f4f4f4;
-  border:1px dashed #bbb;
-  border-radius:7px;
-  padding:7px;
-  font-size:10px;
-  word-break:break-all;
-  margin-top:6px;
-}
-
-.address-box{
-  width:100%;
-  border:1px solid #ccc;
-  border-radius:8px;
-  padding:9px 10px;
-  background:#f7f7f7;
-  font-size:12px;
-  line-height:1.45;
-}
-
-.address-box strong{
-  display:block;
-  margin-bottom:2px;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.notice{
-  background:#f2f2f2;
-  border-radius:8px;
-  padding:8px;
-  font-size:11px;
-  line-height:1.4;
-  margin-bottom:8px;
-}
-
-.menu-line{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.menu-info{
-  flex:1;
-  min-width:0;
-}
-
-.price{
-  font-size:12px;
-  font-weight:800;
-}
-
-.qty{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  flex-shrink:0;
-}
-
-.qty button{
-  width:30px;
-  height:30px;
-  border:1px solid #ccc;
-  border-radius:7px;
-  background:#fff;
-  font-weight:900;
-}
-
-.qty-number{
-  min-width:18px;
-  text-align:center;
-  font-size:12px;
-  font-weight:800;
-}
-
-.variant-list{
-  margin-top:7px;
-  padding-top:5px;
-  border-top:1px solid #eee;
-}
-
-.variant-order{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:6px;
-  padding:4px 0;
-  font-size:11px;
-}
-
-.variant-editor{
-  border:1px solid #ddd;
-  border-radius:8px;
-  padding:7px;
-  margin-top:6px;
-}
-
-.variant-edit-line{
-  display:grid;
-  grid-template-columns:1fr 95px 32px;
-  gap:5px;
-  margin-bottom:5px;
-}
-
-.variant-edit-line input{
-  height:36px;
-}
-
-.remove{
-  border:0;
-  border-radius:7px;
-  background:#e7b5b5;
-  font-weight:900;
-}
-
-.radio-list{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-
-.radio-row{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:12px;
-}
-
-.radio-row input{
-  width:auto;
-  height:auto;
-}
-
-.order-page{
-  height:100vh;
-  overflow:hidden;
-}
-
-.order-scroll{
-  position:absolute;
-  top:94px;
-  bottom:84px;
-  left:0;
-  right:0;
-  overflow-y:auto;
-  padding:0 13px;
-}
-
-.order-fixed{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#fff;
-  border-top:1px solid #ddd;
-  padding:6px 13px 8px;
-}
-
-.total-line{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:14px;
-  font-weight:900;
-  margin-bottom:3px;
-}
-
-.order-fixed .btn{
-  margin-top:3px;
-}
-
-.check-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:7px;
-}
-
-.check-actions{
-  display:flex;
-  gap:5px;
-}
-
-.empty{
-  text-align:center;
-  color:#777;
-  font-size:12px;
-  padding:18px 5px;
-}
-
-.customer-data{
-  font-size:11px;
-  line-height:1.45;
-}
-
-.money{
-  font-weight:900;
-}
-
-.history{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid #eee;
-  padding:7px 0;
-  font-size:11px;
-}
-
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:17px;
-  transform:translateX(-50%);
-  z-index:9999;
-  background:#222;
-  color:#fff;
-  border-radius:8px;
-  padding:9px 12px;
-  font-size:11px;
-  max-width:90%;
-  text-align:center;
-}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#f3f5f7;color:#17202a;font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+#app{width:100%;max-width:520px;margin:0 auto;min-height:100vh;background:#fff}
+.screen{padding:14px 14px 28px;min-height:100vh}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.back{border:0;background:transparent;padding:6px 0;font-weight:700;color:#222}
+.title{text-align:center;font-size:21px;font-weight:800;margin:10px 0 18px}
+.subtitle{text-align:center;font-size:14px;color:#66717c;margin:-8px 0 18px}
+.card{border:1px solid #d9dee3;border-radius:12px;padding:13px;margin:10px 0;background:#fff}
+.label{font-weight:700;font-size:14px;margin:12px 0 6px}
+input{width:100%;border:1px solid #cfd5da;border-radius:9px;padding:11px 12px;background:#fff;outline:none}
+input:focus{border-color:#6b7785}
+.btn{width:100%;border:1px solid #cfd5da;border-radius:9px;background:#fff;padding:11px 12px;margin-top:10px;font-weight:700}
+.btn.primary{background:#17202a;color:#fff;border-color:#17202a}
+.btn.danger{border-color:#d7a5a5;color:#9b2226}
+.btn.small{width:auto;padding:8px 10px;margin:0;font-size:12px}
+.btnrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.muted{color:#6b747d;font-size:13px}
+.address{border:1px solid #cfd5da;border-radius:10px;padding:11px;background:#fafbfc;line-height:1.55;font-size:14px}
+.address b{display:inline-block;min-width:88px}
+.sep{border:0;border-top:1px solid #e5e8eb;margin:14px 0}
+.menu-item{padding:12px 0;border-bottom:1px solid #eceff1}
+.menu-item:last-child{border-bottom:0}
+.menu-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.menu-name{font-weight:800}
+.price{font-weight:700}
+.qty{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.qty button{width:28px;height:28px;border:1px solid #cfd5da;border-radius:7px;background:#fff;font-weight:800}
+.qty span{min-width:22px;text-align:center}
+.variant{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px}
+.variant input{width:auto}
+.variant .grow{flex:1}
+.status{font-weight:800;font-size:12px;margin:5px 0 8px}
+.open{color:#18794e}.closed{color:#7b3f3f}.available{color:#18794e}.sold{color:#9b2226}
+.disabled{opacity:.5;pointer-events:none}
+.notice{padding:10px 11px;border-radius:9px;background:#f3f5f7;margin:10px 0;font-size:13px}
+.totalbar{position:sticky;bottom:0;background:#fff;border-top:1px solid #ddd;padding:12px 0 4px;margin-top:10px}
+.totalrow{display:flex;justify-content:space-between;font-weight:800}
+.center{text-align:center}
+.smalltext{font-size:12px;color:#69737d}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.modal.show{display:flex}
+.sheet{width:100%;max-width:520px;background:#fff;border-radius:16px 16px 0 0;padding:16px;max-height:88vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#17202a;color:#fff;padding:10px 14px;border-radius:9px;display:none;z-index:30;font-size:13px}
+.toast.show{display:block}
+.linkbox{word-break:break-all;font-size:12px;background:#f7f8f9;border:1px solid #e0e4e7;padding:9px;border-radius:8px}
+.order-line{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin:7px 0}
+.badge{display:inline-block;padding:4px 7px;border-radius:7px;background:#eef1f3;font-size:11px;font-weight:800}
+@media(max-width:360px){.screen{padding:12px}.title{font-size:19px}.grid2{grid-template-columns:1fr}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
 <div id="app"></div>
-
+<div id="toast" class="toast"></div>
 <script>
-"use strict";
-
-
 /* =========================================================
-   SUPABASE
-   Tambahan koneksi database. Bagian lain dipertahankan.
-========================================================= */
+   KURIR SIMPLE
+   Supabase REST API
+   Publishable key aman ditaruh di browser; RLS menentukan
+   data apa yang boleh dibaca/ditulis.
+   ========================================================= */
+const SUPABASE_URL = "https://xkysusfemehvdaqkyzhg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JDmN5TndzBue7Rsmeiphtw_K2MzPcbA";
+const TABLE = "kurir_simple_data";
+const REST = SUPABASE_URL + "/rest/v1/" + TABLE;
 
-const SUPABASE_URL="https://xkysusfemehvdaqkyzhg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_JDmN5TndzBue7Rsmeiphtw_K2MzPcbA";
-const sb=window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
-
-let supabaseReady=false;
-let loadingSharedData=false;
-
-async function syncToSupabase(){
-  try{
-    if(!data.courier?.id)return;
-    const payload={
-      courier_id:data.courier.id,
-      data:data,
-      updated_at:new Date().toISOString()
-    };
-    const {error}=await sb
-      .from("kurir_app_state")
-      .upsert(payload,{onConflict:"courier_id"});
-    if(error)throw error;
-    supabaseReady=true;
-  }catch(e){
-    console.warn("Supabase sync gagal:",e);
-  }
-}
-
-async function loadSharedByCourier(courierId){
-  try{
-    const {data:row,error}=await sb
-      .from("kurir_app_state")
-      .select("data")
-      .eq("courier_id",courierId)
-      .maybeSingle();
-    if(error)throw error;
-    if(row?.data){
-      data={
-        courier:row.data.courier||null,
-        partners:Array.isArray(row.data.partners)?row.data.partners:[],
-        customers:Array.isArray(row.data.customers)?row.data.customers:[],
-        orders:Array.isArray(row.data.orders)?row.data.orders:[],
-        incomes:Array.isArray(row.data.incomes)?row.data.incomes:[]
-      };
-      localStorage.setItem(KEY,JSON.stringify(data));
-      return true;
-    }
-  }catch(e){
-    console.warn("Supabase load gagal:",e);
-  }
-  return false;
-}
-
-async function loadSharedByPartner(partnerId){
-  try{
-    const {data:rows,error}=await sb
-      .from("kurir_app_state")
-      .select("data")
-      .contains("data",{partners:[{id:partnerId}]})
-      .limit(1);
-    if(error)throw error;
-    const row=rows?.[0];
-    if(row?.data){
-      data={
-        courier:row.data.courier||null,
-        partners:Array.isArray(row.data.partners)?row.data.partners:[],
-        customers:Array.isArray(row.data.customers)?row.data.customers:[],
-        orders:Array.isArray(row.data.orders)?row.data.orders:[],
-        incomes:Array.isArray(row.data.incomes)?row.data.incomes:[]
-      };
-      localStorage.setItem(KEY,JSON.stringify(data));
-      return true;
-    }
-  }catch(e){
-    console.warn("Supabase partner load gagal:",e);
-  }
-  return false;
-}
-
-async function refreshSharedData(){
-  const h=location.hash;
-  if(loadingSharedData)return;
-  loadingSharedData=true;
-  try{
-    if(h.startsWith("#mitra=")){
-      const pid=decodeURIComponent(h.substring(7));
-      const ok=await loadSharedByPartner(pid);
-      if(ok){
-        currentPartnerId=pid;
-        render("partnerPublic");
-        return;
-      }
-    }
-    if(h.startsWith("#pelanggan=")){
-      const cid=decodeURIComponent(h.substring(11));
-      const ok=await loadSharedByCourier(cid);
-      if(ok){
-        render("customerRegister");
-        return;
-      }
-    }
-  }finally{
-    loadingSharedData=false;
-  }
-}
-
-/* =========================================================
-   DATA
-========================================================= */
-
-const KEY="KURIR_SIMPLE_DATA";
-
-const kosong={
+let state = {
   courier:null,
   partners:[],
   customers:[],
   orders:[],
   incomes:[]
 };
-
-let data=load();
-
-let currentPartnerId=null;
-let currentCustomerId=null;
-let currentOrderId=null;
-let editingMenuId=null;
-let localCustomerId=localStorage.getItem("KURIR_SIMPLE_CUSTOMER_ID")||null;
-
-function load(){
-  try{
-    const x=JSON.parse(localStorage.getItem(KEY));
-    if(!x)return structuredClone(kosong);
-
-    return{
-      courier:x.courier||null,
-      partners:Array.isArray(x.partners)?x.partners:[],
-      customers:Array.isArray(x.customers)?x.customers:[],
-      orders:Array.isArray(x.orders)?x.orders:[],
-      incomes:Array.isArray(x.incomes)?x.incomes:[]
-    };
-  }catch(e){
-    return structuredClone(kosong);
-  }
-}
-
-function save(){
-  localStorage.setItem(KEY,JSON.stringify(data));
-  syncToSupabase();
-}
-
-function id(prefix){
-  return prefix+"-"+Date.now()+"-"+Math.random()
-    .toString(36).substring(2,8);
-}
+let rowId = null;
+let editingPartnerId = null;
+let editingMenuId = null;
+let currentPartnerId = null;
+let currentOrderId = null;
+let selectedCustomer = null;
+let customerCart = {};
+let publicMode = null;
 
 function esc(v){
-  return String(v??"")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+  return String(v ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
-
-function rupiah(v){
-  return new Intl.NumberFormat("id-ID",{
-    style:"currency",
-    currency:"IDR",
-    maximumFractionDigits:0
-  }).format(Number(v)||0);
+function uid(prefix="id"){return prefix+"_"+crypto.randomUUID().replaceAll("-","").slice(0,18)}
+function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0)}
+function now(){return new Date().toISOString()}
+function toast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2200);
 }
-
-function partner(id){
-  return data.partners.find(x=>x.id===id);
-}
-
-function menu(id){
-  const p=partner(currentPartnerId);
-  return p?.menus?.find(x=>x.id===id);
-}
-
-function order(id){
-  return data.orders.find(x=>x.id===id);
-}
-
-function toast(text){
-  const old=document.querySelector(".toast");
-  if(old)old.remove();
-
-  const x=document.createElement("div");
-  x.className="toast";
-  x.textContent=text;
-  document.body.appendChild(x);
-
-  setTimeout(()=>x.remove(),2300);
-}
-
-/* =========================================================
-   ROUTING
-========================================================= */
-
-function go(page){
-  render(page);
-  window.scrollTo(0,0);
-}
-
-function baseURL(){
-  return window.location.href.split("#")[0];
-}
-
-function partnerLink(id){
-  return baseURL()+"#mitra="+encodeURIComponent(id);
-}
-
-function customerLink(){
-  const courierId=data.courier?.id||"";
-  return baseURL()+"#pelanggan="+encodeURIComponent(courierId);
-}
-
-async function start(){
-  const h=location.hash;
-
-  if(h.startsWith("#mitra=")){
-    const id=decodeURIComponent(h.substring(7));
-    if(partner(id)){
-      currentPartnerId=id;
-      render("partnerPublic");
-      return;
-    }
-    const ok=await loadSharedByPartner(id);
-    if(ok && partner(id)){
-      currentPartnerId=id;
-      render("partnerPublic");
-      return;
-    }
-    document.getElementById("app").innerHTML=
-      `<div class="page"><div class="empty">
-        Mitra Usaha tidak ditemukan.
-      </div></div>`;
-    return;
-  }
-
-  if(h.startsWith("#pelanggan=")){
-    const courierId=decodeURIComponent(h.substring(11));
-    if(!data.courier || data.courier.id!==courierId){
-      await loadSharedByCourier(courierId);
-    }
-    render("customerRegister");
-    return;
-  }
-
-  if(h==="#pelanggan"){
-    render("customerRegister");
-    return;
-  }
-
-  if(data.courier){
-    render("dashboard");
-  }else{
-    render("register");
-  }
-}
-
-/* =========================================================
-   LOCATION
-========================================================= */
-
-let courierLocation=null;
-let customerLocation=null;
-
+/* ============================================================
+   LINK PUBLIK KURIR SIMPLE
+   Jika aplikasi dijalankan dari GitHub Pages/hosting, alamat
+   publik otomatis mengikuti alamat tersebut. Jika masih dibuka
+   sebagai file lokal, link lokal TIDAK bisa dibuka HP lain.
+   ============================================================ */
 /*
-  Tidak ada halaman izin lokasi di aplikasi.
-  Kode langsung memanggil geolocation.
-  Jika Android/browser membutuhkan izin sistem,
-  dialog tersebut berasal dari sistem/browser.
+  ALAMAT PUBLIK APLIKASI.
+  Jika aplikasi sudah di-host di GitHub Pages/hosting, biarkan kosong:
+  kode otomatis memakai alamat halaman tempat aplikasi sedang berjalan.
+  Jika Anda ingin memaksa satu alamat tertentu, isi contoh:
+  const PUBLIC_APP_URL = "https://username.github.io/kurir-simple/";
 */
-
-function getLocation(callback){
-  if(!navigator.geolocation){
-    toast("Lokasi tidak tersedia pada browser ini.");
-    return;
+const PUBLIC_APP_URL = ""; // ISI DENGAN ALAMAT GITHUB PAGES, contoh: https://username.github.io/kurir-simple/
+function baseURL(){
+  let raw = PUBLIC_APP_URL.trim();
+  if(raw){
+    if(!/^https?:\/\//i.test(raw)) raw = "https://" + raw;
+    const u = new URL(raw);
+    u.search = "";
+    u.hash = "";
+    return u.href.replace(/\/$/,"") + "/";
   }
-
-  if(!window.isSecureContext){
-    toast("Buka aplikasi melalui HTTPS agar lokasi dapat digunakan.");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    async pos=>{
-      const lat=pos.coords.latitude;
-      const lon=pos.coords.longitude;
-
-      const address=await reverseGeocode(lat,lon);
-
-      callback({
-        lat,
-        lon,
-        address,
-        capturedAt:new Date().toISOString()
-      });
-    },
-    err=>{
-      if(err.code===1){
-        toast("Izin lokasi ditolak. Izinkan lokasi pada browser.");
-      }else if(err.code===2){
-        toast("Lokasi perangkat belum tersedia.");
-      }else if(err.code===3){
-        toast("Pengambilan lokasi terlalu lama. Coba lagi.");
-      }else{
-        toast("Lokasi belum berhasil diperoleh.");
-      }
-    },
-    {
-      enableHighAccuracy:true,
-      timeout:20000,
-      maximumAge:0
-    }
-  );
-}
-
-async function reverseGeocode(lat,lon){
-  try{
-    const url=
-      "https://nominatim.openstreetmap.org/reverse"+
-      "?format=jsonv2"+
-      "&lat="+encodeURIComponent(lat)+
-      "&lon="+encodeURIComponent(lon)+
-      "&zoom=18"+
-      "&addressdetails=1";
-
-    const r=await fetch(url,{
-      headers:{
-        "Accept":"application/json"
-      }
-    });
-
-    if(!r.ok)throw new Error();
-
-    const d=await r.json();
-    const a=d.address||{};
-
-    return{
-      province:a.state||a.province||"",
-      regency:a.county||a.city||a.town||"",
-      district:a.municipality||a.city_district||a.suburb||"",
-      village:a.village||a.town||a.suburb||a.neighbourhood||"",
-      display:d.display_name||""
-    };
-  }catch(e){
-    return{
-      province:"",
-      regency:"",
-      district:"",
-      village:"",
-      display:"Alamat lengkap belum tersedia."
-    };
-  }
-}
-
-function addressHTML(a){
-  return `
-    <div class="address-box">
-      <strong>Alamat</strong>
-      ${esc(a?.province||"Provinsi belum tersedia")}<br>
-      ${esc(a?.regency||"Kabupaten belum tersedia")}<br>
-      ${esc(a?.district||"Kecamatan belum tersedia")}<br>
-      ${esc(a?.village||"Desa belum tersedia")}
-    </div>
-  `;
-}
-
-/* =========================================================
-   COPY
-========================================================= */
-
-async function copyLink(text){
-  try{
-    if(navigator.clipboard&&window.isSecureContext){
-      await navigator.clipboard.writeText(text);
-    }else{
-      const t=document.createElement("textarea");
-      t.value=text;
-      t.style.position="fixed";
-      t.style.opacity="0";
-      document.body.appendChild(t);
-      t.focus();
-      t.select();
-      document.execCommand("copy");
-      t.remove();
-    }
-
-    toast("Link berhasil disalin ke clipboard.");
-  }catch(e){
-    toast("Link tidak berhasil disalin.");
-  }
-}
-
-/* =========================================================
-   SHELL
-========================================================= */
-
-function shell(title,body,back){
-  return `
-  <div class="page">
-    <div class="header">
-      ${back?
-      `<button class="back" onclick="go('${back}')">
-        ← KEMBALI
-      </button>`:""}
-
-      <div class="title">${title}</div>
-    </div>
-
-    ${body}
-  </div>`;
-}
-
-/* =========================================================
-   A1 - DAFTAR KURIR
-========================================================= */
-
-function renderRegister(){
-  document.getElementById("app").innerHTML=`
-  <div class="page">
-
-    <div class="header">
-      <div class="title">DAFTAR AKUN KURIR</div>
-    </div>
-
-    <div class="content">
-
-      <div class="field">
-        <label class="label">Nama</label>
-        <input id="regName" placeholder="Nama">
-      </div>
-
-      <div class="field">
-        <label class="label">Nomor Telepon</label>
-        <input id="regPhone"
-               inputmode="numeric"
-               maxlength="12"
-               placeholder="Nomor Telepon">
-      </div>
-
-      <div class="field">
-        <label class="label">Alamat</label>
-
-        <button
-          id="courierLocationButton"
-          class="btn secondary"
-          onclick="shareCourierLocation()">
-          BAGIKAN LOKASI
-        </button>
-
-        <div id="courierAddress"
-             class="hidden"></div>
-      </div>
-
-      <button class="btn primary"
-        onclick="registerCourier()">
-        SELESAI
-      </button>
-
-    </div>
-  </div>`;
-}
-
-function shareCourierLocation(){
-  getLocation(location=>{
-    courierLocation=location;
-
-    const btn=document.getElementById(
-      "courierLocationButton"
-    );
-
-    const box=document.getElementById(
-      "courierAddress"
-    );
-
-    if(btn)btn.classList.add("hidden");
-
-    if(box){
-      box.classList.remove("hidden");
-      box.innerHTML=addressHTML(location.address);
-    }
-
-    toast("Lokasi berhasil dibagikan.");
-  });
-}
-
-function registerCourier(){
-  const name=document.getElementById("regName").value.trim();
-  const phone=document.getElementById("regPhone").value.trim();
-
-  if(!name){
-    toast("Nama harus diisi.");
-    return;
-  }
-
-  if(!/^\d{12}$/.test(phone)){
-    toast("Nomor telepon harus 12 digit.");
-    return;
-  }
-
-  if(!courierLocation){
-    toast("Bagikan lokasi terlebih dahulu.");
-    return;
-  }
-
-  data.courier={
-    id:id("KURIR"),
-    name,
-    phone,
-    location:courierLocation
-  };
-
-  save();
-
-  courierLocation=null;
-
-  go("dashboard");
-}
-
-/* =========================================================
-   B1 - DASHBOARD KURIR
-========================================================= */
-
-function renderDashboard(){
-  document.getElementById("app").innerHTML=`
-  <div class="page">
-
-    <div class="dashboard">
-
-      <div class="logo">KURIR SIMPLE</div>
-      <div class="dashboard-sub">
-        DASHBOARD UTAMA
-      </div>
-
-      <div class="dashboard-buttons">
-
-        <button class="btn primary"
-          onclick="go('partners')">
-          MITRA USAHA
-        </button>
-
-        <button class="btn primary"
-          onclick="go('customers')">
-          PELANGGAN
-        </button>
-
-        <button class="btn primary"
-          onclick="go('orders')">
-          PESANAN
-        </button>
-
-        <button class="btn primary"
-          onclick="go('income')">
-          PEMASUKAN
-        </button>
-
-        <button class="btn secondary"
-          onclick="go('account')">
-          AKUN
-        </button>
-
-      </div>
-
-    </div>
-  </div>`;
-}
-
-/* =========================================================
-   B2 - MITRA USAHA
-========================================================= */
-
-function renderPartners(){
-  const list=data.partners.map(p=>`
-    <div class="card clickable"
-      onclick="openPartner('${p.id}')">
-
-      <div class="item-title">
-        ${esc(p.name)}
-      </div>
-
-      <div class="item-sub">
-        ${esc(p.phone)}
-      </div>
-
-      <div style="margin-top:5px">
-        <span class="status ${p.status}">
-          ${p.status==="open"?"OPEN":"CLOSED"}
-        </span>
-      </div>
-
-      <div
-        class="action-row"
-        onclick="event.stopPropagation()">
-
-        <button
-          class="btn small ${
-            p.status==="open"?"success":"secondary"
-          }"
-          onclick="setStatus('${p.id}','open')">
-          OPEN
-        </button>
-
-        <button
-          class="btn small ${
-            p.status==="closed"?"danger":"secondary"
-          }"
-          onclick="setStatus('${p.id}','closed')">
-          CLOSED
-        </button>
-      </div>
-
-      <button
-        class="btn secondary small"
-        onclick="
-          event.stopPropagation();
-          copyLink(partnerLink('${p.id}'));
-        ">
-        SALIN LINK MITRA USAHA
-      </button>
-
-    </div>
-  `).join("");
-
-  document.getElementById("app").innerHTML=shell(
-    "MITRA USAHA",
-    `
-    <div class="content">
-
-      <div class="section-title">
-        DAFTAR MITRA USAHA DI DESA
-      </div>
-
-      ${
-        list||
-        `<div class="empty">
-          Belum ada Mitra Usaha.
-        </div>`
-      }
-
-      <button class="btn primary"
-        onclick="go('addPartner')">
-        TAMBAH MITRA USAHA
-      </button>
-
-    </div>
-    `,
-    "dashboard"
-  );
-}
-
-function setStatus(id,status){
-  const p=partner(id);
-  if(!p)return;
-
-  p.status=status;
-  save();
-
-  render("partners");
-  toast(
-    "Status berubah menjadi "+
-    status.toUpperCase()+"."
-  );
-}
-
-/* =========================================================
-   B3 - TAMBAH MITRA
-========================================================= */
-
-function renderAddPartner(){
-  document.getElementById("app").innerHTML=shell(
-    "TAMBAH MITRA USAHA",
-    `
-    <div class="content">
-
-      <div class="field">
-        <label class="label">Nama Mitra Usaha</label>
-        <input id="partnerName"
-          placeholder="Nama Mitra Usaha">
-      </div>
-
-      <div class="field">
-        <label class="label">Nomor Telepon</label>
-        <input id="partnerPhone"
-          inputmode="numeric"
-          maxlength="12"
-          placeholder="Nomor Telepon">
-      </div>
-
-      <button class="btn primary"
-        onclick="savePartner()">
-        SIMPAN
-      </button>
-
-    </div>
-    `,
-    "partners"
-  );
-}
-
-function savePartner(){
-  const name=document.getElementById("partnerName").value.trim();
-  const phone=document.getElementById("partnerPhone").value.trim();
-
-  if(!name){
-    toast("Nama Mitra harus diisi.");
-    return;
-  }
-
-  if(!/^\d{12}$/.test(phone)){
-    toast("Nomor telepon harus 12 digit.");
-    return;
-  }
-
-  data.partners.push({
-    id:id("MITRA"),
-    courierId:data.courier?.id||null,
-    name,
-    phone,
-    status:"closed",
-    menus:[]
-  });
-
-  save();
-
-  go("partners");
-  toast("Mitra Usaha berhasil disimpan.");
-}
-
-/* =========================================================
-   B4 - DETAIL MITRA
-========================================================= */
-
-function openPartner(id){
-  currentPartnerId=id;
-  render("partnerDetail");
-}
-
-function renderPartnerDetail(){
-  const p=partner(currentPartnerId);
-
-  if(!p){
-    go("partners");
-    return;
-  }
-
-  document.getElementById("app").innerHTML=shell(
-    p.name,
-    `
-    <div class="content">
-
-      <div class="card">
-
-        <div class="item-title">
-          ${esc(p.name)}
-        </div>
-
-        <div class="item-sub">
-          ${esc(p.phone)}
-        </div>
-
-        <div style="margin-top:5px">
-          <span class="status ${p.status}">
-            ${p.status==="open"?"OPEN":"CLOSED"}
-          </span>
-        </div>
-
-      </div>
-
-      <div class="section-title">
-        DAFTAR MENU
-      </div>
-
-      ${
-        p.menus.length
-        ?p.menus.map(m=>`
-          <div class="card clickable"
-            onclick="editMenu('${m.id}')">
-
-            <div class="menu-line">
-
-              <div class="menu-info">
-
-                <div class="item-title">
-                  ${esc(m.name)}
-                </div>
-
-                ${
-                  m.variants.length
-                  ?`
-                    <div class="item-sub">
-                      ${m.variants.length}
-                      varian
-                    </div>
-                  `
-                  :`
-                    <div class="price">
-                      ${rupiah(m.price)}
-                    </div>
-                  `
-                }
-
-              </div>
-
-            </div>
-
-            <div class="item-sub">
-              Tekan bagian menu untuk edit.
-            </div>
-
-          </div>
-        `).join("")
-        :`
-          <div class="empty">
-            Belum ada menu.
-          </div>
-        `
-      }
-
-      <button class="btn primary"
-        onclick="newMenu()">
-        TAMBAH MENU
-      </button>
-
-      <button class="btn danger"
-        onclick="deletePartner()">
-        HAPUS MITRA USAHA
-      </button>
-
-    </div>
-    `,
-    "partners"
-  );
-}
-
-function deletePartner(){
-  if(!confirm("Hapus Mitra Usaha ini?"))return;
-
-  data.partners=data.partners.filter(
-    x=>x.id!==currentPartnerId
-  );
-
-  save();
-
-  currentPartnerId=null;
-
-  go("partners");
-}
-
-/* =========================================================
-   B5 - EDIT / TAMBAH MENU
-========================================================= */
-
-function newMenu(){
-  editingMenuId=null;
-  render("menuEditor");
-}
-
-function editMenu(idMenu){
-  editingMenuId=idMenu;
-  render("menuEditor");
-}
-
-function renderMenuEditor(){
-  const p=partner(currentPartnerId);
-  const m=editingMenuId
-    ?p.menus.find(x=>x.id===editingMenuId)
-    :null;
-
-  document.getElementById("app").innerHTML=shell(
-    m?"EDIT MENU":"TAMBAH MENU",
-    `
-    <div class="content">
-
-      <div class="field">
-        <label class="label">Nama Menu</label>
-        <input id="menuName"
-          value="${esc(m?.name||"")}"
-          placeholder="Nama Menu">
-      </div>
-
-      <div class="field">
-        <label class="label">Harga Menu</label>
-        <input id="menuPrice"
-          inputmode="numeric"
-          value="${m?.price||""}"
-          placeholder="Harga">
-      </div>
-
-      <div class="card">
-
-        <div class="label">
-          JENIS VARIAN
-        </div>
-
-        <div class="radio-list">
-
-          <label class="radio-row">
-            <input
-              type="radio"
-              name="selection"
-              value="none"
-              ${!m||m.selection==="none"?"checked":""}>
-            Tidak memiliki varian
-          </label>
-
-          <label class="radio-row">
-            <input
-              type="radio"
-              name="selection"
-              value="one"
-              ${m?.selection==="one"?"checked":""}>
-            Hanya pilih satu varian
-          </label>
-
-          <label class="radio-row">
-            <input
-              type="radio"
-              name="selection"
-              value="many"
-              ${m?.selection==="many"?"checked":""}>
-            Bisa pilih beberapa varian
-          </label>
-
-        </div>
-
-        <div style="height:9px"></div>
-
-        <div class="label">
-          HARGA VARIAN
-        </div>
-
-        <div class="radio-list">
-
-          <label class="radio-row">
-            <input
-              type="radio"
-              name="variantPrice"
-              value="different"
-              ${!m||m.variantPrice==="different"?"checked":""}>
-            Setiap varian memiliki harga berbeda
-          </label>
-
-          <label class="radio-row">
-            <input
-              type="radio"
-              name="variantPrice"
-              value="same"
-              ${m?.variantPrice==="same"?"checked":""}>
-            Harga varian sama
-          </label>
-
-        </div>
-
-        <div id="variants">
-          ${(m?.variants||[])
-            .map(v=>variantHTML(v))
-            .join("")}
-        </div>
-
-        <button class="btn secondary"
-          onclick="addVariant()">
-          TAMBAH VARIAN
-        </button>
-
-      </div>
-
-      <button class="btn primary"
-        onclick="saveMenuData()">
-        SIMPAN
-      </button>
-
-      ${
-        m
-        ?`
-        <button class="btn danger"
-          onclick="deleteCurrentMenu()">
-          HAPUS MENU
-        </button>`
-        :""
-      }
-
-    </div>
-    `,
-    "partnerDetail"
-  );
-}
-
-function variantHTML(v={}){
-  return `
-    <div class="variant-editor variant-row">
-
-      <div class="variant-edit-line">
-
-        <input
-          class="v-name"
-          placeholder="Nama varian"
-          value="${esc(v.name||"")}">
-
-        <input
-          class="v-price"
-          inputmode="numeric"
-          placeholder="Harga"
-          value="${v.price||""}">
-
-        <button
-          class="remove"
-          onclick="
-            this.closest('.variant-row').remove()
-          ">
-          ×
-        </button>
-
-      </div>
-
-    </div>
-  `;
-}
-
-function addVariant(){
-  document.getElementById("variants")
-    .insertAdjacentHTML(
-      "beforeend",
-      variantHTML({})
-    );
-}
-
-function saveMenuData(){
-  const p=partner(currentPartnerId);
-
-  const name=document.getElementById("menuName")
-    .value.trim();
-
-  const price=Number(
-    document.getElementById("menuPrice").value
-  )||0;
-
-  const selection=document.querySelector(
-    'input[name="selection"]:checked'
-  )?.value||"none";
-
-  const variantPrice=document.querySelector(
-    'input[name="variantPrice"]:checked'
-  )?.value||"different";
-
-  if(!name){
-    toast("Nama menu harus diisi.");
-    return;
-  }
-
-  const variants=[];
-
-  document.querySelectorAll(".variant-row")
-    .forEach(row=>{
-      const n=row.querySelector(".v-name")
-        ?.value.trim();
-
-      const pr=Number(
-        row.querySelector(".v-price")?.value
-      )||0;
-
-      if(n){
-        variants.push({
-          id:id("VARIAN"),
-          name:n,
-          price:variantPrice==="same"
-            ?price
-            :pr
-        });
-      }
-    });
-
-  if(editingMenuId){
-    const m=p.menus.find(
-      x=>x.id===editingMenuId
-    );
-
-    m.name=name;
-    m.price=price;
-    m.selection=selection;
-    m.variantPrice=variantPrice;
-    m.variants=variants;
-  }else{
-    p.menus.push({
-      id:id("MENU"),
-      name,
-      price,
-      selection,
-      variantPrice,
-      variants
-    });
-  }
-
-  save();
-
-  go("partnerDetail");
-}
-
-function deleteCurrentMenu(){
-  const p=partner(currentPartnerId);
-
-  if(!confirm("Hapus menu ini?"))return;
-
-  p.menus=p.menus.filter(
-    x=>x.id!==editingMenuId
-  );
-
-  save();
-
-  editingMenuId=null;
-
-  go("partnerDetail");
-}
-
-/* =========================================================
-   C. LINK MITRA UNTUK PELANGGAN
-========================================================= */
-
-function renderPartnerPublic(){
-  const p=partner(currentPartnerId);
-
-  if(!p){
-    document.getElementById("app").innerHTML=
-      `<div class="page">
-        <div class="empty">
-          Mitra Usaha tidak ditemukan.
-        </div>
-      </div>`;
-    return;
-  }
-
-  document.getElementById("app").innerHTML=`
-  <div class="page">
-
-    <div class="header">
-      <div class="title">
-        ${esc(p.name)}
-      </div>
-    </div>
-
-    <div class="content">
-
-      <div class="card">
-        <div class="item-title">
-          ${esc(p.name)}
-        </div>
-
-        <div style="margin-top:5px">
-          <span class="status ${p.status}">
-            ${p.status==="open"?"OPEN":"CLOSED"}
-          </span>
-        </div>
-      </div>
-
-      ${
-        p.status==="closed"
-        ?`
-        <div class="notice">
-          Mitra Usaha sedang CLOSED.
-          Pesanan belum dapat dibuat.
-        </div>
-        `
-        :""
-      }
-
-      ${
-        p.status==="open"
-        ?`
-        <button class="btn primary"
-          onclick="customerEnter('${p.id}')">
-          PESAN
-        </button>
-        `
-        :""
-      }
-
-    </div>
-  </div>`;
-}
-
-function customerEnter(id){
-  currentPartnerId=id;
-
+  if(!isPublicWebURL()) return "";
+  const u = new URL(location.href);
+  u.search = "";
+  u.hash = "";
   /*
-    Gunakan akun pelanggan yang memang tersimpan
-    pada perangkat ini, bukan pelanggan milik orang lain
-    yang ikut tersimpan di data online Kurir.
+    Gunakan pathname file aplikasi yang sedang di-host.
+    Contoh GitHub Pages:
+    https://username.github.io/kurir-simple/index.html
   */
-  const localCustomer=data.customers.find(
-    x=>x.id===localCustomerId
-  );
-
-  if(localCustomer){
-    currentCustomerId=localCustomer.id;
-    render("customerPartnerMenu");
-  }else{
-    render("customerRegister");
+  return u.href.replace(/\/$/,"") + "/";
+}
+function isPublicWebURL(){
+  return /^https?:$/i.test(location.protocol);
+}
+function q(name){return new URLSearchParams(location.search).get(name)}
+function linkForCourier(){
+  const b=baseURL();
+  return b ? b+"?kurir="+encodeURIComponent(rowId)+"&pelanggan=1" : "";
+}
+function linkForPartner(pid){
+  const b=baseURL();
+  return b ? b+"?kurir="+encodeURIComponent(rowId)+"&mitra="+encodeURIComponent(pid) : "";
+}
+function ensurePublicLink(){
+  if(!PUBLIC_APP_URL.trim() && !isPublicWebURL()){
+    toast("Aplikasi masih dibuka dari file lokal. Upload ke GitHub Pages agar link dapat dibuka lewat WhatsApp.");
+    return false;
   }
+  if(!rowId){
+    toast("ID Kurir belum tersedia. Simpan akun Kurir terlebih dahulu.");
+    return false;
+  }
+  return true;
 }
-
-/* =========================================================
-   D. DAFTAR PELANGGAN
-========================================================= */
-
-function renderCustomers(){
-  document.getElementById("app").innerHTML=shell(
-    "PELANGGAN",
-    `
-    <div class="content">
-
-      <div class="card">
-        <div class="item-title">
-          LINK PELANGGAN
-        </div>
-
-        <div class="item-sub">
-          Bagikan link ini kepada pelanggan.
-        </div>
-
-        <button class="btn secondary"
-          onclick="copyLink(customerLink())">
-          SALIN LINK PELANGGAN
-        </button>
-      </div>
-
-      <div class="section-title">
-        DAFTAR PELANGGAN
-      </div>
-
-      ${
-        data.customers.length
-        ?data.customers.map(c=>`
-          <div class="card clickable"
-            onclick="openCustomer('${c.id}')">
-
-            <div class="item-title">
-              ${esc(c.name)}
-            </div>
-
-            <div class="customer-data">
-              ${esc(c.phone)}<br>
-              ${addressText(c.location?.address)}
-            </div>
-
-          </div>
-        `).join("")
-        :`
-        <div class="empty">
-          Belum ada pelanggan.
-        </div>
-        `
-      }
-
-    </div>
-    `,
-    "dashboard"
-  );
+function headers(extra={}){
+  return Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json","Accept":"application/json"},extra);
 }
-
-function openCustomer(id){
-  currentCustomerId=id;
-  render("customerDashboard");
-}
-
-function addressText(a){
-  if(!a)return "Alamat belum tersedia.";
-
-  return [
-    a.province,
-    a.regency,
-    a.district,
-    a.village
-  ].filter(Boolean).join(", ");
-}
-
-/* =========================================================
-   E. DAFTAR PELANGGAN DARI LINK
-========================================================= */
-
-function renderCustomerRegister(){
-  document.getElementById("app").innerHTML=`
-  <div class="page">
-
-    <div class="header">
-      <div class="title">
-        DAFTAR AKUN PELANGGAN
-      </div>
-    </div>
-
-    <div class="content">
-
-      <div class="field">
-        <label class="label">Nama</label>
-        <input id="customerName"
-          placeholder="Nama">
-      </div>
-
-      <div class="field">
-        <label class="label">Nomor Telepon</label>
-        <input id="customerPhone"
-          inputmode="numeric"
-          maxlength="12"
-          placeholder="Nomor Telepon">
-      </div>
-
-      <div class="field">
-
-        <label class="label">Alamat</label>
-
-        <button
-          id="customerLocationButton"
-          class="btn secondary"
-          onclick="shareCustomerLocation()">
-          BAGIKAN LOKASI
-        </button>
-
-        <div id="customerAddress"
-          class="hidden"></div>
-
-      </div>
-
-      <button class="btn primary"
-        onclick="registerCustomer()">
-        SELESAI
-      </button>
-
-    </div>
-  </div>`;
-}
-
-function shareCustomerLocation(){
-  getLocation(location=>{
-    customerLocation=location;
-
-    const button=document.getElementById(
-      "customerLocationButton"
-    );
-
-    const box=document.getElementById(
-      "customerAddress"
-    );
-
-    if(button)button.classList.add("hidden");
-
-    if(box){
-      box.classList.remove("hidden");
-      box.innerHTML=addressHTML(
-        location.address
-      );
+async function api(path="",options={}){
+  const res=await fetch(REST+path,Object.assign({headers:headers()},options));
+  const txt=await res.text();
+  let data=null; try{data=txt?JSON.parse(txt):null}catch{}
+  if(!res.ok){
+    const msg=(data&&data.message)||txt||("HTTP "+res.status);
+    if(/could not find the table .*kurir_simple_data.*schema cache/i.test(msg)){
+      throw new Error("Supabase belum mengenali tabel kurir_simple_data. Jalankan SQL KURIR SIMPLE di Supabase SQL Editor, lalu jalankan: NOTIFY pgrst, 'reload schema';");
     }
-
-    toast("Lokasi berhasil dibagikan.");
+    throw new Error(msg);
+  }
+  return data;
+}
+async function loadRow(id){
+  const data=await api("?select=*&id=eq."+encodeURIComponent(id)+"&limit=1");
+  if(!data.length) throw new Error("Data Kurir tidak ditemukan.");
+  rowId=data[0].id;
+  state=data[0].data||state;
+  normalize();
+}
+async function createRow(){
+  normalize();
+  const data=await api("",{
+    method:"POST",
+    headers:headers({"Prefer":"return=representation"}),
+    body:JSON.stringify({data:state})
+  });
+  rowId=data[0].id;
+}
+async function save(){
+  if(!rowId) return;
+  normalize();
+  await api("?id=eq."+encodeURIComponent(rowId),{
+    method:"PATCH",
+    headers:headers({"Prefer":"return=minimal"}),
+    body:JSON.stringify({data:state,updated_at:now()})
   });
 }
-
-function registerCustomer(){
-  const name=document.getElementById(
-    "customerName"
-  ).value.trim();
-
-  const phone=document.getElementById(
-    "customerPhone"
-  ).value.trim();
-
-  if(!name){
-    toast("Nama harus diisi.");
-    return;
-  }
-
-  if(!/^\d{12}$/.test(phone)){
-    toast("Nomor telepon harus 12 digit.");
-    return;
-  }
-
-  if(!customerLocation){
-    toast("Bagikan lokasi terlebih dahulu.");
-    return;
-  }
-
-  const c={
-    id:id("PELANGGAN"),
-    courierId:data.courier?.id||decodeURIComponent(
-      location.hash.startsWith("#pelanggan=")
-        ?location.hash.substring(11)
-        :""
-    ),
-    name,
-    phone,
-    location:customerLocation
-  };
-
-  data.customers.push(c);
-
-  save();
-
-  currentCustomerId=c.id;
-  localCustomerId=c.id;
-  localStorage.setItem("KURIR_SIMPLE_CUSTOMER_ID",c.id);
-  customerLocation=null;
-
-  render("customerDashboard");
+function normalize(){
+  if(!state||typeof state!=="object")state={};
+  state.courier=state.courier||null;
+  state.partners=Array.isArray(state.partners)?state.partners:[];
+  state.customers=Array.isArray(state.customers)?state.customers:[];
+  state.orders=Array.isArray(state.orders)?state.orders:[];
+  state.incomes=Array.isArray(state.incomes)?state.incomes:[];
+  state.partners.forEach(p=>{p.menus=Array.isArray(p.menus)?p.menus:[];p.status=p.status||"CLOSED"});
+  state.partners.forEach(p=>p.menus.forEach(m=>{
+    m.status=m.status||"TERSEDIA";m.hasVariants=!!m.hasVariants;
+    m.variants=Array.isArray(m.variants)?m.variants:[];
+    m.pickRule=m.pickRule||"single";m.priceRule=m.priceRule||"same";
+  }));
 }
-
-/* =========================================================
-   F. DASHBOARD PELANGGAN
-========================================================= */
-
-function renderCustomerDashboard(){
-  const c=data.customers.find(
-    x=>x.id===currentCustomerId
-  );
-
-  document.getElementById("app").innerHTML=`
-  <div class="page">
-
-    <div class="header">
-      <div class="title">
-        AKUN PELANGGAN
-      </div>
-    </div>
-
-    <div class="content">
-
-      <div class="card">
-        <div class="item-title">
-          ${esc(c?.name||"Pelanggan")}
-        </div>
-
-        <div class="customer-data">
-          ${esc(c?.phone||"")}<br>
-          ${addressText(c?.location?.address)}
-        </div>
-      </div>
-
-      <div class="dashboard-buttons">
-
-        <button class="btn primary"
-          onclick="go('customerPartnerList')">
-          BUAT PESANAN
-        </button>
-
-        <button class="btn secondary"
-          onclick="go('customerResults')">
-          HASIL PENGECEKAN STOK
-        </button>
-
-      </div>
-
-    </div>
+function addressBox(a){
+  if(!a)return `<div class="address muted">Lokasi belum dibagikan.</div>`;
+  return `<div class="address">
+    <div><b>Provinsi</b>${esc(a.province||"-")}</div>
+    <div><b>Kabupaten</b>${esc(a.regency||"-")}</div>
+    <div><b>Kecamatan</b>${esc(a.district||"-")}</div>
+    <div><b>Desa</b>${esc(a.village||"-")}</div>
   </div>`;
 }
-
-/* =========================================================
-   G. PILIH MITRA UNTUK PESANAN
-========================================================= */
-
-function renderCustomerPartnerList(){
-  document.getElementById("app").innerHTML=shell(
-    "MITRA USAHA",
-    `
-    <div class="content">
-
-      ${
-        data.partners.filter(p=>
-          !data.courier?.id ||
-          p.courierId===data.courier.id ||
-          data.partners.length===1
-        ).length
-        ?data.partners.filter(p=>
-          !data.courier?.id ||
-          p.courierId===data.courier.id ||
-          data.partners.length===1
-        ).map(p=>`
-          <div class="card clickable"
-            onclick="
-              currentPartnerId='${p.id}';
-              render('customerPartnerMenu');
-            ">
-
-            <div class="item-title">
-              ${esc(p.name)}
-            </div>
-
-            <div style="margin-top:5px">
-              <span class="status ${p.status}">
-                ${p.status==="open"?"OPEN":"CLOSED"}
-              </span>
-            </div>
-
-          </div>
-        `).join("")
-        :`
-        <div class="empty">
-          Belum ada Mitra Usaha.
-        </div>
-        `
-      }
-
-    </div>
-    `,
-    "customerDashboard"
-  );
-}
-
-/* =========================================================
-   H. MENU PELANGGAN
-========================================================= */
-
-let cart={};
-
-function renderCustomerPartnerMenu(){
-  const p=partner(currentPartnerId);
-
-  if(!p){
-    go("customerPartnerList");
-    return;
+function back(){
+  /* Navigasi internal aplikasi. Jangan bergantung pada history browser,
+     karena sebagian besar perpindahan halaman KURIR SIMPLE dilakukan
+     dengan render() tanpa mengubah URL. */
+  if(publicMode==="customer") {
+    switch(currentView){
+      case "customerMenu": return renderCustomerPick();
+      case "customerOrders": return renderCustomerPick();
+      case "customerAccount": return renderCustomerPick();
+      case "customerSend": return renderCustomerOrders();
+      default: return showDashboard();
+    }
+  }
+  if(publicMode==="partner") {
+    switch(currentView){
+      case "partnerOrdersPublic": return renderPartnerPublic();
+      case "partnerCheck": return showPartnerOrdersPublic();
+      default: return renderPartnerPublic();
+    }
   }
 
-  if(p.status==="closed"){
-    render("partnerPublic");
-    return;
-  }
-
-  if(!cart[currentPartnerId]){
-    cart[currentPartnerId]={};
-  }
-
-  document.getElementById("app").innerHTML=`
-  <div class="page order-page">
-
-    <div class="header">
-      <button class="back"
-        onclick="go('customerPartnerList')">
-        ← KEMBALI
-      </button>
-
-      <div class="title">
-        ${esc(p.name)}
-      </div>
-    </div>
-
-    <div class="order-scroll">
-
-      <div class="card">
-        <div class="item-title">
-          DATA PELANGGAN
-        </div>
-
-        <div class="customer-data">
-          ${esc(
-            data.customers.find(
-              x=>x.id===currentCustomerId
-            )?.name||""
-          )}
-        </div>
-      </div>
-
-      ${p.menus.map(m=>
-        customerMenuHTML(m)
-      ).join("")}
-
-      <div style="height:10px"></div>
-
-    </div>
-
-    <div class="order-fixed">
-
-      <div class="total-line">
-        <span>TOTAL PESANAN</span>
-        <span id="orderTotal">
-          ${rupiah(cartTotal())}
-        </span>
-      </div>
-
-      <button class="btn primary"
-        onclick="finishCustomerOrder()">
-        SELESAI
-      </button>
-
-    </div>
-
-  </div>`;
-}
-
-function customerMenuHTML(m){
-  const item=cart[currentPartnerId]?.[m.id]||{
-    qty:0,
-    variants:{}
-  };
-
-  if(m.selection==="none"){
-    return `
-    <div class="card">
-
-      <div class="menu-line">
-
-        <div class="menu-info">
-
-          <div class="item-title">
-            ${esc(m.name)}
-          </div>
-
-          <div class="price">
-            ${rupiah(m.price)}
-          </div>
-
-        </div>
-
-        ${quantityHTML(
-          m.id,
-          item.qty
-        )}
-
-      </div>
-
-    </div>`;
-  }
-
-  /*
-    Varian langsung ditampilkan.
-    Tidak perlu menekan tombol TAMBAH VARIAN
-    terlebih dahulu.
-  */
-
-  return `
-  <div class="card">
-
-    <div class="item-title">
-      ${esc(m.name)}
-    </div>
-
-    <div class="variant-list">
-
-      ${m.variants.map(v=>
-        variantCustomerHTML(m,v,item)
-      ).join("")}
-
-    </div>
-
-  </div>`;
-}
-
-function quantityHTML(menuId,qty){
-  return `
-    <div class="qty">
-
-      <button
-        onclick="changeSimpleQty(
-          '${menuId}',-1
-        )">
-        −
-      </button>
-
-      <span class="qty-number"
-        id="qty-${menuId}">
-        ${qty}
-      </span>
-
-      <button
-        onclick="changeSimpleQty(
-          '${menuId}',1
-        )">
-        +
-      </button>
-
-    </div>
-  `;
-}
-
-function variantCustomerHTML(m,v,item){
-  const q=item.variants?.[v.id]||0;
-
-  return `
-  <div class="variant-order">
-
-    <div>
-      ${esc(v.name)}
-      <span class="price">
-        ${rupiah(v.price)}
-      </span>
-    </div>
-
-    <div class="qty">
-
-      <button
-        onclick="
-          changeVariantQty(
-            '${m.id}',
-            '${v.id}',
-            -1
-          )
-        ">
-        −
-      </button>
-
-      <span class="qty-number">
-        ${q}
-      </span>
-
-      <button
-        onclick="
-          changeVariantQty(
-            '${m.id}',
-            '${v.id}',
-            1
-          )
-        ">
-        +
-      </button>
-
-    </div>
-
-  </div>`;
-}
-
-function changeSimpleQty(menuId,delta){
-  if(!cart[currentPartnerId])
-    cart[currentPartnerId]={};
-
-  if(!cart[currentPartnerId][menuId]){
-    cart[currentPartnerId][menuId]={
-      qty:0,
-      variants:{}
-    };
-  }
-
-  const x=cart[currentPartnerId][menuId];
-
-  x.qty=Math.max(0,x.qty+delta);
-
-  renderCustomerPartnerMenu();
-}
-
-function changeVariantQty(menuId,variantId,delta){
-  if(!cart[currentPartnerId])
-    cart[currentPartnerId]={};
-
-  if(!cart[currentPartnerId][menuId]){
-    cart[currentPartnerId][menuId]={
-      qty:0,
-      variants:{}
-    };
-  }
-
-  const x=cart[currentPartnerId][menuId];
-
-  if(!x.variants)
-    x.variants={};
-
-  const q=x.variants[variantId]||0;
-
-  x.variants[variantId]=
-    Math.max(0,q+delta);
-
-  renderCustomerPartnerMenu();
-}
-
-/* =========================================================
-   TOTAL OTOMATIS
-========================================================= */
-
-function cartTotal(){
-  const p=partner(currentPartnerId);
-  if(!p)return 0;
-
-  const c=cart[currentPartnerId]||{};
-
-  let total=0;
-
-  p.menus.forEach(m=>{
-    const item=c[m.id];
-    if(!item)return;
-
-    if(m.selection==="none"){
-      total+=m.price*(item.qty||0);
+  switch(currentView){
+    case "customerLink": return showDashboard();
+    case "partners": return showDashboard();
+    case "addPartner": return showPartners();
+    case "partner": return showPartners();
+    case "menuAdd": return showPartnerDetail(editingPartnerId || currentPartnerId);
+    case "menuEdit": return showPartnerDetail(editingPartnerId || currentPartnerId);
+    case "variant": return showMenuForm(!!editingMenuId);
+    case "income": return showDashboard();
+    case "account": return showDashboard();
+    case "editAccount": return showAccount();
+    case "ordersCourier": return showAccount();
+    case "orderDetail": return showCourierOrders();
+    case "register":
+      if(state.courier) return showDashboard();
+      if(window.history.length > 1) return window.history.back();
       return;
-    }
-
-    m.variants.forEach(v=>{
-      const q=item.variants?.[v.id]||0;
-      total+=v.price*q;
-    });
-  });
-
-  return total;
+    default:
+      if(window.history.length > 1) return window.history.back();
+      return showDashboard();
+  }
+}
+function render(html){document.getElementById("app").innerHTML=html}
+function header(title,backBtn=true){
+  return `<div class="top">${backBtn?`<button type="button" class="back" onclick="back()">← KEMBALI</button>`:""}</div><div class="title">${title}</div>`;
+}
+function requireCourier(){
+  if(!state.courier){showCourierRegister();return false}
+  return true;
 }
 
-/* =========================================================
-   I. SELESAI PESANAN
-========================================================= */
+/* ---------- LOCATION ---------- */
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 
-async function finishCustomerOrder(){
-  const p=partner(currentPartnerId);
-  const c=data.customers.find(
-    x=>x.id===currentCustomerId
-  );
-
-  if(!p||!c)return;
-
-  const items=[];
-
-  p.menus.forEach(m=>{
-    const x=cart[currentPartnerId]?.[m.id];
-    if(!x)return;
-
-    if(m.selection==="none"){
-      if(x.qty>0){
-        items.push({
-          menuId:m.id,
-          menuName:m.name,
-          qty:x.qty,
-          price:m.price,
-          variants:[]
-        });
+async function getBestGPSPosition(){
+  if(!navigator.geolocation) throw new Error("Perangkat tidak mendukung lokasi.");
+  return new Promise((resolve,reject)=>{
+    let best=null, finished=false, timer=null, watchId=null;
+    const finish=()=>{
+      if(finished)return;
+      finished=true;
+      if(timer)clearTimeout(timer);
+      if(watchId!==null)navigator.geolocation.clearWatch(watchId);
+      if(best)resolve(best); else reject(new Error("Lokasi tidak berhasil diperoleh."));
+    };
+    const success=pos=>{
+      if(!best || pos.coords.accuracy < best.coords.accuracy) best=pos;
+      /* Hentikan lebih cepat jika akurasi sudah sangat baik. */
+      if(pos.coords.accuracy <= 20) setTimeout(finish,350);
+    };
+    const error=err=>{
+      if(!best && (err.code===1 || err.code===2)){
+        if(timer)clearTimeout(timer);
+        finished=true;
+        if(watchId!==null)navigator.geolocation.clearWatch(watchId);
+        reject(new Error(err.code===1?"Izin lokasi ditolak. Izinkan lokasi untuk browser ini.":"Lokasi belum tersedia."));
       }
-    }else{
-      const vars=[];
-
-      m.variants.forEach(v=>{
-        const q=x.variants?.[v.id]||0;
-
-        if(q>0){
-          vars.push({
-            variantId:v.id,
-            variantName:v.name,
-            qty:q,
-            price:v.price
-          });
-        }
+    };
+    try{
+      watchId=navigator.geolocation.watchPosition(success,error,{
+        enableHighAccuracy:true,
+        timeout:10000,
+        maximumAge:0
       });
+      timer=setTimeout(finish,10000);
+    }catch(e){reject(e)}
+  });
+}
 
-      if(vars.length){
-        items.push({
-          menuId:m.id,
-          menuName:m.name,
-          qty:0,
-          price:0,
-          variants:vars
-        });
-      }
+function firstNonEmpty(...values){
+  return values.find(v=>v!==undefined && v!==null && String(v).trim()!=="") || "";
+}
+
+function administrativeFromBigData(j){
+  const out={province:"",regency:"",district:"",village:""};
+  const arr=Array.isArray(j?.localityInfo?.administrative)?j.localityInfo.administrative:[];
+
+  for(const item of arr){
+    const name=firstNonEmpty(item?.name,item?.description);
+    if(!name)continue;
+    const order=Number(item?.order);
+    const level=String(item?.adminLevel??item?.adminLevelName??"").toLowerCase();
+    const desc=String(item?.description??"").toLowerCase();
+    const text=(level+" "+desc).trim();
+
+    if(/province|provinsi/.test(text) || order===4){
+      out.province ||= name;
+    }else if(/regency|kabupaten|county/.test(text) || order===6){
+      out.regency ||= name;
+    }else if(/district|kecamatan|city district/.test(text) || order===8){
+      out.district ||= name;
+    }else if(/village|desa|kelurahan|subdistrict/.test(text) || order>=10){
+      out.village ||= name;
     }
-  });
-
-  if(!items.length){
-    toast("Belum ada menu yang dipilih.");
-    return;
   }
 
-  /* Ambil lokasi terbaru tepat sebelum pesanan dikirim. */
-  getLocation(async latestLocation=>{
-    c.location=latestLocation;
+  const info=Array.isArray(j?.localityInfo?.informative)?j.localityInfo.informative:[];
+  const byText=(rx)=>info.find(x=>rx.test(String(x?.description||x?.name||"")))?.name;
 
-    const newOrder={
-    id:id("PESANAN"),
-    partnerId:p.id,
-    partnerName:p.name,
-    customerId:c.id,
-    customerName:c.name,
-    customerPhone:c.phone,
-    customerLocation:c.location,
-    items,
-    subtotal:cartTotal(),
-    shipping:0,
-    total:cartTotal(),
-    stockChecked:false,
-    stockResult:null,
-    status:"menunggu_pengecekan",
-    createdAt:new Date().toISOString()
+  out.province=firstNonEmpty(
+    out.province,
+    j?.principalSubdivision,
+    byText(/province|provinsi/i)
+  );
+  out.regency=firstNonEmpty(
+    out.regency,
+    j?.city,
+    j?.locality,
+    byText(/regency|kabupaten|county/i)
+  );
+  out.district=firstNonEmpty(
+    out.district,
+    j?.district,
+    byText(/district|kecamatan/i)
+  );
+  out.village=firstNonEmpty(
+    out.village,
+    j?.village,
+    j?.suburb,
+    j?.locality,
+    byText(/village|desa|kelurahan|subdistrict/i)
+  );
+
+  return out;
+}
+
+function administrativeFromNominatim(a){
+  return {
+    province:firstNonEmpty(a?.state,a?.province),
+    regency:firstNonEmpty(a?.county,a?.regency,a?.city,a?.municipality),
+    district:firstNonEmpty(a?.city_district,a?.district,a?.subdistrict,a?.municipality),
+    village:firstNonEmpty(a?.village,a?.suburb,a?.town,a?.quarter,a?.neighbourhood)
   };
-
-    data.orders.push(newOrder);
-
-    save();
-
-    currentOrderId=newOrder.id;
-
-    cart[currentPartnerId]={};
-
-    go("customerOrderResult");
-  });
 }
 
-/* =========================================================
-   J. HASIL PESANAN PELANGGAN
-========================================================= */
-
-function renderCustomerOrderResult(){
-  const o=order(currentOrderId);
-
-  if(!o)return;
-
-  document.getElementById("app").innerHTML=shell(
-    "HASIL PESANAN",
-    `
-    <div class="content">
-
-      <div class="card">
-        <div class="item-title">
-          ${esc(o.partnerName)}
-        </div>
-
-        <div class="item-sub">
-          Status:
-          ${
-            o.status==="menunggu_pengecekan"
-            ?"MENUNGGU PENGECEKAN STOK"
-            :o.status==="stok_diperiksa"
-            ?"HASIL PENGECEKAN TERSEDIA"
-            :o.status==="diproses"
-            ?"PROSES PESANAN"
-            :"SELESAI"
-          }
-        </div>
-      </div>
-
-      ${orderItemsHTML(o)}
-
-      <div class="card">
-
-        <div class="total-line">
-          <span>SUBTOTAL</span>
-          <span>${rupiah(o.subtotal)}</span>
-        </div>
-
-        <div class="total-line">
-          <span>ONGKIR</span>
-          <span>${rupiah(o.shipping)}</span>
-        </div>
-
-        <div class="total-line">
-          <span>TOTAL</span>
-          <span>${rupiah(o.total)}</span>
-        </div>
-
-      </div>
-
-      ${
-        o.status==="stok_diperiksa"
-        ?`
-        <button class="btn primary"
-          onclick="processCustomerOrder()">
-          PROSES PESANAN SAYA
-        </button>
-
-        <button class="btn danger"
-          onclick="cancelOrder()">
-          BATALKAN
-        </button>
-        `
-        :""
-      }
-
-      ${
-        o.status==="diproses"
-        ?`
-        <div class="notice">
-          Pesanan sedang diproses oleh
-          Mitra Usaha dan Kurir.
-        </div>
-        `
-        :""
-      }
-
-    </div>
-    `,
-    "customerDashboard"
-  );
+function mergeAdministrative(n,b){
+  return {
+    province:firstNonEmpty(n.province,b.province),
+    regency:firstNonEmpty(n.regency,b.regency),
+    district:firstNonEmpty(n.district,b.district),
+    village:firstNonEmpty(n.village,b.village)
+  };
 }
 
-function orderItemsHTML(o){
-  return `
-  <div class="section-title">
-    PESANAN
-  </div>
-
-  ${o.items.map(item=>`
-    <div class="card">
-
-      <div class="item-title">
-        ${esc(item.menuName)}
-      </div>
-
-      ${
-        item.qty
-        ?`
-          <div class="item-sub">
-            ${item.qty} × ${rupiah(item.price)}
-          </div>
-        `
-        :""
-      }
-
-      ${
-        item.variants?.length
-        ?item.variants.map(v=>`
-          <div class="variant-order">
-            <span>
-              ${esc(v.variantName)}
-            </span>
-            <span>
-              ${v.qty} × ${rupiah(v.price)}
-            </span>
-          </div>
-        `).join("")
-        :""
-      }
-
-    </div>
-  `).join("")}
-  `;
+async function reverseLocation(lat,lon){
+  const nomUrl="https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+encodeURIComponent(lat)+"&lon="+encodeURIComponent(lon)+"&zoom=18&addressdetails=1&accept-language=id";
+  const bdcUrl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+encodeURIComponent(lat)+"&longitude="+encodeURIComponent(lon)+"&localityLanguage=id";
+  const results=await Promise.allSettled([
+    fetch(nomUrl,{headers:{"Accept":"application/json"}}).then(r=>{if(!r.ok)throw new Error("Nominatim "+r.status);return r.json()}),
+    fetch(bdcUrl,{headers:{"Accept":"application/json"}}).then(r=>{if(!r.ok)throw new Error("BigDataCloud "+r.status);return r.json()})
+  ]);
+  const nom=results[0].status==="fulfilled"?results[0].value:null;
+  const bdc=results[1].status==="fulfilled"?results[1].value:null;
+  if(!nom && !bdc) throw new Error("Layanan alamat tidak dapat dihubungi.");
+  const na=administrativeFromNominatim(nom?.address||{});
+  const ba=administrativeFromBigData(bdc||{});
+  const ad=mergeAdministrative(na,ba);
+  return {
+    lat:Number(lat),
+    lon:Number(lon),
+    accuracy:null,
+    province:ad.province,
+    regency:ad.regency,
+    district:ad.district,
+    village:ad.village,
+    display:firstNonEmpty(nom?.display_name,bdc?.localityInfo?.informative?.map?.(x=>x?.name).filter(Boolean).join(", "),[ad.village,ad.district,ad.regency,ad.province].filter(Boolean).join(", "))
+  };
 }
 
-/* =========================================================
-   K. HASIL PENGECEKAN STOK
-========================================================= */
-
-function renderCustomerResults(){
-  const list=data.orders
-    .filter(o=>o.customerId===currentCustomerId);
-
-  document.getElementById("app").innerHTML=shell(
-    "HASIL PENGECEKAN STOK",
-    `
-    <div class="content">
-
-      ${
-        list.length
-        ?list.map(o=>`
-          <div class="card clickable"
-            onclick="
-              currentOrderId='${o.id}';
-              render('customerOrderResult');
-            ">
-
-            <div class="item-title">
-              ${esc(o.partnerName)}
-            </div>
-
-            <div class="item-sub">
-              ${
-                o.status==="menunggu_pengecekan"
-                ?"MENUNGGU PENGECEKAN"
-                :o.status==="stok_diperiksa"
-                ?"HASIL PENGECEKAN SUDAH ADA"
-                :o.status==="diproses"
-                ?"SEDANG DIPROSES"
-                :"SELESAI"
-              }
-            </div>
-
-          </div>
-        `).join("")
-        :`
-        <div class="empty">
-          Belum ada hasil pengecekan.
-        </div>
-        `
-      }
-
-    </div>
-    `,
-    "customerDashboard"
-  );
-}
-
-/* =========================================================
-   L. PROSES / BATALKAN
-========================================================= */
-
-function processCustomerOrder(){
-  const o=order(currentOrderId);
-  if(!o)return;
-
-  if(!o.stockResult){
-    toast("Hasil pengecekan belum tersedia.");
-    return;
-  }
-
-  const ada=o.stockResult.filter(x=>x.available);
-
-  if(!ada.length){
-    toast("Tidak ada menu yang tersedia.");
-    return;
-  }
-
-  o.status="diproses";
+async function getLocation(target){
+  if(!navigator.geolocation){toast("Perangkat tidak mendukung lokasi.");return false}
 
   /*
-    Hanya item ADA yang diteruskan.
+     Simpan dulu nilai form yang sedang diketik. Pada halaman pendaftaran,
+     lokasi melakukan rerender sehingga nilai input yang belum tersimpan ke
+     state bisa hilang.
   */
-  o.items=o.items.filter(item=>{
-    const result=o.stockResult.find(
-      x=>x.menuId===item.menuId
-    );
+  if(target===state.courier && currentView==="register"){
+    const nameEl=document.getElementById("cName");
+    const waEl=document.getElementById("cWa");
+    state.courier=state.courier||{};
+    if(nameEl)state.courier.name=nameEl.value;
+    if(waEl)state.courier.wa=waEl.value.replace(/\D/g,"");
+  }
 
-    return result?.available;
-  });
+  toast("Mencari lokasi akurat...");
+  try{
+    const pos=await getBestGPSPosition();
+    const lat=pos.coords.latitude,lon=pos.coords.longitude;
+    const location=await reverseLocation(lat,lon);
+    location.accuracy=Number(pos.coords.accuracy||0);
 
-  o.subtotal=calculateOrderSubtotal(o);
-  o.total=o.subtotal+o.shipping;
+    /* Jangan mengganti object courier sehingga nama/WA yang sudah diketik
+       tetap berada di state. */
+    target.location=location;
 
-  save();
-
-  render("customerOrderResult");
+    toast("Lokasi berhasil ditemukan.");
+    rerenderCurrent();
+    return true;
+  }catch(e){
+    toast(e.message||"Lokasi gagal diambil.");
+    rerenderCurrent();
+    return false;
+  }
 }
 
-function cancelOrder(){
-  const o=order(currentOrderId);
-  if(!o)return;
-
-  o.status="dibatalkan";
-
-  save();
-
-  render("customerOrderResult");
+/* ---------- ROUTING ---------- */
+let currentView="home";
+function rerenderCurrent(){
+  if(publicMode==="customer") return renderCustomer();
+  if(publicMode==="partner") return renderPartnerPublic();
+  switch(currentView){
+    case "register":showCourierRegister();break;
+    case "dashboard":showDashboard();break;
+    case "partners":showPartners();break;
+    case "partner":showPartnerDetail(currentPartnerId);break;
+    case "menuAdd":showMenuForm();break;
+    case "menuEdit":showMenuForm(true);break;
+    case "variant":showVariantSettings();break;
+    case "income":showIncome();break;
+    case "account":showAccount();break;
+    case "editAccount":showEditAccount();break;
+    case "ordersCourier":showCourierOrders();break;
+    case "orderDetail":showOrderDetail(currentOrderId);break;
+    default:showDashboard();
+  }
+}
+async function boot(){
+  const k=q("kurir"),mitra=q("mitra"),pel=q("pelanggan");
+  try{
+    if(k){await loadRow(k)}
+    else{
+      const saved=localStorage.getItem("KURIR_SIMPLE_ROW");
+      if(saved){try{await loadRow(saved)}catch{localStorage.removeItem("KURIR_SIMPLE_ROW")}}
+    }
+    if(k && mitra){publicMode="partner";currentPartnerId=mitra;return renderPartnerPublic()}
+    if(k && pel){publicMode="customer";return renderCustomer()}
+  }catch(e){render(`<div class="screen">${header("KURIR SIMPLE",false)}<div class="notice">${esc(e.message)}</div></div>`);return}
+  if(state.courier) showDashboard(); else showCourierRegister();
+}
+function go(v){
+  publicMode=null;currentView=v;rerenderCurrent();
 }
 
-function calculateOrderSubtotal(o){
+/* ---------- COURIER REGISTRATION ---------- */
+function showCourierRegister(){
+  currentView="register";publicMode=null;
+  const c=state.courier||{};
+  render(`<div class="screen">
+    ${header("DAFTAR AKUN KURIR",true)}
+    <div class="label">Nama</div>
+    <input id="cName" value="${esc(c.name||"")}" placeholder="">
+    <div class="label">Nomor WhatsApp</div>
+    <input id="cWa" inputmode="numeric" maxlength="12" value="${esc(c.wa||"")}" placeholder="12 digit">
+    ${c.location?`<div class="label">Alamat</div>${addressBox(c.location)}`:`<button class="btn" onclick="registerLocation()">BAGIKAN LOKASI</button>`}
+    <button class="btn primary" onclick="finishRegister()">SELESAI</button>
+  </div>`);
+}
+function registerLocation(){
+  state.courier=state.courier||{};
+
+  /* Simpan nama dan nomor sebelum halaman di-rerender oleh proses lokasi. */
+  const nameEl=document.getElementById("cName");
+  const waEl=document.getElementById("cWa");
+  if(nameEl)state.courier.name=nameEl.value;
+  if(waEl)state.courier.wa=waEl.value.replace(/\D/g,"");
+
+  getLocation(state.courier);
+}
+async function finishRegister(){
+  const name=document.getElementById("cName").value.trim();
+  const wa=document.getElementById("cWa").value.replace(/\D/g,"");
+  if(!name)return toast("Nama wajib diisi.");
+  if(wa.length!==12)return toast("Nomor WhatsApp harus 12 digit.");
+  if(!state.courier?.location)return toast("Bagikan lokasi terlebih dahulu.");
+  state.courier={name,wa,location:state.courier.location};
+  try{
+    if(!rowId)await createRow(); else await save();
+    localStorage.setItem("KURIR_SIMPLE_ROW",rowId);
+    showDashboard();
+  }catch(e){toast("Gagal menyimpan: "+e.message)}
+}
+
+/* ---------- DASHBOARD ---------- */
+function showDashboard(){
+  currentView="dashboard";publicMode=null;
+  render(`<div class="screen">
+    <div class="title">KURIR SIMPLE</div>
+    <div class="subtitle">DASHBOARD UTAMA</div>
+    <button class="btn" onclick="go('partners')">MITRA USAHA</button>
+    <button class="btn" onclick="showCustomerLink()">PELANGGAN</button>
+    <button class="btn" onclick="showIncome()">RIWAYAT PEMASUKAN</button>
+    <button class="btn" onclick="showAccount()">AKUN</button>
+  </div>`);
+}
+function showCustomerLink(){
+  currentView="customerLink";publicMode=null;
+  render(`<div class="screen">${header("PELANGGAN",true)}
+    <div class="subtitle">MENU PELANGGAN</div>
+    <button class="btn primary" onclick="ensurePublicLink()&&copyText(linkForCourier())">SALIN LINK</button>
+    <button class="btn" onclick="showCourierOrders()">PESANAN MASUK</button>
+  </div>`);
+}
+/* ---------- PARTNERS ---------- */
+function showPartners(){
+  currentView="partners";publicMode=null;
+  const cards=state.partners.map(p=>`
+    <div class="card">
+      <div style="font-weight:800">${esc(p.name)}</div>
+      <div class="muted">WhatsApp: ${esc(p.wa)}</div>
+      <div class="btnrow" style="margin-top:10px">
+        <button class="btn small ${p.status==="OPEN"?"primary":""}" onclick="setPartnerStatus('${p.id}','OPEN')">OPEN</button>
+        <button class="btn small ${p.status==="CLOSED"?"primary":""}" onclick="setPartnerStatus('${p.id}','CLOSED')">CLOSED</button>
+      </div>
+      <button class="btn" onclick="ensurePublicLink()&&copyText(linkForPartner('${p.id}'))">SALIN LINK</button>
+      <button class="btn" onclick="showPartnerDetail('${p.id}')">BUKA MITRA</button>
+    </div>`).join("");
+  render(`<div class="screen">${header("MITRA USAHA",true)}
+    <div class="subtitle">DAFTAR MITRA USAHA DI DESA</div>
+    ${cards||`<div class="notice center">Belum ada Mitra Usaha.</div>`}
+    <button class="btn primary" onclick="showAddPartner()">TAMBAH MITRA USAHA</button>
+  </div>`);
+}
+async function setPartnerStatus(id,status){
+  const p=state.partners.find(x=>x.id===id);if(!p)return;
+  p.status=status;
+  try{await save();toast("Status "+status+" tersimpan.");showPartners()}catch(e){toast(e.message)}
+}
+function showAddPartner(){
+  currentView="addPartner";publicMode=null;
+  render(`<div class="screen">${header("TAMBAH MITRA USAHA",true)}
+    <div class="label">Nama Mitra Usaha</div><input id="pName">
+    <div class="label">Nomor WhatsApp</div><input id="pWa" inputmode="numeric" maxlength="12">
+    <button class="btn primary" onclick="addPartner()">SIMPAN</button>
+  </div>`);
+}
+async function addPartner(){
+  const name=document.getElementById("pName").value.trim();
+  const wa=document.getElementById("pWa").value.replace(/\D/g,"");
+  if(!name||wa.length!==12)return toast("Nama dan WhatsApp 12 digit wajib diisi.");
+  state.partners.push({id:uid("mitra"),name,wa,status:"CLOSED",menus:[]});
+  try{await save();showPartners()}catch(e){toast(e.message)}
+}
+function showPartnerDetail(pid){
+  currentView="partner";currentPartnerId=pid;publicMode=null;
+  const p=state.partners.find(x=>x.id===pid);if(!p)return showPartners();
+  const menus=p.menus.map(m=>`
+    <div class="menu-item">
+      <div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="price">${rupiah(m.basePrice)}</div></div>
+      <div class="status ${m.status==="TERSEDIA"?"available":"sold"}">${m.status}</div>
+      <div class="btnrow">
+        <button class="btn small" onclick="editMenu('${m.id}')">EDIT</button>
+        <button class="btn small danger" onclick="deleteMenu('${p.id}','${m.id}')">HAPUS</button>
+      </div>
+    </div>`).join("");
+  render(`<div class="screen">${header(esc(p.name),true)}
+    <div class="muted center">DAFTAR MENU</div>
+    <div class="card">${menus||`<div class="muted center">Belum ada menu.</div>`}</div>
+    <button class="btn primary" onclick="addMenu('${pid}')">TAMBAH MENU</button>
+    <button class="btn" onclick="ensurePublicLink()&&copyText(linkForPartner('${pid}'))">SALIN LINK MITRA USAHA</button>
+  </div>`);
+}
+function addMenu(pid){editingPartnerId=pid;editingMenuId=null;showMenuForm(false)}
+function editMenu(mid){editingMenuId=mid;showMenuForm(true)}
+function findEditingMenu(){
+  const p=state.partners.find(x=>x.id===editingPartnerId||x.id===currentPartnerId);
+  const m=p?.menus.find(x=>x.id===editingMenuId);
+  return {p,m}
+}
+function showMenuForm(isEdit){
+  currentView=isEdit?"menuEdit":"menuAdd";
+  if(!editingPartnerId)editingPartnerId=currentPartnerId;
+  const p=state.partners.find(x=>x.id===editingPartnerId);
+  const m=isEdit?p?.menus.find(x=>x.id===editingMenuId):null;
+  if(!p)return showPartners();
+  render(`<div class="screen">${header(isEdit?"EDIT MENU":"TAMBAH MENU",true)}
+    <div class="label">Nama Menu</div><input id="mName" value="${esc(m?.name||"")}">
+    <div class="label">Harga Dasar</div><input id="mPrice" inputmode="numeric" value="${m?.basePrice??""}">
+    ${isEdit?`<div class="notice">Status menu: <b>${esc(m?.status||"TERSEDIA")}</b></div>`:""}
+    <button class="btn" onclick="openVariantSettings()">${m?.hasVariants?"EDIT PENGATURAN VARIAN":"TAMBAH VARIAN"}</button>
+    ${m?.hasVariants?`<div class="notice">${m.pickRule==="single"?"Hanya pilih satu":"Bisa pilih lebih dari satu"} · ${m.priceRule==="different"?"Harga tiap varian beda":"Harga tiap varian sama"}<br>${m.variants.map(v=>esc(v.name)+" "+rupiah(m.priceRule==="different"?v.price:m.basePrice)).join(", ")}</div>`:""}
+    <button class="btn primary" onclick="saveMenu()">SIMPAN</button>
+    ${isEdit?`<button class="btn" onclick="toggleMenuStatus('${m.id}')">UBAH TERSEDIA/HABIS</button>`:""}
+  </div>`);
+}
+async function saveMenu(){
+  const p=state.partners.find(x=>x.id===editingPartnerId);if(!p)return;
+  const name=document.getElementById("mName").value.trim();
+  const price=Number(document.getElementById("mPrice").value.replace(/\D/g,""));
+  if(!name||!price)return toast("Nama menu dan harga dasar wajib diisi.");
+  let m=editingMenuId?p.menus.find(x=>x.id===editingMenuId):null;
+  if(!m){
+    m={id:uid("menu"),name,basePrice:price,status:"TERSEDIA",hasVariants:false,pickRule:"single",priceRule:"same",variants:[]};
+    p.menus.push(m);
+  }else{m.name=name;m.basePrice=price}
+  try{await save();showPartnerDetail(p.id)}catch(e){toast(e.message)}
+}
+function openVariantSettings(){
+  const p=state.partners.find(x=>x.id===editingPartnerId);let m=editingMenuId?p?.menus.find(x=>x.id===editingMenuId):null;
+  if(!m){
+    const name=document.getElementById("mName").value.trim(),price=Number(document.getElementById("mPrice").value.replace(/\D/g,""));
+    if(!name||!price)return toast("Isi nama dan harga dasar dulu.");
+    m={id:uid("menu"),name,basePrice:price,status:"TERSEDIA",hasVariants:true,pickRule:"single",priceRule:"same",variants:[]};
+    p.menus.push(m);editingMenuId=m.id;
+  }else m.hasVariants=true;
+  showVariantSettings();
+}
+function showVariantSettings(){
+  currentView="variant";
+  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
+  if(!m)return showPartners();
+  const vars=m.variants.map((v,i)=>`
+    <div class="card">
+      <div class="label">Nama Varian</div><input id="vn${i}" value="${esc(v.name)}">
+      <div class="label">Harga Varian</div><input id="vp${i}" inputmode="numeric" value="${v.price||""}">
+      <button class="btn small danger" onclick="removeVariant(${i})">HAPUS VARIAN</button>
+    </div>`).join("");
+  render(`<div class="screen">${header("PENGATURAN VARIAN",true)}
+    <div class="label">Jumlah Pemilihan</div>
+    <div class="grid2">
+      <button class="btn ${m.pickRule==="single"?"primary":""}" onclick="setTempPick('single')">Hanya pilih satu</button>
+      <button class="btn ${m.pickRule==="multi"?"primary":""}" onclick="setTempPick('multi')">Bisa pilih lebih dari satu</button>
+    </div>
+    <div class="label">Aturan Harga Menu</div>
+    <div class="grid2">
+      <button class="btn ${m.priceRule==="different"?"primary":""}" onclick="setTempPrice('different')">Harga tiap varian beda</button>
+      <button class="btn ${m.priceRule==="same"?"primary":""}" onclick="setTempPrice('same')">Harga tiap varian sama</button>
+    </div>
+    <div class="label">Daftar Varian</div>${vars||`<div class="muted">Belum ada varian.</div>`}
+    <button class="btn" onclick="addVariant()">TAMBAH VARIAN</button>
+    <button class="btn primary" onclick="saveVariants()">SIMPAN MENU</button>
+  </div>`);
+}
+function syncVariantInputs(){
+  const p=state.partners.find(x=>x.id===editingPartnerId);
+  const m=p?.menus.find(x=>x.id===editingMenuId);
+  if(!m||!Array.isArray(m.variants))return;
+  m.variants=m.variants.map((v,i)=>({
+    ...v,
+    name:document.getElementById("vn"+i)?.value.trim() ?? v.name ?? "",
+    price:(document.getElementById("vp"+i)?.value ?? "")!==""
+      ? (Number(document.getElementById("vp"+i).value.replace(/\D/g,""))||0)
+      : (v.price ?? m.basePrice)
+  }));
+}
+function setTempPick(v){
+  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
+  if(!m)return;
+  syncVariantInputs();
+  m.pickRule=v;
+  showVariantSettings();
+}
+function setTempPrice(v){
+  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
+  if(!m)return;
+  syncVariantInputs();
+  m.priceRule=v;
+  showVariantSettings();
+}
+function addVariant(){
+  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
+  if(!m)return;
+  syncVariantInputs();
+  m.variants.push({id:uid("var"),name:"",price:m.basePrice});
+  showVariantSettings();
+}
+function removeVariant(i){
+  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
+  if(!m)return;
+  syncVariantInputs();
+  m.variants.splice(i,1);
+  showVariantSettings();
+}
+async function saveVariants(){
+  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
+  if(!m)return;
+  syncVariantInputs();
+  m.variants=m.variants.map((v,i)=>({
+    id:v.id||uid("var"),
+    name:(v.name||"").trim()||("Varian "+(i+1)),
+    price:Number(v.price)||m.basePrice
+  }));
+  if(!m.variants.length)return toast("Tambahkan minimal satu varian.");
+  try{await save();showMenuForm(true)}catch(e){toast(e.message)}
+}
+async function toggleMenuStatus(mid){
+  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===mid);if(!m)return;
+  m.status=m.status==="TERSEDIA"?"HABIS":"TERSEDIA";
+  await save();showMenuForm(true);
+}
+async function deleteMenu(pid,mid){
+  if(!confirm("Hapus menu ini?"))return;
+  const p=state.partners.find(x=>x.id===pid);p.menus=p.menus.filter(m=>m.id!==mid);
+  try{await save();showPartnerDetail(pid)}catch(e){toast(e.message)}
+}
+
+/* ---------- PARTNER PUBLIC / ORDERS ---------- */
+function renderPartnerPublic(){
+  publicMode="partner";currentView="partnerPublic";
+  const p=state.partners.find(x=>x.id===currentPartnerId);
+  if(!p)return render(`<div class="screen">${header("MITRA USAHA",false)}<div class="notice">Mitra tidak ditemukan.</div></div>`);
+  const menus=p.menus.map(m=>`
+    <div class="menu-item">
+      <div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="price">${rupiah(m.basePrice)}</div></div>
+      <div class="status ${m.status==="TERSEDIA"?"available":"sold"}">${m.status}</div>
+    </div>`).join("");
+  render(`<div class="screen">${header(esc(p.name),false)}
+    <div class="muted center">DAFTAR MENU</div>
+    <div class="card">${menus||`<div class="muted center">Belum ada menu.</div>`}</div>
+    <button class="btn" onclick="showPartnerOrdersPublic()">PESANAN MASUK</button>
+  </div>`);
+}
+function showPartnerOrdersPublic(){
+  currentView="partnerOrdersPublic";
+  const p=state.partners.find(x=>x.id===currentPartnerId);
+  const orders=state.orders.filter(o=>o.partnerIds?.includes(p.id)&&o.status==="SENT_TO_PARTNER");
+  render(`<div class="screen">${header("PESANAN MASUK",true)}
+    ${orders.map(o=>`<div class="card"><b>${esc(o.customer?.name||"Pelanggan")}</b><div class="muted">Pesanan telah dikirim</div><button class="btn" onclick="partnerCheck('${o.id}')">LIHAT PESANAN</button></div>`).join("")||`<div class="notice">Belum ada pesanan masuk.</div>`}
+  </div>`);
+}
+function partnerCheck(oid){
+  currentOrderId=oid;
+  const o=state.orders.find(x=>x.id===oid),p=state.partners.find(x=>x.id===currentPartnerId);
+  const lines=o.items.filter(i=>i.partnerId===p.id);
+  render(`<div class="screen">${header("PENGECEKAN PRODUK",true)}
+    ${lines.map((i,idx)=>`<div class="card"><b>${esc(i.menuName)}${i.variantName?" · "+esc(i.variantName):""}</b><div class="muted">Jumlah: ${i.qty}</div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn small ${i.check!=="KOSONG"?"primary":""}" onclick="setCheck('${oid}',${idx},'ADA')">ADA</button>
+        <button class="btn small ${i.check==="KOSONG"?"primary":""}" onclick="setCheck('${oid}',${idx},'KOSONG')">KOSONG</button>
+      </div></div>`).join("")}
+    <button class="btn primary" onclick="sendCheck('${oid}','${p.id}')">KIRIM HASIL PENGECEKAN</button>
+  </div>`);
+}
+function setCheck(oid,idx,v){
+  const o=state.orders.find(x=>x.id===oid);
+  const p=state.partners.find(x=>x.id===currentPartnerId);
+  const lines=o.items.filter(i=>i.partnerId===p.id);lines[idx].check=v;renderPartnerCheckKeep(o,p)
+}
+function renderPartnerCheckKeep(o,p){partnerCheck(o.id)}
+async function sendCheck(oid,pid){
+  const o=state.orders.find(x=>x.id===oid);
+  const lines=o.items.filter(i=>i.partnerId===pid);
+  if(lines.some(i=>!i.check))return toast("Tentukan ADA/KOSONG untuk semua produk.");
+  const allDone=o.partnerIds.every(pid2=>o.items.filter(i=>i.partnerId===pid2).every(i=>i.check));
+  o.partnerChecks=o.partnerChecks||{};
+  o.partnerChecks[pid]=true;
+  if(allDone)o.status="CHECKED";
+  try{await save();toast("Hasil pengecekan dikirim.");renderPartnerPublic()}catch(e){toast(e.message)}
+}
+
+/* ---------- CUSTOMER ---------- */
+function customerHeader(){
+  const c=selectedCustomer||state.customers.find(x=>x.id===localStorage.getItem("KS_CUSTOMER_"+rowId));
+  if(!c)return "";
+  return `<div class="card">
+    <div class="smalltext">AKUN PELANGGAN</div>
+    <div><b>Nama</b> ${esc(c.name)}</div>
+    <div><b>Nomor WA</b> ${esc(c.wa)}</div>
+    <div><b>Alamat</b> ${esc(c.location?.display||[c.location?.village,c.location?.district,c.location?.regency,c.location?.province].filter(Boolean).join(", "))}</div>
+    <button class="btn small" style="margin-top:9px" onclick="customerRelocate()">BAGIKAN ULANG LOKASI</button>
+  </div>`;
+}
+function renderCustomer(){
+  publicMode="customer";
+  const c=state.customers.find(x=>x.id===localStorage.getItem("KS_CUSTOMER_"+rowId));
+  selectedCustomer=c||null;
+  if(!c)return renderCustomerAccount();
+  renderCustomerPick();
+}
+function renderCustomerAccount(){
+  currentView="customerAccount";
+  render(`<div class="screen">
+    ${header("AKUN PELANGGAN",false)}
+    <div class="label">Nama</div><input id="cuName">
+    <div class="label">Nomor WA</div><input id="cuWa" inputmode="numeric" maxlength="12">
+    ${selectedCustomer?.location?`<div class="label">Alamat Lengkap</div>${addressBox(selectedCustomer.location)}`:`<button class="btn" onclick="customerShareLocation()">BAGIKAN LOKASI</button>`}
+    <button class="btn primary" onclick="saveCustomerAccount()">SIMPAN</button>
+  </div>`);
+}
+async function customerShareLocation(){
+  selectedCustomer=selectedCustomer||{};
+  await getLocation(selectedCustomer);
+  renderCustomerAccount();
+}
+async function saveCustomerAccount(){
+  const name=document.getElementById("cuName").value.trim();
+  const wa=document.getElementById("cuWa").value.replace(/\D/g,"");
+  if(!name||wa.length!==12)return toast("Nama dan WA 12 digit wajib diisi.");
+  if(!selectedCustomer?.location)return toast("Bagikan lokasi terlebih dahulu.");
+  let c=state.customers.find(x=>x.id===selectedCustomer.id);
+  if(!c){c={id:uid("cust"),name,wa,location:selectedCustomer.location};state.customers.push(c)}
+  else{c.name=name;c.wa=wa;c.location=selectedCustomer.location}
+  selectedCustomer=c;localStorage.setItem("KS_CUSTOMER_"+rowId,c.id);
+  try{await save();renderCustomerPick()}catch(e){toast(e.message)}
+}
+async function customerRelocate(){
+  const ok=await getLocation(selectedCustomer);
+  if(!ok)return;
+  const c=state.customers.find(x=>x.id===selectedCustomer.id);if(c){c.location=selectedCustomer.location;await save()}
+  renderCustomerPick();
+}
+function renderCustomerPick(){
+  currentView="customerPick";
+  const partners=state.partners.map(p=>`
+    <div class="card ${p.status==="CLOSED"?"disabled":""}" onclick="${p.status==="OPEN"?`customerOpenPartner('${p.id}')`:""}">
+      <b>${esc(p.name)}</b><div class="status ${p.status==="OPEN"?"open":"closed"}">${p.status}</div>
+    </div>`).join("");
+  render(`<div class="screen">
+    ${customerHeader()}
+    <hr class="sep">
+    <div class="title">PILIH MITRA USAHA</div>
+    ${partners||`<div class="notice">Belum ada Mitra Usaha.</div>`}
+    <button class="btn" onclick="renderCustomerOrders()">LIHAT PESANAN</button>
+  </div>`);
+}
+function customerOpenPartner(pid){
+  currentPartnerId=pid;customerCart={};renderCustomerMenu();
+}
+function renderCustomerMenu(){
+  currentView="customerMenu";
+  const p=state.partners.find(x=>x.id===currentPartnerId);if(!p)return renderCustomerPick();
+  let html=p.menus.map(m=>customerMenuHTML(m)).join("");
+  render(`<div class="screen">
+    ${customerHeader()}
+    <hr class="sep"><div class="title">${esc(p.name)}</div>
+    <div>${html||`<div class="notice">Belum ada menu.</div>`}</div>
+    <div class="totalbar"><div class="totalrow"><span>TOTAL</span><span>${rupiah(cartPartnerTotal(p.id))}</span></div><button class="btn primary" onclick="saveCustomerPartnerOrder()">SIMPAN</button></div>
+  </div>`);
+}
+function customerMenuHTML(m){
+  const qv=customerCart[m.id]?.qty||0;
+  if(m.status==="HABIS")return `<div class="menu-item disabled"><div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="price">${rupiah(m.basePrice)}</div></div><div class="status sold">HABIS</div></div>`;
+  if(!m.hasVariants)return `<div class="menu-item"><div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="qty"><button onclick="event.stopPropagation();changeCart('${m.id}',null,-1)">−</button><span>${qv}</span><button onclick="event.stopPropagation();changeCart('${m.id}',null,1)">+</button></div></div><div class="price">${rupiah(m.basePrice)}</div></div>`;
+  if(m.pickRule==="single"){
+    const sel=customerCart[m.id]?.variantId||"";
+    return `<div class="menu-item"><div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="qty"><button onclick="changeCart('${m.id}',null,-1)">−</button><span>${customerCart[m.id]?.qty||0}</span><button onclick="changeCart('${m.id}',null,1)">+</button></div></div>
+      ${m.variants.map(v=>`<label class="variant"><input type="radio" name="rv_${m.id}" value="${v.id}" ${sel===v.id?"checked":""} onchange="selectVariant('${m.id}','${v.id}')"><span class="grow">${esc(v.name)}</span><span>${rupiah(m.priceRule==="different"?v.price:m.basePrice)}</span></label>`).join("")}</div>`;
+  }
+  return `<div class="menu-item"><div class="menu-name">${esc(m.name)}</div>
+    ${m.variants.map(v=>{const q2=customerCart[m.id]?.variants?.[v.id]||0;return `<div class="variant"><span class="grow">${esc(v.name)}</span><span>${rupiah(m.priceRule==="different"?v.price:m.basePrice)}</span><span class="qty"><button onclick="changeCart('${m.id}','${v.id}',-1)">−</button><span>${q2}</span><button onclick="changeCart('${m.id}','${v.id}',1)">+</button></span></div>`}).join("")}</div>`;
+}
+function selectVariant(mid,vid){customerCart[mid]=customerCart[mid]||{qty:0};customerCart[mid].variantId=vid;renderCustomerMenu()}
+function changeCart(mid,vid,delta){
+  const p=state.partners.find(x=>x.id===currentPartnerId),m=p.menus.find(x=>x.id===mid);
+  customerCart[mid]=customerCart[mid]||{};
+  if(!m.hasVariants){customerCart[mid].qty=Math.max(0,(customerCart[mid].qty||0)+delta)}
+  else if(m.pickRule==="single"){customerCart[mid].qty=Math.max(0,(customerCart[mid].qty||0)+delta)}
+  else{
+    customerCart[mid].variants=customerCart[mid].variants||{};
+    customerCart[mid].variants[vid]=Math.max(0,(customerCart[mid].variants[vid]||0)+delta);
+  }
+  renderCustomerMenu();
+}
+function cartPartnerTotal(pid){
+  const p=state.partners.find(x=>x.id===pid),cart=customerCart;
   let total=0;
-
-  o.items.forEach(item=>{
-    if(item.qty){
-      total+=item.qty*item.price;
-    }
-
-    item.variants?.forEach(v=>{
-      total+=v.qty*v.price;
-    });
-  });
-
-  return total;
-}
-
-/* =========================================================
-   M. PESANAN MITRA USAHA
-========================================================= */
-
-function renderPartnerOrders(){
-  const orders=data.orders.filter(
-    o=>o.partnerId===currentPartnerId
-  );
-
-  document.getElementById("app").innerHTML=shell(
-    "PESANAN MASUK",
-    `
-    <div class="content">
-
-      ${
-        orders.length
-        ?orders.map(o=>`
-          <div class="card clickable"
-            onclick="
-              currentOrderId='${o.id}';
-              render('stockCheck');
-            ">
-
-            <div class="item-title">
-              PESANAN
-            </div>
-
-            <div class="item-sub">
-              ${esc(o.status)}
-            </div>
-
-          </div>
-        `).join("")
-        :`
-        <div class="empty">
-          Belum ada pesanan.
-        </div>
-        `
+  p?.menus.forEach(m=>{
+    const c=cart[m.id];if(!c||m.status==="HABIS")return;
+    if(!m.hasVariants)total+=m.basePrice*(c.qty||0);
+    else if(m.pickRule==="single"){
+      if(c.variantId) {
+        const v=m.variants.find(x=>x.id===c.variantId);
+        total+=(m.priceRule==="different"?v?.price:m.basePrice||0)*(c.qty||0);
       }
-
-    </div>
-    `,
-    "partnerDashboard"
-  );
+    }else Object.entries(c.variants||{}).forEach(([vid,q])=>{const v=m.variants.find(x=>x.id===vid);total+=(m.priceRule==="different"?v?.price:m.basePrice||0)*q})
+  });return total;
+}
+function cartToItems(pid){
+  const p=state.partners.find(x=>x.id===pid),items=[];
+  p.menus.forEach(m=>{
+    const c=customerCart[m.id];if(!c||m.status==="HABIS")return;
+    if(!m.hasVariants && (c.qty||0)>0)items.push({id:uid("item"),partnerId:pid,menuId:m.id,menuName:m.name,variantId:null,variantName:null,qty:c.qty,unitPrice:m.basePrice,check:null});
+    else if(m.hasVariants&&m.pickRule==="single"&&c.variantId&&c.qty>0){
+      const v=m.variants.find(x=>x.id===c.variantId);items.push({id:uid("item"),partnerId:pid,menuId:m.id,menuName:m.name,variantId:v.id,variantName:v.name,qty:c.qty,unitPrice:m.priceRule==="different"?v.price:m.basePrice,check:null});
+    }else if(m.hasVariants&&m.pickRule==="multi")Object.entries(c.variants||{}).forEach(([vid,q])=>{if(q>0){const v=m.variants.find(x=>x.id===vid);items.push({id:uid("item"),partnerId:pid,menuId:m.id,menuName:m.name,variantId:v.id,variantName:v.name,qty:q,unitPrice:m.priceRule==="different"?v.price:m.basePrice,check:null})}})
+  });return items;
+}
+async function saveCustomerPartnerOrder(){
+  const items=cartToItems(currentPartnerId);if(!items.length)return toast("Pilih menu terlebih dahulu.");
+  let draft=JSON.parse(localStorage.getItem("KS_DRAFT_"+rowId)||"[]");
+  draft=draft.filter(x=>x.partnerId!==currentPartnerId);
+  draft.push({partnerId:currentPartnerId,items});
+  localStorage.setItem("KS_DRAFT_"+rowId,JSON.stringify(draft));
+  toast("Pesanan Mitra disimpan.");
+  renderCustomerPick();
+}
+function getDraft(){
+  try{return JSON.parse(localStorage.getItem("KS_DRAFT_"+rowId)||"[]")}catch{return[]}
+}
+function renderCustomerOrders(){
+  const draft=getDraft();
+  const draftBlocks=draft.map(d=>{
+    const p=state.partners.find(x=>x.id===d.partnerId),sub=d.items.reduce((s,i)=>s+i.qty*i.unitPrice,0);
+    return `<div class="card"><b>${esc(p?.name||"MITRA")}</b>${d.items.map(i=>`<div class="order-line"><span>${esc(i.menuName)}${i.variantName?" "+esc(i.variantName):""} ×${i.qty}</span><span>${rupiah(i.qty*i.unitPrice)}</span></div>`).join("")}<hr class="sep"><div class="totalrow"><span>TOTAL BELANJA MITRA</span><span>${rupiah(sub)}</span></div></div>`
+  }).join("");
+  const total=draft.reduce((s,d)=>s+d.items.reduce((a,i)=>a+i.qty*i.unitPrice,0),0);
+  const submitted=state.orders.filter(o=>o.customer?.id===selectedCustomer?.id && (o.status==="SENT_TO_PARTNER"||o.status==="CHECKED"||o.status==="READY_FOR_COURIER"));
+  const submittedBlocks=submitted.map(o=>{
+    const result=o.items.map(i=>`<div class="order-line"><span>${esc(i.menuName)}${i.variantName?" "+esc(i.variantName):""} ×${i.qty}</span><span>${esc(i.check||"MENUNGGU")}</span></div>`).join("");
+    const sub=o.items.filter(i=>i.check!=="KOSONG").reduce((s,i)=>s+i.qty*i.unitPrice,0);
+    let action="";
+    if(o.status==="CHECKED") action=`<button class="btn primary" onclick="processCheckedOrder('${o.id}')">PROSES PESANAN SAYA</button><button class="btn danger" onclick="cancelCustomerOrder('${o.id}')">BATALKAN PESANAN</button>`;
+    else if(o.status==="READY_FOR_COURIER") action=`<div class="notice">Pesanan sudah diproses dan diteruskan kepada Kurir.</div>`;
+    else action=`<div class="notice">Menunggu hasil pengecekan Mitra.</div>`;
+    return `<div class="card"><b>HASIL PENGECEKAN PESANAN</b>${result}<hr class="sep"><div class="totalrow"><span>SUBTOTAL TERSEDIA</span><span>${rupiah(sub)}</span></div>${action}</div>`;
+  }).join("");
+  render(`<div class="screen">${customerHeader()}<hr class="sep">
+    <div class="title">LIHAT PESANAN</div>
+    ${draftBlocks||`<div class="notice">Belum ada pesanan baru yang tersimpan.</div>`}
+    ${draft.length?`<div class="totalbar"><div class="totalrow"><span>TOTAL SELURUH BELANJA</span><span>${rupiah(total)}</span></div><button class="btn primary" onclick="sendCustomerOrder()">KIRIM PESANAN</button></div>`:""}
+    ${submittedBlocks}
+  </div>`);
+}
+async function processCheckedOrder(oid){
+  const o=state.orders.find(x=>x.id===oid);if(!o)return;
+  o.items=o.items.filter(i=>i.check!=="KOSONG");
+  o.status="READY_FOR_COURIER";
+  o.total=o.items.reduce((s,i)=>s+i.qty*i.unitPrice,0)+(o.shippingFee||0);
+  try{await save();toast("Pesanan diproses.");renderCustomerOrders()}catch(e){toast(e.message)}
+}
+async function cancelCustomerOrder(oid){
+  const o=state.orders.find(x=>x.id===oid);if(!o)return;
+  o.status="CANCELLED";
+  try{await save();toast("Pesanan dibatalkan.");renderCustomerOrders()}catch(e){toast(e.message)}
+}
+async function sendCustomerOrder(){
+  const draft=getDraft();if(!draft.length)return toast("Belum ada pesanan.");
+  const c=selectedCustomer||state.customers.find(x=>x.id===localStorage.getItem("KS_CUSTOMER_"+rowId));
+  const items=draft.flatMap(d=>d.items);
+  const partnerIds=[...new Set(items.map(i=>i.partnerId))];
+  const order={id:uid("ord"),createdAt:now(),customer:{id:c.id,name:c.name,wa:c.wa,location:c.location},partnerIds,items,status:"SENT_TO_PARTNER",partnerChecks:{},courierId:rowId,shippingFee:0,total:items.reduce((s,i)=>s+i.qty*i.unitPrice,0)};
+  state.orders.push(order);
+  localStorage.removeItem("KS_DRAFT_"+rowId);
+  try{await save();currentOrderId=order.id;currentView="customerSend";render(`<div class="screen">${header("KIRIM PESANAN",false)}<div class="card center"><b>PESANAN AKAN DIKIRIM KE KURIR</b></div><button class="btn primary" onclick="renderCustomerPick()">KEMBALI KE PILIH MITRA USAHA</button></div>`)}catch(e){toast(e.message)}
 }
 
-/* =========================================================
-   N. DASHBOARD MITRA VIA LINK
-========================================================= */
-
-function renderPartnerDashboard(){
-  const p=partner(currentPartnerId);
-
-  document.getElementById("app").innerHTML=shell(
-    p?.name||"MITRA USAHA",
-    `
-    <div class="content">
-
-      <div class="card">
-
-        <div class="item-title">
-          ${esc(p?.name||"")}
-        </div>
-
-        <div style="margin-top:5px">
-          <span class="status ${p?.status}">
-            ${p?.status==="open"?"OPEN":"CLOSED"}
-          </span>
-        </div>
-
-      </div>
-
-      <div class="dashboard-buttons">
-
-        <button class="btn primary"
-          onclick="render('partnerOrders')">
-          PESANAN MASUK
-        </button>
-
-        <button class="btn primary"
-          onclick="render('stockCheckList')">
-          PENGECEKAN PRODUK
-        </button>
-
-      </div>
-
-    </div>
-    `,
-    "partnerPublic"
-  );
+/* ---------- COURIER ORDERS ---------- */
+function showCourierOrders(){
+  currentView="ordersCourier";
+  const orders=state.orders.filter(o=>o.status==="CHECKED"||o.status==="READY_FOR_COURIER");
+  render(`<div class="screen">${header("PESANAN MASUK",true)}
+    ${orders.map(o=>`<div class="card"><b>Nama Pelanggan: ${esc(o.customer?.name)}</b><div class="label">Lokasi Pelanggan</div><button class="btn" onclick="openMap('${encodeURIComponent(o.customer?.location?.lat||"")}','${encodeURIComponent(o.customer?.location?.lon||"")}')">LIHAT LOKASI</button><div class="label">Mitra Usaha</div>${o.partnerIds.map(pid=>esc(state.partners.find(p=>p.id===pid)?.name||"")).join(", ")}<div class="label">Ongkir</div><input id="ongkir_${o.id}" inputmode="numeric" value="${o.shippingFee||""}"><button class="btn primary" onclick="saveOngkir('${o.id}')">SIMPAN ONGKIR</button><button class="btn" onclick="showOrderDetail('${o.id}')">LIHAT DETAIL</button></div>`).join("")||`<div class="notice">Belum ada pesanan siap diproses Kurir.</div>`}
+  </div>`);
+}
+function openMap(lat,lon){
+  if(!lat||!lon)return toast("Lokasi belum tersedia.");
+  window.open("https://www.google.com/maps?q="+decodeURIComponent(lat)+","+decodeURIComponent(lon),"_blank");
+}
+async function saveOngkir(oid){
+  const o=state.orders.find(x=>x.id===oid),el=document.getElementById("ongkir_"+oid);
+  const fee=Number(el.value.replace(/\D/g,""));if(!fee)return toast("Ongkir wajib diisi.");
+  o.shippingFee=fee;o.total=o.items.reduce((s,i)=>s+i.qty*i.unitPrice,0)+fee;o.status="READY_FOR_COURIER";
+  state.incomes.push({id:uid("inc"),date:now(),orderId:oid,amount:fee});
+  try{await save();toast("Ongkir tersimpan.");showCourierOrders()}catch(e){toast(e.message)}
+}
+function showOrderDetail(oid){
+  currentView="orderDetail";currentOrderId=oid;
+  const o=state.orders.find(x=>x.id===oid);if(!o)return showCourierOrders();
+  const lines=o.items.map(i=>`<div class="order-line"><span>${esc(i.menuName)}${i.variantName?" "+esc(i.variantName):""} ×${i.qty}</span><span>${rupiah(i.qty*i.unitPrice)}</span></div>`).join("");
+  const sub=o.items.reduce((s,i)=>s+i.qty*i.unitPrice,0);
+  render(`<div class="screen">${header("DETAIL PESANAN",true)}
+    <div class="card"><b>${esc(state.partners.find(p=>p.id===o.partnerIds[0])?.name||"MITRA USAHA")}</b>${lines}<hr class="sep"><div class="order-line"><span>Subtotal</span><span>${rupiah(sub)}</span></div><div class="order-line"><span>Ongkir</span><span>${rupiah(o.shippingFee)}</span></div><hr class="sep"><div class="totalrow"><span>Total</span><span>${rupiah(o.total)}</span></div></div>
+  </div>`);
 }
 
-/* =========================================================
-   O. PENGECEKAN STOK
-========================================================= */
-
-function renderStockCheckList(){
-  const list=data.orders.filter(
-    o=>o.partnerId===currentPartnerId &&
-       o.status==="menunggu_pengecekan"
-  );
-
-  document.getElementById("app").innerHTML=shell(
-    "PENGECEKAN PRODUK",
-    `
-    <div class="content">
-
-      ${
-        list.length
-        ?list.map(o=>`
-          <div class="card clickable"
-            onclick="
-              currentOrderId='${o.id}';
-              render('stockCheck');
-            ">
-
-            <div class="item-title">
-              PESANAN
-            </div>
-
-            <div class="item-sub">
-              ${o.items.length} menu
-            </div>
-
-          </div>
-        `).join("")
-        :`
-        <div class="empty">
-          Tidak ada pesanan yang perlu dicek.
-        </div>
-        `
-      }
-
-    </div>
-    `,
-    "partnerDashboard"
-  );
+/* ---------- INCOME / ACCOUNT ---------- */
+function showIncome(){
+  currentView="income";publicMode=null;
+  const groups={};
+  state.incomes.forEach(i=>{const d=i.date.slice(0,10);(groups[d]??=[]).push(i)});
+  const html=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([d,arr])=>`<div class="card"><b>${d}</b>${arr.map(i=>`<div class="order-line"><span>Ongkir</span><span>${rupiah(i.amount)}</span></div>`).join("")}<hr class="sep"><div class="totalrow"><span>TOTAL</span><span>${rupiah(arr.reduce((s,i)=>s+i.amount,0))}</span></div></div>`).join("");
+  render(`<div class="screen">${header("RIWAYAT PEMASUKAN",true)}${html||`<div class="notice">Belum ada pemasukan.</div>`}</div>`);
+}
+function showAccount(){
+  currentView="account";publicMode=null;
+  const c=state.courier;
+  render(`<div class="screen">${header("AKUN",true)}
+    <div class="card"><div class="label">Nama</div>${esc(c.name)}<div class="label">Nomor WhatsApp</div>${esc(c.wa)}<div class="label">Alamat</div>${addressBox(c.location)}</div>
+    <button class="btn primary" onclick="showEditAccount()">EDIT AKUN</button>
+  </div>`);
+}
+function showEditAccount(){
+  currentView="editAccount";publicMode=null;const c=state.courier;
+  render(`<div class="screen">${header("EDIT AKUN KURIR",true)}
+    <div class="label">Nama</div><input id="ecName" value="${esc(c.name)}">
+    <div class="label">Nomor WhatsApp</div><input id="ecWa" inputmode="numeric" maxlength="12" value="${esc(c.wa)}">
+    <div class="label">Alamat</div>${addressBox(c.location)}
+    <button class="btn" onclick="editCourierLocation()">BAGIKAN ULANG LOKASI</button>
+    <button class="btn primary" onclick="saveAccount()">SIMPAN</button>
+  </div>`);
+}
+async function editCourierLocation(){const ok=await getLocation(state.courier);if(ok)showEditAccount()}
+async function saveAccount(){
+  const n=document.getElementById("ecName").value.trim(),w=document.getElementById("ecWa").value.replace(/\D/g,"");
+  if(!n||w.length!==12)return toast("Nama dan WA 12 digit wajib diisi.");
+  state.courier.name=n;state.courier.wa=w;
+  try{await save();showAccount()}catch(e){toast(e.message)}
+}
+async function copyText(text){
+  try{await navigator.clipboard.writeText(text);toast("Link berhasil disalin.");}
+  catch{const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();toast("Link berhasil disalin.");}
 }
 
-function renderStockCheck(){
-  const o=order(currentOrderId);
-
-  if(!o)return;
-
-  document.getElementById("app").innerHTML=shell(
-    "PENGECEKAN PRODUK",
-    `
-    <div class="content">
-
-      <div class="notice">
-        Tampilkan menu yang dipesan.
-        Data pelanggan tidak ditampilkan
-        pada bagian pengecekan stok.
-      </div>
-
-      ${o.items.map(item=>{
-        const result=
-          o.stockResult?.find(
-            x=>x.menuId===item.menuId
-          );
-
-        return `
-        <div class="card">
-
-          <div class="item-title">
-            ${esc(item.menuName)}
-          </div>
-
-          ${
-            item.qty
-            ?`
-              <div class="item-sub">
-                Jumlah: ${item.qty}
-              </div>
-            `
-            :""
-          }
-
-          ${
-            item.variants?.length
-            ?item.variants.map(v=>`
-              <div class="item-sub">
-                ${esc(v.variantName)}
-                × ${v.qty}
-              </div>
-            `).join("")
-            :""
-          }
-
-          <div class="action-row">
-
-            <button
-              class="btn small ${
-                result?.available
-                ?"success"
-                :"secondary"
-              }"
-              onclick="
-                setStock(
-                  '${item.menuId}',
-                  true
-                )
-              ">
-              ADA
-            </button>
-
-            <button
-              class="btn small ${
-                result && !result.available
-                ?"danger"
-                :"secondary"
-              }"
-              onclick="
-                setStock(
-                  '${item.menuId}',
-                  false
-                )
-              ">
-              KOSONG
-            </button>
-
-          </div>
-
-        </div>
-        `;
-      }).join("")}
-
-      <button class="btn primary"
-        onclick="sendStockResult()">
-        KIRIM HASIL PENGECEKAN
-      </button>
-
-    </div>
-    `,
-    "stockCheckList"
-  );
-}
-
-function setStock(menuId,available){
-  const o=order(currentOrderId);
-
-  if(!o.stockResult)
-    o.stockResult=[];
-
-  const old=o.stockResult.find(
-    x=>x.menuId===menuId
-  );
-
-  if(old){
-    old.available=available;
-  }else{
-    o.stockResult.push({
-      menuId,
-      available
-    });
-  }
-
-  render("stockCheck");
-}
-
-function sendStockResult(){
-  const o=order(currentOrderId);
-
-  if(!o)return;
-
-  if(!o.stockResult ||
-     o.stockResult.length!==o.items.length){
-    toast("Tentukan ADA atau KOSONG untuk semua menu.");
-    return;
-  }
-
-  o.status="stok_diperiksa";
-
-  save();
-
-  toast("Hasil pengecekan berhasil dikirim.");
-
-  render("partnerDashboard");
-}
-
-/* =========================================================
-   P. PESANAN KURIR
-========================================================= */
-
-function renderOrders(){
-  const list=data.orders.filter(
-    o=>o.status==="diproses"
-  );
-
-  document.getElementById("app").innerHTML=shell(
-    "PESANAN",
-    `
-    <div class="content">
-
-      ${
-        list.length
-        ?list.map(o=>`
-          <div class="card clickable"
-            onclick="
-              currentOrderId='${o.id}';
-              render('courierOrder');
-            ">
-
-            <div class="item-title">
-              ${esc(o.customerName)}
-            </div>
-
-            <div class="item-sub">
-              ${esc(o.partnerName)}
-            </div>
-
-          </div>
-        `).join("")
-        :`
-        <div class="empty">
-          Belum ada pesanan yang diproses.
-        </div>
-        `
-      }
-
-    </div>
-    `,
-    "dashboard"
-  );
-}
-
-/* =========================================================
-   Q. DETAIL PESANAN KURIR
-========================================================= */
-
-function renderCourierOrder(){
-  const o=order(currentOrderId);
-
-  if(!o)return;
-
-  document.getElementById("app").innerHTML=shell(
-    "DETAIL PESANAN",
-    `
-    <div class="content">
-
-      <div class="card">
-
-        <div class="item-title">
-          DATA PELANGGAN
-        </div>
-
-        <div class="customer-data">
-          ${esc(o.customerName)}<br>
-          ${esc(o.customerPhone)}
-        </div>
-
-        ${
-          o.customerLocation?.lat
-          ?`
-          <a
-            class="map-link"
-            target="_blank"
-            href="https://www.google.com/maps?q=${
-              encodeURIComponent(
-                o.customerLocation.lat+
-                ","+
-                o.customerLocation.lon
-              )
-            }">
-            LIHAT LOKASI PELANGGAN
-          </a>
-          `
-          :""
-        }
-
-      </div>
-
-      <div class="card">
-
-        <div class="item-title">
-          MITRA USAHA
-        </div>
-
-        <div class="item-sub">
-          ${esc(o.partnerName)}
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <label class="label">
-          ONGKIR
-        </label>
-
-        <input
-          id="shipping"
-          inputmode="numeric"
-          value="${o.shipping||""}"
-          placeholder="Masukkan ongkir">
-
-        <button class="btn primary"
-          onclick="saveShipping()">
-          SIMPAN ONGKIR
-        </button>
-
-      </div>
-
-      <div class="card">
-
-        <div class="total-line">
-          <span>SUBTOTAL</span>
-          <span>${rupiah(o.subtotal)}</span>
-        </div>
-
-        <div class="total-line">
-          <span>ONGKIR</span>
-          <span>${rupiah(o.shipping)}</span>
-        </div>
-
-        <div class="total-line">
-          <span>TOTAL</span>
-          <span>${rupiah(o.total)}</span>
-        </div>
-
-      </div>
-
-    </div>
-    `,
-    "orders"
-  );
-}
-
-function saveShipping(){
-  const o=order(currentOrderId);
-
-  const shipping=Number(
-    document.getElementById("shipping").value
-  )||0;
-
-  o.shipping=shipping;
-  o.total=o.subtotal+shipping;
-
-  save();
-
-  render("courierOrder");
-}
-
-/* =========================================================
-   R. PEMASUKAN
-========================================================= */
-
-function renderIncome(){
-  const total=data.incomes.reduce(
-    (sum,x)=>sum+Number(x.amount||0),
-    0
-  );
-
-  document.getElementById("app").innerHTML=shell(
-    "PEMASUKAN",
-    `
-    <div class="content">
-
-      <div class="card">
-
-        <div class="item-title">
-          TOTAL PEMASUKAN
-        </div>
-
-        <div
-          style="
-            font-size:20px;
-            font-weight:900;
-            margin-top:5px;
-          ">
-          ${rupiah(total)}
-        </div>
-
-      </div>
-
-      <button class="btn primary"
-        onclick="go('addIncome')">
-        TAMBAH PEMASUKAN
-      </button>
-
-      <div class="section-title">
-        RIWAYAT PEMASUKAN
-      </div>
-
-      ${
-        data.incomes.length
-        ?data.incomes.slice().reverse()
-          .map(x=>`
-            <div class="history">
-
-              <div>
-                ${esc(x.description)}
-                <br>
-                <span class="item-sub">
-                  ${esc(x.date)}
-                </span>
-              </div>
-
-              <div class="money">
-                ${rupiah(x.amount)}
-              </div>
-
-            </div>
-          `).join("")
-        :`
-          <div class="empty">
-            Belum ada pemasukan.
-          </div>
-        `
-      }
-
-    </div>
-    `,
-    "dashboard"
-  );
-}
-
-function renderAddIncome(){
-  document.getElementById("app").innerHTML=shell(
-    "TAMBAH PEMASUKAN",
-    `
-    <div class="content">
-
-      <div class="field">
-        <label class="label">
-          Keterangan
-        </label>
-
-        <input
-          id="incomeDescription"
-          placeholder="Keterangan">
-      </div>
-
-      <div class="field">
-        <label class="label">
-          Harga
-        </label>
-
-        <input
-          id="incomeAmount"
-          inputmode="numeric"
-          placeholder="Harga">
-      </div>
-
-      <button class="btn primary"
-        onclick="addIncome()">
-        TAMBAH PEMASUKAN
-      </button>
-
-    </div>
-    `,
-    "income"
-  );
-}
-
-function addIncome(){
-  const description=document
-    .getElementById("incomeDescription")
-    .value.trim();
-
-  const amount=Number(
-    document.getElementById("incomeAmount").value
-  )||0;
-
-  if(!description||amount<=0){
-    toast("Isi pemasukan dengan benar.");
-    return;
-  }
-
-  data.incomes.push({
-    id:id("PEMASUKAN"),
-    description,
-    amount,
-    date:new Date().toLocaleDateString("id-ID")
-  });
-
-  save();
-
-  go("income");
-}
-
-/* =========================================================
-   S. AKUN KURIR
-========================================================= */
-
-function renderAccount(){
-  const c=data.courier;
-
-  document.getElementById("app").innerHTML=shell(
-    "AKUN",
-    `
-    <div class="content">
-
-      <div class="card">
-
-        <div class="field">
-          <label class="label">Nama</label>
-          <input
-            value="${esc(c.name)}"
-            disabled>
-        </div>
-
-        <div class="field">
-          <label class="label">Nomor Telepon</label>
-          <input
-            value="${esc(c.phone)}"
-            disabled>
-        </div>
-
-        <div class="field">
-          <label class="label">Alamat</label>
-
-          ${addressHTML(
-            c.location?.address
-          )}
-
-        </div>
-
-      </div>
-
-      <button class="btn primary"
-        onclick="editCourier()">
-        EDIT AKUN
-      </button>
-
-    </div>
-    `,
-    "dashboard"
-  );
-}
-
-/* =========================================================
-   T. EDIT AKUN KURIR
-========================================================= */
-
-function editCourier(){
-  const c=data.courier;
-
-  document.getElementById("app").innerHTML=shell(
-    "EDIT AKUN",
-    `
-    <div class="content">
-
-      <div class="field">
-        <label class="label">Nama</label>
-
-        <input id="editName"
-          value="${esc(c.name)}">
-      </div>
-
-      <div class="field">
-        <label class="label">
-          Nomor Telepon
-        </label>
-
-        <input id="editPhone"
-          inputmode="numeric"
-          maxlength="12"
-          value="${esc(c.phone)}">
-      </div>
-
-      <div class="field">
-
-        <label class="label">
-          Alamat
-        </label>
-
-        ${addressHTML(
-          c.location?.address
-        )}
-
-        <button class="btn secondary"
-          onclick="changeCourierLocation()">
-          BAGIKAN LOKASI BARU
-        </button>
-
-      </div>
-
-      <button class="btn primary"
-        onclick="saveCourierEdit()">
-        SIMPAN
-      </button>
-
-    </div>
-    `,
-    "account"
-  );
-}
-
-let editCourierLocationData=null;
-
-function changeCourierLocation(){
-  getLocation(location=>{
-    editCourierLocationData=location;
-
-    const field=document.querySelector(
-      ".field .address-box"
-    );
-
-    if(field){
-      field.outerHTML=addressHTML(
-        location.address
-      );
-    }
-
-    toast("Lokasi berhasil diperbarui.");
-  });
-}
-
-function saveCourierEdit(){
-  const name=document.getElementById(
-    "editName"
-  ).value.trim();
-
-  const phone=document.getElementById(
-    "editPhone"
-  ).value.trim();
-
-  if(!name){
-    toast("Nama harus diisi.");
-    return;
-  }
-
-  if(!/^\d{12}$/.test(phone)){
-    toast("Nomor telepon harus 12 digit.");
-    return;
-  }
-
-  data.courier.name=name;
-  data.courier.phone=phone;
-
-  if(editCourierLocationData){
-    data.courier.location=
-      editCourierLocationData;
-  }
-
-  editCourierLocationData=null;
-
-  save();
-
-  go("account");
-}
-
-/* =========================================================
-   ROUTER RENDER
-========================================================= */
-
-function render(page){
-
-  switch(page){
-
-    case"register":
-      renderRegister();
-      break;
-
-    case"dashboard":
-      renderDashboard();
-      break;
-
-    case"partners":
-      renderPartners();
-      break;
-
-    case"addPartner":
-      renderAddPartner();
-      break;
-
-    case"partnerDetail":
-      renderPartnerDetail();
-      break;
-
-    case"menuEditor":
-      renderMenuEditor();
-      break;
-
-    case"partnerPublic":
-      renderPartnerPublic();
-      break;
-
-    case"customers":
-      renderCustomers();
-      break;
-
-    case"customerRegister":
-      renderCustomerRegister();
-      break;
-
-    case"customerDashboard":
-      renderCustomerDashboard();
-      break;
-
-    case"customerPartnerList":
-      renderCustomerPartnerList();
-      break;
-
-    case"customerPartnerMenu":
-      renderCustomerPartnerMenu();
-      break;
-
-    case"customerOrderResult":
-      renderCustomerOrderResult();
-      break;
-
-    case"customerResults":
-      renderCustomerResults();
-      break;
-
-    case"partnerDashboard":
-      renderPartnerDashboard();
-      break;
-
-    case"partnerOrders":
-      renderPartnerOrders();
-      break;
-
-    case"stockCheckList":
-      renderStockCheckList();
-      break;
-
-    case"stockCheck":
-      renderStockCheck();
-      break;
-
-    case"orders":
-      renderOrders();
-      break;
-
-    case"courierOrder":
-      renderCourierOrder();
-      break;
-
-    case"income":
-      renderIncome();
-      break;
-
-    case"addIncome":
-      renderAddIncome();
-      break;
-
-    case"account":
-      renderAccount();
-      break;
-
-    default:
-      renderDashboard();
-  }
-}
-
-/* =========================================================
-   REFRESH DATA ONLINE
-========================================================= */
-
-setInterval(async()=>{
-  if(location.hash.startsWith("#mitra=")){
-    const pid=decodeURIComponent(location.hash.substring(7));
-    const ok=await loadSharedByPartner(pid);
-    if(ok && partner(pid)){
-      currentPartnerId=pid;
-      render("partnerPublic");
-    }
-    return;
-  }
-
-  if(location.hash.startsWith("#pelanggan=")){
-    const cid=decodeURIComponent(location.hash.substring(11));
-    await loadSharedByCourier(cid);
-    return;
-  }
-
-  if(data.courier?.id){
-    await loadSharedByCourier(data.courier.id);
-  }
-},15000);
-
-/* =========================================================
-   START
-========================================================= */
-
-start();
-
+/* ---------- ERROR / EXTRAS ---------- */
+window.addEventListener("unhandledrejection",e=>console.error(e.reason));
+boot();
 </script>
 </body>
-    </html>
+</html>
