@@ -6,1049 +6,1104 @@
 <title>KURIR SIMPLE</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#f3f5f7;color:#17202a;font-family:Arial,Helvetica,sans-serif}
+:root{
+  --bg:#f4f6f8;--card:#fff;--text:#17202a;--muted:#68727d;
+  --line:#dfe4e8;--primary:#1667d9;--primary2:#0e56bd;
+  --success:#16834a;--danger:#c73535;--closed:#9aa1a8;
+}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
 body{min-height:100vh}
-button,input{font:inherit}
+button,input,textarea{font:inherit}
 button{cursor:pointer}
-#app{width:100%;max-width:520px;margin:0 auto;min-height:100vh;background:#fff}
-.screen{padding:14px 14px 28px;min-height:100vh}
-.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.back{border:0;background:transparent;padding:6px 0;font-weight:700;color:#222}
-.title{text-align:center;font-size:21px;font-weight:800;margin:10px 0 18px}
-.subtitle{text-align:center;font-size:14px;color:#66717c;margin:-8px 0 18px}
-.card{border:1px solid #d9dee3;border-radius:12px;padding:13px;margin:10px 0;background:#fff}
-.label{font-weight:700;font-size:14px;margin:12px 0 6px}
-input{width:100%;border:1px solid #cfd5da;border-radius:9px;padding:11px 12px;background:#fff;outline:none}
-input:focus{border-color:#6b7785}
-.btn{width:100%;border:1px solid #cfd5da;border-radius:9px;background:#fff;padding:11px 12px;margin-top:10px;font-weight:700}
-.btn.primary{background:#17202a;color:#fff;border-color:#17202a}
-.btn.danger{border-color:#d7a5a5;color:#9b2226}
-.btn.small{width:auto;padding:8px 10px;margin:0;font-size:12px}
-.btnrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.muted{color:#6b747d;font-size:13px}
-.address{border:1px solid #cfd5da;border-radius:10px;padding:11px;background:#fafbfc;line-height:1.55;font-size:14px}
-.address b{display:inline-block;min-width:88px}
-.sep{border:0;border-top:1px solid #e5e8eb;margin:14px 0}
-.menu-item{padding:12px 0;border-bottom:1px solid #eceff1}
-.menu-item:last-child{border-bottom:0}
-.menu-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.menu-name{font-weight:800}
-.price{font-weight:700}
-.qty{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.qty button{width:28px;height:28px;border:1px solid #cfd5da;border-radius:7px;background:#fff;font-weight:800}
-.qty span{min-width:22px;text-align:center}
-.variant{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px}
-.variant input{width:auto}
-.variant .grow{flex:1}
-.status{font-weight:800;font-size:12px;margin:5px 0 8px}
-.open{color:#18794e}.closed{color:#7b3f3f}.available{color:#18794e}.sold{color:#9b2226}
-.disabled{opacity:.5;pointer-events:none}
-.notice{padding:10px 11px;border-radius:9px;background:#f3f5f7;margin:10px 0;font-size:13px}
-.totalbar{position:sticky;bottom:0;background:#fff;border-top:1px solid #ddd;padding:12px 0 4px;margin-top:10px}
-.totalrow{display:flex;justify-content:space-between;font-weight:800}
+#app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--bg)}
+.screen{min-height:100vh;padding:16px 14px 28px}
+.header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.back{border:0;background:transparent;padding:8px 4px;font-weight:700;color:var(--primary)}
+.title{font-size:21px;font-weight:800;text-align:center;flex:1}
+.home-title{text-align:center;font-size:22px;font-weight:800;margin:18px 0 30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+label{display:block;font-size:14px;font-weight:700;margin:12px 0 7px}
+input,textarea{
+  width:100%;border:1px solid #cfd6dc;border-radius:10px;padding:12px 11px;
+  background:#fff;color:var(--text);outline:none
+}
+input:focus,textarea:focus{border-color:var(--primary)}
+textarea{min-height:90px;resize:vertical}
+.btn{
+  width:100%;border:0;border-radius:10px;padding:12px 13px;margin-top:10px;
+  background:var(--primary);color:#fff;font-weight:800
+}
+.btn:active{transform:translateY(1px)}
+.btn.secondary{background:#eef3f8;color:#1b2733}
+.btn.success{background:var(--success)}
+.btn.danger{background:var(--danger)}
+.btn.outline{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn.small{width:auto;margin:0;padding:8px 10px;font-size:13px}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
 .center{text-align:center}
-.smalltext{font-size:12px;color:#69737d}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center;z-index:10}
-.modal.show{display:flex}
-.sheet{width:100%;max-width:520px;background:#fff;border-radius:16px 16px 0 0;padding:16px;max-height:88vh;overflow:auto}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#17202a;color:#fff;padding:10px 14px;border-radius:9px;display:none;z-index:30;font-size:13px}
-.toast.show{display:block}
-.linkbox{word-break:break-all;font-size:12px;background:#f7f8f9;border:1px solid #e0e4e7;padding:9px;border-radius:8px}
-.order-line{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin:7px 0}
-.badge{display:inline-block;padding:4px 7px;border-radius:7px;background:#eef1f3;font-size:11px;font-weight:800}
-@media(max-width:360px){.screen{padding:12px}.title{font-size:19px}.grid2{grid-template-columns:1fr}}
+.muted{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:35px 12px}
+.merchant-card.closed{opacity:.6}
+.merchant-name{font-size:18px;font-weight:800}
+.status-row{display:flex;gap:7px;margin-top:10px}
+.status-row button{flex:1}
+.status{
+  display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:800;
+}
+.status.open{background:#e2f5e9;color:#14753f}
+.status.closed{background:#eceef0;color:#697078}
+.link-btn{margin-top:9px}
+.menu-card{padding:13px}
+.menu-name{font-weight:800;font-size:16px}
+.price{font-weight:800;margin-top:4px}
+.menu-actions{display:flex;gap:8px;margin-top:10px}
+.menu-actions button{flex:1}
+.section-title{font-size:15px;font-weight:800;margin:18px 0 8px}
+.variant-box{border:1px solid var(--line);border-radius:11px;padding:11px;margin-top:9px;background:#fafbfc}
+.variant-head{font-weight:800;margin-bottom:8px}
+.radio-line{display:flex;gap:9px;align-items:center;margin:8px 0}
+.radio-line input{width:auto}
+.setting-box{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;background:#fff}
+.setting-title{font-weight:800;margin-bottom:7px}
+.hidden{display:none!important}
+.customer-merchant{border:1px solid var(--line);border-radius:13px;margin-bottom:10px;overflow:hidden;background:#fff}
+.customer-merchant-head{padding:14px}
+.customer-merchant.open{border-color:#b8cbe4}
+.customer-merchant.closed{opacity:.55}
+.customer-menu-list{padding:0 12px 12px}
+.customer-menu{border-top:1px solid var(--line);padding:13px 0}
+.menu-main-row{display:flex;align-items:center;gap:8px}
+.menu-main-row .grow{flex:1}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e9eef3;font-weight:900}
+.qty strong{min-width:18px;text-align:center}
+.variant-option{display:flex;align-items:center;gap:9px;padding:9px 0}
+.variant-option input{width:auto}
+.variant-option .grow{flex:1}
+.variant-qty{margin-left:auto}
+.cart-merchant{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.cart-line{display:flex;justify-content:space-between;gap:10px;padding:5px 0}
+.order-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.order-label{font-weight:900;margin-bottom:10px}
+.order-block{padding:9px 0;border-top:1px solid var(--line)}
+.order-block:first-of-type{border-top:0}
+.timestamp{font-size:12px;color:var(--muted);margin-top:10px}
+.order-total{font-weight:900;margin-top:8px}
+.map-box{height:330px;border-radius:14px;background:#dce7d8;position:relative;overflow:hidden;border:1px solid var(--line)}
+.map-box:before,.map-box:after{content:"";position:absolute;background:#fff;opacity:.85}
+.map-box:before{width:120%;height:18px;left:-10%;top:45%;transform:rotate(-18deg)}
+.map-box:after{width:18px;height:120%;left:54%;top:-10%;transform:rotate(27deg)}
+.pin{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);font-size:38px;z-index:2}
+.map-label{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-weight:900;z-index:2}
+.group-header{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.group-name,.courier-name{font-weight:800}
+.longpress-note{font-size:11px;color:var(--muted);margin-top:5px}
+.share-choice{display:flex;flex-direction:column;gap:9px}
+.share-choice button{text-align:left}
+.detail-wide{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}
+.detail-line{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #edf0f2}
+.detail-line:last-child{border-bottom:0}
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+  background:#1e252c;color:#fff;padding:10px 14px;border-radius:9px;
+  z-index:9999;font-size:13px;max-width:90%;text-align:center
+}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:9000;display:flex;align-items:flex-end;justify-content:center}
+.modal{width:min(520px,100%);background:#fff;border-radius:18px 18px 0 0;padding:18px}
+.modal h3{margin:0 0 10px}
+.share-sheet-btn{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:13px;text-align:left;margin-top:8px;font-weight:700}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+.code-box{font-size:30px;font-weight:900;letter-spacing:7px;text-align:center;padding:16px;border:2px dashed #b9c3cc;border-radius:12px;margin:12px 0}
+.check-line{display:flex;gap:8px;align-items:center;margin-top:10px}
+.check-line input{width:auto}
+.notice{background:#fff8df;border:1px solid #ead48a;border-radius:10px;padding:11px;font-size:13px;margin-top:10px}
+@media(max-width:360px){
+  .screen{padding-left:10px;padding-right:10px}
+  .title{font-size:19px}
+}
 </style>
 </head>
 <body>
 <div id="app"></div>
-<div id="toast" class="toast"></div>
 <script>
-/* =========================================================
-   KURIR SIMPLE
-   Supabase REST API
-   Publishable key aman ditaruh di browser; RLS menentukan
-   data apa yang boleh dibaca/ditulis.
-   ========================================================= */
-const SUPABASE_URL = "https://xkysusfemehvdaqkyzhg.supabase.co";
-const SUPABASE_KEY = "sb_publishable_JDmN5TndzBue7Rsmeiphtw_K2MzPcbA";
-const TABLE = "kurir_simple_data";
-const REST = SUPABASE_URL + "/rest/v1/" + TABLE;
+"use strict";
 
-let state = {
+/* =========================
+   DATA
+========================= */
+const KEY="KURIR_SIMPLE_MASTER_V3";
+const state=JSON.parse(localStorage.getItem(KEY)||"null")||{
   courier:null,
-  partners:[],
-  customers:[],
+  merchants:[],
   orders:[],
-  incomes:[]
+  groups:[],
+  customerCodes:[],
+  customers:[]
 };
-let rowId = null;
-let editingPartnerId = null;
-let editingMenuId = null;
-let currentPartnerId = null;
-let currentOrderId = null;
-let selectedCustomer = null;
-let customerCart = {};
-let publicMode = null;
-
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function id(prefix="id"){return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7)}
+function money(n){return "Rp "+Number(n||0).toLocaleString("id-ID")}
 function esc(v){
-  return String(v ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+  return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))
 }
-function uid(prefix="id"){return prefix+"_"+crypto.randomUUID().replaceAll("-","").slice(0,18)}
-function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0)}
-function now(){return new Date().toISOString()}
+function nowText(){
+  return new Date().toLocaleString("id-ID",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})
+}
+function currentCourier(){
+  return state.courier;
+}
+function merchantById(mid){return state.merchants.find(m=>m.id===mid)}
+function orderById(oid){return state.orders.find(o=>o.id===oid)}
 function toast(msg){
-  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
-  clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2200);
+  const old=document.querySelector(".toast"); if(old)old.remove();
+  const d=document.createElement("div");d.className="toast";d.textContent=msg;
+  document.body.appendChild(d);setTimeout(()=>d.remove(),2200)
 }
-/* ============================================================
-   LINK PUBLIK KURIR SIMPLE
-   Jika aplikasi dijalankan dari GitHub Pages/hosting, alamat
-   publik otomatis mengikuti alamat tersebut. Jika masih dibuka
-   sebagai file lokal, link lokal TIDAK bisa dibuka HP lain.
-   ============================================================ */
-/*
-  ALAMAT PUBLIK APLIKASI.
-  Jika aplikasi sudah di-host di GitHub Pages/hosting, biarkan kosong:
-  kode otomatis memakai alamat halaman tempat aplikasi sedang berjalan.
-  Jika Anda ingin memaksa satu alamat tertentu, isi contoh:
-  const PUBLIC_APP_URL = "https://username.github.io/kurir-simple/";
-*/
-const PUBLIC_APP_URL = ""; // ISI DENGAN ALAMAT GITHUB PAGES, contoh: https://username.github.io/kurir-simple/
-function baseURL(){
-  let raw = PUBLIC_APP_URL.trim();
-  if(raw){
-    if(!/^https?:\/\//i.test(raw)) raw = "https://" + raw;
-    const u = new URL(raw);
-    u.search = "";
-    u.hash = "";
-    return u.href.replace(/\/$/,"") + "/";
-  }
-  if(!isPublicWebURL()) return "";
-  const u = new URL(location.href);
-  u.search = "";
-  u.hash = "";
-  /*
-    Gunakan pathname file aplikasi yang sedang di-host.
-    Contoh GitHub Pages:
-    https://username.github.io/kurir-simple/index.html
-  */
-  return u.href.replace(/\/$/,"") + "/";
+function copyText(text){
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>toast("Link berhasil disalin")).catch(()=>fallbackCopy(text))
+  }else fallbackCopy(text)
 }
-function isPublicWebURL(){
-  return /^https?:$/i.test(location.protocol);
+function fallbackCopy(text){
+  const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();
+  try{document.execCommand("copy");toast("Link berhasil disalin")}catch(e){toast("Link: "+text)}
+  t.remove()
 }
-function q(name){return new URLSearchParams(location.search).get(name)}
-function linkForCourier(){
-  const b=baseURL();
-  return b ? b+"?kurir="+encodeURIComponent(rowId)+"&pelanggan=1" : "";
+function appLink(hash){
+  return location.href.split("#")[0]+hash
 }
-function linkForPartner(pid){
-  const b=baseURL();
-  return b ? b+"?kurir="+encodeURIComponent(rowId)+"&mitra="+encodeURIComponent(pid) : "";
-}
-function ensurePublicLink(){
-  if(!PUBLIC_APP_URL.trim() && !isPublicWebURL()){
-    toast("Aplikasi masih dibuka dari file lokal. Upload ke GitHub Pages agar link dapat dibuka lewat WhatsApp.");
-    return false;
-  }
-  if(!rowId){
-    toast("ID Kurir belum tersedia. Simpan akun Kurir terlebih dahulu.");
-    return false;
-  }
-  return true;
-}
-function headers(extra={}){
-  return Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json","Accept":"application/json"},extra);
-}
-async function api(path="",options={}){
-  const res=await fetch(REST+path,Object.assign({headers:headers()},options));
-  const txt=await res.text();
-  let data=null; try{data=txt?JSON.parse(txt):null}catch{}
-  if(!res.ok){
-    const msg=(data&&data.message)||txt||("HTTP "+res.status);
-    if(/could not find the table .*kurir_simple_data.*schema cache/i.test(msg)){
-      throw new Error("Supabase belum mengenali tabel kurir_simple_data. Jalankan SQL KURIR SIMPLE di Supabase SQL Editor, lalu jalankan: NOTIFY pgrst, 'reload schema';");
-    }
-    throw new Error(msg);
-  }
-  return data;
-}
-async function loadRow(id){
-  const data=await api("?select=*&id=eq."+encodeURIComponent(id)+"&limit=1");
-  if(!data.length) throw new Error("Data Kurir tidak ditemukan.");
-  rowId=data[0].id;
-  state=data[0].data||state;
-  normalize();
-}
-async function createRow(){
-  normalize();
-  const data=await api("",{
-    method:"POST",
-    headers:headers({"Prefer":"return=representation"}),
-    body:JSON.stringify({data:state})
-  });
-  rowId=data[0].id;
-}
-async function save(){
-  if(!rowId) return;
-  normalize();
-  await api("?id=eq."+encodeURIComponent(rowId),{
-    method:"PATCH",
-    headers:headers({"Prefer":"return=minimal"}),
-    body:JSON.stringify({data:state,updated_at:now()})
-  });
-}
-function normalize(){
-  if(!state||typeof state!=="object")state={};
-  state.courier=state.courier||null;
-  state.partners=Array.isArray(state.partners)?state.partners:[];
-  state.customers=Array.isArray(state.customers)?state.customers:[];
-  state.orders=Array.isArray(state.orders)?state.orders:[];
-  state.incomes=Array.isArray(state.incomes)?state.incomes:[];
-  state.partners.forEach(p=>{p.menus=Array.isArray(p.menus)?p.menus:[];p.status=p.status||"CLOSED"});
-  state.partners.forEach(p=>p.menus.forEach(m=>{
-    m.status=m.status||"TERSEDIA";m.hasVariants=!!m.hasVariants;
-    m.variants=Array.isArray(m.variants)?m.variants:[];
-    m.pickRule=m.pickRule||"single";m.priceRule=m.priceRule||"same";
-  }));
-}
-function addressBox(a){
-  if(!a)return `<div class="address muted">Lokasi belum dibagikan.</div>`;
-  return `<div class="address">
-    <div><b>Provinsi</b>${esc(a.province||"-")}</div>
-    <div><b>Kabupaten</b>${esc(a.regency||"-")}</div>
-    <div><b>Kecamatan</b>${esc(a.district||"-")}</div>
-    <div><b>Desa</b>${esc(a.village||"-")}</div>
-  </div>`;
-}
-function back(){
-  /* Navigasi internal aplikasi. Jangan bergantung pada history browser,
-     karena sebagian besar perpindahan halaman KURIR SIMPLE dilakukan
-     dengan render() tanpa mengubah URL. */
-  if(publicMode==="customer") {
-    switch(currentView){
-      case "customerMenu": return renderCustomerPick();
-      case "customerOrders": return renderCustomerPick();
-      case "customerAccount": return renderCustomerPick();
-      case "customerSend": return renderCustomerOrders();
-      default: return showDashboard();
-    }
-  }
-  if(publicMode==="partner") {
-    switch(currentView){
-      case "partnerOrdersPublic": return renderPartnerPublic();
-      case "partnerCheck": return showPartnerOrdersPublic();
-      default: return renderPartnerPublic();
-    }
-  }
+function courierCustomerLink(){return appLink("#pelanggan="+encodeURIComponent(state.courier.id))}
+function merchantLink(mid){return appLink("#mitra="+encodeURIComponent(mid))}
+function formatDate(d){return d||nowText()}
 
-  switch(currentView){
-    case "customerLink": return showDashboard();
-    case "partners": return showDashboard();
-    case "addPartner": return showPartners();
-    case "partner": return showPartners();
-    case "menuAdd": return showPartnerDetail(editingPartnerId || currentPartnerId);
-    case "menuEdit": return showPartnerDetail(editingPartnerId || currentPartnerId);
-    case "variant": return showMenuForm(!!editingMenuId);
-    case "income": return showDashboard();
-    case "account": return showDashboard();
-    case "editAccount": return showAccount();
-    case "ordersCourier": return showAccount();
-    case "orderDetail": return showCourierOrders();
-    case "register":
-      if(state.courier) return showDashboard();
-      if(window.history.length > 1) return window.history.back();
-      return;
-    default:
-      if(window.history.length > 1) return window.history.back();
-      return showDashboard();
-  }
+/* =========================
+   SCREEN HELPERS
+========================= */
+function screen(title,body,back=true){
+  return `<div class="screen">
+    <div class="header">${back?`<button class="back" onclick="goBack()">← KEMBALI</button>`:"<span style='width:72px'></span>"}
+      <div class="title">${esc(title)}</div><span style="width:72px"></span>
+    </div>${body}</div>`
 }
-function render(html){document.getElementById("app").innerHTML=html}
-function header(title,backBtn=true){
-  return `<div class="top">${backBtn?`<button type="button" class="back" onclick="back()">← KEMBALI</button>`:""}</div><div class="title">${title}</div>`;
+let historyStack=[];
+let currentPage="";
+
+function render(html,push=true){
+  if(push&&currentPage)historyStack.push(currentPage);
+  document.getElementById("app").innerHTML=html;
+  window.scrollTo(0,0)
 }
-function requireCourier(){
-  if(!state.courier){showCourierRegister();return false}
-  return true;
+function goBack(){
+  const p=historyStack.pop();
+  if(p){openPage(p,false);return}
+  openDashboard(false)
+}
+function openPage(page,push=true){
+  currentPage=page;
+  if(page==="dashboard")return openDashboard(push);
+  if(page==="merchants")return openMerchants(push);
+  if(page==="addMerchant")return openAddMerchant(push);
+  if(page.startsWith("menus:"))return openMenus(page.split(":")[1],push);
+  if(page.startsWith("addMenu:"))return openAddMenu(page.split(":")[1],push);
+  if(page.startsWith("editMenu:"))return openEditMenu(page.split(":")[1],push);
+  if(page==="orders")return openOrders(push);
+  if(page.startsWith("location:"))return openLocation(page.split(":")[1],push);
+  if(page.startsWith("orderDetail:"))return openOrderDetail(page.split(":")[1],push);
+  if(page==="group")return openGroup(push);
+  if(page.startsWith("groupDetail:"))return openGroupDetail(page.split(":")[1],push);
+  if(page.startsWith("sharePartners:"))return openSharePartners(page.split(":")[1],push);
+  if(page.startsWith("shareDetail:"))return openShareDetail(page.split(":")[1],push);
+  if(page==="customerCode")return openCustomerCode(push);
+  if(page.startsWith("customerHome:"))return openCustomerHome(page.split(":")[1],push);
+  if(page.startsWith("customerCart:"))return openCustomerCart(page.split(":")[1],push);
+  if(page.startsWith("survey:"))return openSurvey(page.split(":")[1],push);
+  if(page==="publicCustomer")return openCustomerLogin(push);
+  if(page.startsWith("publicMerchant:"))return openPublicMerchant(page.split(":")[1],push);
+  if(page.startsWith("customerRegister:"))return openCustomerRegister(page.split(":")[1],push);
+}
+function begin(page){historyStack=[];openPage(page,false)}
+function ensureCourier(){
+  if(!state.courier){begin("register");return false}
+  return true
 }
 
-/* ---------- LOCATION ---------- */
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-
-async function getBestGPSPosition(){
-  if(!navigator.geolocation) throw new Error("Perangkat tidak mendukung lokasi.");
-  return new Promise((resolve,reject)=>{
-    let best=null, finished=false, timer=null, watchId=null;
-    const finish=()=>{
-      if(finished)return;
-      finished=true;
-      if(timer)clearTimeout(timer);
-      if(watchId!==null)navigator.geolocation.clearWatch(watchId);
-      if(best)resolve(best); else reject(new Error("Lokasi tidak berhasil diperoleh."));
-    };
-    const success=pos=>{
-      if(!best || pos.coords.accuracy < best.coords.accuracy) best=pos;
-      /* Hentikan lebih cepat jika akurasi sudah sangat baik. */
-      if(pos.coords.accuracy <= 20) setTimeout(finish,350);
-    };
-    const error=err=>{
-      if(!best && (err.code===1 || err.code===2)){
-        if(timer)clearTimeout(timer);
-        finished=true;
-        if(watchId!==null)navigator.geolocation.clearWatch(watchId);
-        reject(new Error(err.code===1?"Izin lokasi ditolak. Izinkan lokasi untuk browser ini.":"Lokasi belum tersedia."));
-      }
-    };
-    try{
-      watchId=navigator.geolocation.watchPosition(success,error,{
-        enableHighAccuracy:true,
-        timeout:10000,
-        maximumAge:0
-      });
-      timer=setTimeout(finish,10000);
-    }catch(e){reject(e)}
-  });
-}
-
-function firstNonEmpty(...values){
-  return values.find(v=>v!==undefined && v!==null && String(v).trim()!=="") || "";
-}
-
-function administrativeFromBigData(j){
-  const out={province:"",regency:"",district:"",village:""};
-  const arr=Array.isArray(j?.localityInfo?.administrative)?j.localityInfo.administrative:[];
-
-  for(const item of arr){
-    const name=firstNonEmpty(item?.name,item?.description);
-    if(!name)continue;
-    const order=Number(item?.order);
-    const level=String(item?.adminLevel??item?.adminLevelName??"").toLowerCase();
-    const desc=String(item?.description??"").toLowerCase();
-    const text=(level+" "+desc).trim();
-
-    if(/province|provinsi/.test(text) || order===4){
-      out.province ||= name;
-    }else if(/regency|kabupaten|county/.test(text) || order===6){
-      out.regency ||= name;
-    }else if(/district|kecamatan|city district/.test(text) || order===8){
-      out.district ||= name;
-    }else if(/village|desa|kelurahan|subdistrict/.test(text) || order>=10){
-      out.village ||= name;
-    }
-  }
-
-  const info=Array.isArray(j?.localityInfo?.informative)?j.localityInfo.informative:[];
-  const byText=(rx)=>info.find(x=>rx.test(String(x?.description||x?.name||"")))?.name;
-
-  out.province=firstNonEmpty(
-    out.province,
-    j?.principalSubdivision,
-    byText(/province|provinsi/i)
-  );
-  out.regency=firstNonEmpty(
-    out.regency,
-    j?.city,
-    j?.locality,
-    byText(/regency|kabupaten|county/i)
-  );
-  out.district=firstNonEmpty(
-    out.district,
-    j?.district,
-    byText(/district|kecamatan/i)
-  );
-  out.village=firstNonEmpty(
-    out.village,
-    j?.village,
-    j?.suburb,
-    j?.locality,
-    byText(/village|desa|kelurahan|subdistrict/i)
-  );
-
-  return out;
-}
-
-function administrativeFromNominatim(a){
-  return {
-    province:firstNonEmpty(a?.state,a?.province),
-    regency:firstNonEmpty(a?.county,a?.regency,a?.city,a?.municipality),
-    district:firstNonEmpty(a?.city_district,a?.district,a?.subdistrict,a?.municipality),
-    village:firstNonEmpty(a?.village,a?.suburb,a?.town,a?.quarter,a?.neighbourhood)
-  };
-}
-
-function mergeAdministrative(n,b){
-  return {
-    province:firstNonEmpty(n.province,b.province),
-    regency:firstNonEmpty(n.regency,b.regency),
-    district:firstNonEmpty(n.district,b.district),
-    village:firstNonEmpty(n.village,b.village)
-  };
-}
-
-async function reverseLocation(lat,lon){
-  const nomUrl="https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+encodeURIComponent(lat)+"&lon="+encodeURIComponent(lon)+"&zoom=18&addressdetails=1&accept-language=id";
-  const bdcUrl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+encodeURIComponent(lat)+"&longitude="+encodeURIComponent(lon)+"&localityLanguage=id";
-  const results=await Promise.allSettled([
-    fetch(nomUrl,{headers:{"Accept":"application/json"}}).then(r=>{if(!r.ok)throw new Error("Nominatim "+r.status);return r.json()}),
-    fetch(bdcUrl,{headers:{"Accept":"application/json"}}).then(r=>{if(!r.ok)throw new Error("BigDataCloud "+r.status);return r.json()})
-  ]);
-  const nom=results[0].status==="fulfilled"?results[0].value:null;
-  const bdc=results[1].status==="fulfilled"?results[1].value:null;
-  if(!nom && !bdc) throw new Error("Layanan alamat tidak dapat dihubungi.");
-  const na=administrativeFromNominatim(nom?.address||{});
-  const ba=administrativeFromBigData(bdc||{});
-  const ad=mergeAdministrative(na,ba);
-  return {
-    lat:Number(lat),
-    lon:Number(lon),
-    accuracy:null,
-    province:ad.province,
-    regency:ad.regency,
-    district:ad.district,
-    village:ad.village,
-    display:firstNonEmpty(nom?.display_name,bdc?.localityInfo?.informative?.map?.(x=>x?.name).filter(Boolean).join(", "),[ad.village,ad.district,ad.regency,ad.province].filter(Boolean).join(", "))
-  };
-}
-
-async function getLocation(target){
-  if(!navigator.geolocation){toast("Perangkat tidak mendukung lokasi.");return false}
-
-  /*
-     Simpan dulu nilai form yang sedang diketik. Pada halaman pendaftaran,
-     lokasi melakukan rerender sehingga nilai input yang belum tersimpan ke
-     state bisa hilang.
-  */
-  if(target===state.courier && currentView==="register"){
-    const nameEl=document.getElementById("cName");
-    const waEl=document.getElementById("cWa");
-    state.courier=state.courier||{};
-    if(nameEl)state.courier.name=nameEl.value;
-    if(waEl)state.courier.wa=waEl.value.replace(/\D/g,"");
-  }
-
-  toast("Mencari lokasi akurat...");
-  try{
-    const pos=await getBestGPSPosition();
-    const lat=pos.coords.latitude,lon=pos.coords.longitude;
-    const location=await reverseLocation(lat,lon);
-    location.accuracy=Number(pos.coords.accuracy||0);
-
-    /* Jangan mengganti object courier sehingga nama/WA yang sudah diketik
-       tetap berada di state. */
-    target.location=location;
-
-    toast("Lokasi berhasil ditemukan.");
-    rerenderCurrent();
-    return true;
-  }catch(e){
-    toast(e.message||"Lokasi gagal diambil.");
-    rerenderCurrent();
-    return false;
-  }
-}
-
-/* ---------- ROUTING ---------- */
-let currentView="home";
-function rerenderCurrent(){
-  if(publicMode==="customer") return renderCustomer();
-  if(publicMode==="partner") return renderPartnerPublic();
-  switch(currentView){
-    case "register":showCourierRegister();break;
-    case "dashboard":showDashboard();break;
-    case "partners":showPartners();break;
-    case "partner":showPartnerDetail(currentPartnerId);break;
-    case "menuAdd":showMenuForm();break;
-    case "menuEdit":showMenuForm(true);break;
-    case "variant":showVariantSettings();break;
-    case "income":showIncome();break;
-    case "account":showAccount();break;
-    case "editAccount":showEditAccount();break;
-    case "ordersCourier":showCourierOrders();break;
-    case "orderDetail":showOrderDetail(currentOrderId);break;
-    default:showDashboard();
-  }
-}
-async function boot(){
-  const k=q("kurir"),mitra=q("mitra"),pel=q("pelanggan");
-  try{
-    if(k){await loadRow(k)}
-    else{
-      const saved=localStorage.getItem("KURIR_SIMPLE_ROW");
-      if(saved){try{await loadRow(saved)}catch{localStorage.removeItem("KURIR_SIMPLE_ROW")}}
-    }
-    if(k && mitra){publicMode="partner";currentPartnerId=mitra;return renderPartnerPublic()}
-    if(k && pel){publicMode="customer";return renderCustomer()}
-  }catch(e){render(`<div class="screen">${header("KURIR SIMPLE",false)}<div class="notice">${esc(e.message)}</div></div>`);return}
-  if(state.courier) showDashboard(); else showCourierRegister();
-}
-function go(v){
-  publicMode=null;currentView=v;rerenderCurrent();
-}
-
-/* ---------- COURIER REGISTRATION ---------- */
-function showCourierRegister(){
-  currentView="register";publicMode=null;
-  const c=state.courier||{};
+/* =========================
+   DAFTAR AKUN
+========================= */
+function openRegister(){
+  currentPage="register";
   render(`<div class="screen">
-    ${header("DAFTAR AKUN KURIR",true)}
-    <div class="label">Nama</div>
-    <input id="cName" value="${esc(c.name||"")}" placeholder="">
-    <div class="label">Nomor WhatsApp</div>
-    <input id="cWa" inputmode="numeric" maxlength="12" value="${esc(c.wa||"")}" placeholder="12 digit">
-    ${c.location?`<div class="label">Alamat</div>${addressBox(c.location)}`:`<button class="btn" onclick="registerLocation()">BAGIKAN LOKASI</button>`}
-    <button class="btn primary" onclick="finishRegister()">SELESAI</button>
-  </div>`);
-}
-function registerLocation(){
-  state.courier=state.courier||{};
-
-  /* Simpan nama dan nomor sebelum halaman di-rerender oleh proses lokasi. */
-  const nameEl=document.getElementById("cName");
-  const waEl=document.getElementById("cWa");
-  if(nameEl)state.courier.name=nameEl.value;
-  if(waEl)state.courier.wa=waEl.value.replace(/\D/g,"");
-
-  getLocation(state.courier);
-}
-async function finishRegister(){
-  const name=document.getElementById("cName").value.trim();
-  const wa=document.getElementById("cWa").value.replace(/\D/g,"");
-  if(!name)return toast("Nama wajib diisi.");
-  if(wa.length!==12)return toast("Nomor WhatsApp harus 12 digit.");
-  if(!state.courier?.location)return toast("Bagikan lokasi terlebih dahulu.");
-  state.courier={name,wa,location:state.courier.location};
-  try{
-    if(!rowId)await createRow(); else await save();
-    localStorage.setItem("KURIR_SIMPLE_ROW",rowId);
-    showDashboard();
-  }catch(e){toast("Gagal menyimpan: "+e.message)}
-}
-
-/* ---------- DASHBOARD ---------- */
-function showDashboard(){
-  currentView="dashboard";publicMode=null;
-  render(`<div class="screen">
-    <div class="title">KURIR SIMPLE</div>
-    <div class="subtitle">DASHBOARD UTAMA</div>
-    <button class="btn" onclick="go('partners')">MITRA USAHA</button>
-    <button class="btn" onclick="showCustomerLink()">PELANGGAN</button>
-    <button class="btn" onclick="showIncome()">RIWAYAT PEMASUKAN</button>
-    <button class="btn" onclick="showAccount()">AKUN</button>
-  </div>`);
-}
-function showCustomerLink(){
-  currentView="customerLink";publicMode=null;
-  render(`<div class="screen">${header("PELANGGAN",true)}
-    <div class="subtitle">MENU PELANGGAN</div>
-    <button class="btn primary" onclick="ensurePublicLink()&&copyText(linkForCourier())">SALIN LINK</button>
-    <button class="btn" onclick="showCourierOrders()">PESANAN MASUK</button>
-  </div>`);
-}
-/* ---------- PARTNERS ---------- */
-function showPartners(){
-  currentView="partners";publicMode=null;
-  const cards=state.partners.map(p=>`
+    <div class="home-title">DAFTAR AKUN</div>
     <div class="card">
-      <div style="font-weight:800">${esc(p.name)}</div>
-      <div class="muted">WhatsApp: ${esc(p.wa)}</div>
-      <div class="btnrow" style="margin-top:10px">
-        <button class="btn small ${p.status==="OPEN"?"primary":""}" onclick="setPartnerStatus('${p.id}','OPEN')">OPEN</button>
-        <button class="btn small ${p.status==="CLOSED"?"primary":""}" onclick="setPartnerStatus('${p.id}','CLOSED')">CLOSED</button>
+      <label>Nama</label><input id="regName" placeholder="">
+      <label>Nomor Telepon</label><input id="regPhone" inputmode="numeric" maxlength="15" placeholder="">
+      <button class="btn" onclick="saveCourier()">SIMPAN</button>
+    </div>
+  </div>`,false)
+}
+function saveCourier(){
+  const name=document.getElementById("regName").value.trim();
+  const phone=document.getElementById("regPhone").value.trim();
+  if(!name||!phone){toast("Nama dan nomor telepon wajib diisi");return}
+  state.courier=state.courier||{id:id("kurir"),name:"",phone:""};
+  state.courier.name=name;state.courier.phone=phone;save();
+  toast("Akun berhasil disimpan");begin("dashboard")
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+function openDashboard(push=true){
+  if(!state.courier)return openRegister();
+  currentPage="dashboard";
+  render(`<div class="screen">
+    <div class="home-title">DASHBOARD UTAMA</div>
+    <div class="card">
+      <button class="btn" onclick="openPage('merchants')">MITRA USAHA</button>
+      <button class="btn" onclick="openPage('group')">MASUK KE GRUP</button>
+      <button class="btn" onclick="openPage('orders')">PESANAN BARU</button>
+    </div>
+    <div class="card">
+      <div style="font-weight:800">${esc(state.courier.name)}</div>
+      <div class="muted" style="margin-top:4px">${esc(state.courier.phone)}</div>
+      <button class="btn outline" onclick="openPage('customerCode')">KODE PELANGGAN</button>
+      <button class="btn secondary" onclick="copyText(courierCustomerLink())">SALIN LINK PELANGGAN</button>
+    </div>
+  </div>`,push)
+}
+
+/* =========================
+   MITRA
+========================= */
+function openMerchants(push=true){
+  if(!ensureCourier())return;
+  currentPage="merchants";
+  const cards=state.merchants.map(m=>`
+    <div class="card merchant-card ${m.status==='OPEN'?'':'closed'}" onclick="openPage('menus:${m.id}')">
+      <div class="merchant-name">${esc(m.name)}</div>
+      <div class="muted" style="margin-top:5px">WhatsApp: ${esc(m.phone)}</div>
+      <div class="status-row" onclick="event.stopPropagation()">
+        <button class="btn small ${m.status==='OPEN'?'success':''}" onclick="setMerchantStatus('${m.id}','OPEN')">OPEN</button>
+        <button class="btn small ${m.status==='CLOSED'?'danger':''}" onclick="setMerchantStatus('${m.id}','CLOSED')">CLOSED</button>
       </div>
-      <button class="btn" onclick="ensurePublicLink()&&copyText(linkForPartner('${p.id}'))">SALIN LINK</button>
-      <button class="btn" onclick="showPartnerDetail('${p.id}')">BUKA MITRA</button>
+      <button class="btn outline link-btn" onclick="event.stopPropagation();copyText(merchantLink('${m.id}'))">SALIN LINK</button>
     </div>`).join("");
-  render(`<div class="screen">${header("MITRA USAHA",true)}
-    <div class="subtitle">DAFTAR MITRA USAHA DI DESA</div>
-    ${cards||`<div class="notice center">Belum ada Mitra Usaha.</div>`}
-    <button class="btn primary" onclick="showAddPartner()">TAMBAH MITRA USAHA</button>
-  </div>`);
+  render(screen("MITRA USAHA",`
+    ${cards||`<div class="empty">Belum ada mitra usaha.</div>`}
+    <button class="btn" onclick="openPage('addMerchant')">TAMBAH MITRA USAHA</button>
+  `),push)
 }
-async function setPartnerStatus(id,status){
-  const p=state.partners.find(x=>x.id===id);if(!p)return;
-  p.status=status;
-  try{await save();toast("Status "+status+" tersimpan.");showPartners()}catch(e){toast(e.message)}
+function setMerchantStatus(mid,status){
+  const m=merchantById(mid);if(!m)return;
+  m.status=status;save();openMerchants(false)
 }
-function showAddPartner(){
-  currentView="addPartner";publicMode=null;
-  render(`<div class="screen">${header("TAMBAH MITRA USAHA",true)}
-    <div class="label">Nama Mitra Usaha</div><input id="pName">
-    <div class="label">Nomor WhatsApp</div><input id="pWa" inputmode="numeric" maxlength="12">
-    <button class="btn primary" onclick="addPartner()">SIMPAN</button>
-  </div>`);
+function openAddMerchant(push=true){
+  currentPage="addMerchant";
+  render(screen("TAMBAH MITRA USAHA",`
+    <div class="card">
+      <label>Nama Mitra Usaha</label><input id="mName">
+      <label>Nomor WhatsApp</label><input id="mPhone" inputmode="numeric">
+      <button class="btn" onclick="saveMerchant()">SIMPAN</button>
+    </div>
+  `),push)
 }
-async function addPartner(){
-  const name=document.getElementById("pName").value.trim();
-  const wa=document.getElementById("pWa").value.replace(/\D/g,"");
-  if(!name||wa.length!==12)return toast("Nama dan WhatsApp 12 digit wajib diisi.");
-  state.partners.push({id:uid("mitra"),name,wa,status:"CLOSED",menus:[]});
-  try{await save();showPartners()}catch(e){toast(e.message)}
-}
-function showPartnerDetail(pid){
-  currentView="partner";currentPartnerId=pid;publicMode=null;
-  const p=state.partners.find(x=>x.id===pid);if(!p)return showPartners();
-  const menus=p.menus.map(m=>`
-    <div class="menu-item">
-      <div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="price">${rupiah(m.basePrice)}</div></div>
-      <div class="status ${m.status==="TERSEDIA"?"available":"sold"}">${m.status}</div>
-      <div class="btnrow">
-        <button class="btn small" onclick="editMenu('${m.id}')">EDIT</button>
-        <button class="btn small danger" onclick="deleteMenu('${p.id}','${m.id}')">HAPUS</button>
-      </div>
-    </div>`).join("");
-  render(`<div class="screen">${header(esc(p.name),true)}
-    <div class="muted center">DAFTAR MENU</div>
-    <div class="card">${menus||`<div class="muted center">Belum ada menu.</div>`}</div>
-    <button class="btn primary" onclick="addMenu('${pid}')">TAMBAH MENU</button>
-    <button class="btn" onclick="ensurePublicLink()&&copyText(linkForPartner('${pid}'))">SALIN LINK MITRA USAHA</button>
-  </div>`);
-}
-function addMenu(pid){editingPartnerId=pid;editingMenuId=null;showMenuForm(false)}
-function editMenu(mid){editingMenuId=mid;showMenuForm(true)}
-function findEditingMenu(){
-  const p=state.partners.find(x=>x.id===editingPartnerId||x.id===currentPartnerId);
-  const m=p?.menus.find(x=>x.id===editingMenuId);
-  return {p,m}
-}
-function showMenuForm(isEdit){
-  currentView=isEdit?"menuEdit":"menuAdd";
-  if(!editingPartnerId)editingPartnerId=currentPartnerId;
-  const p=state.partners.find(x=>x.id===editingPartnerId);
-  const m=isEdit?p?.menus.find(x=>x.id===editingMenuId):null;
-  if(!p)return showPartners();
-  render(`<div class="screen">${header(isEdit?"EDIT MENU":"TAMBAH MENU",true)}
-    <div class="label">Nama Menu</div><input id="mName" value="${esc(m?.name||"")}">
-    <div class="label">Harga Dasar</div><input id="mPrice" inputmode="numeric" value="${m?.basePrice??""}">
-    ${isEdit?`<div class="notice">Status menu: <b>${esc(m?.status||"TERSEDIA")}</b></div>`:""}
-    <button class="btn" onclick="openVariantSettings()">${m?.hasVariants?"EDIT PENGATURAN VARIAN":"TAMBAH VARIAN"}</button>
-    ${m?.hasVariants?`<div class="notice">${m.pickRule==="single"?"Hanya pilih satu":"Bisa pilih lebih dari satu"} · ${m.priceRule==="different"?"Harga tiap varian beda":"Harga tiap varian sama"}<br>${m.variants.map(v=>esc(v.name)+" "+rupiah(m.priceRule==="different"?v.price:m.basePrice)).join(", ")}</div>`:""}
-    <button class="btn primary" onclick="saveMenu()">SIMPAN</button>
-    ${isEdit?`<button class="btn" onclick="toggleMenuStatus('${m.id}')">UBAH TERSEDIA/HABIS</button>`:""}
-  </div>`);
-}
-async function saveMenu(){
-  const p=state.partners.find(x=>x.id===editingPartnerId);if(!p)return;
+function saveMerchant(){
   const name=document.getElementById("mName").value.trim();
-  const price=Number(document.getElementById("mPrice").value.replace(/\D/g,""));
-  if(!name||!price)return toast("Nama menu dan harga dasar wajib diisi.");
-  let m=editingMenuId?p.menus.find(x=>x.id===editingMenuId):null;
-  if(!m){
-    m={id:uid("menu"),name,basePrice:price,status:"TERSEDIA",hasVariants:false,pickRule:"single",priceRule:"same",variants:[]};
-    p.menus.push(m);
-  }else{m.name=name;m.basePrice=price}
-  try{await save();showPartnerDetail(p.id)}catch(e){toast(e.message)}
+  const phone=document.getElementById("mPhone").value.trim();
+  if(!name||!phone){toast("Data mitra belum lengkap");return}
+  state.merchants.push({
+    id:id("mitra"),courierId:state.courier.id,name,phone,status:"CLOSED",menus:[]
+  });
+  save();toast("Mitra berhasil ditambahkan");openMerchants(false)
 }
-function openVariantSettings(){
-  const p=state.partners.find(x=>x.id===editingPartnerId);let m=editingMenuId?p?.menus.find(x=>x.id===editingMenuId):null;
-  if(!m){
-    const name=document.getElementById("mName").value.trim(),price=Number(document.getElementById("mPrice").value.replace(/\D/g,""));
-    if(!name||!price)return toast("Isi nama dan harga dasar dulu.");
-    m={id:uid("menu"),name,basePrice:price,status:"TERSEDIA",hasVariants:true,pickRule:"single",priceRule:"same",variants:[]};
-    p.menus.push(m);editingMenuId=m.id;
-  }else m.hasVariants=true;
-  showVariantSettings();
+
+/* =========================
+   MENU LIST
+========================= */
+function menuDisplayPrice(menu){
+  if(menu.priceMode==="different"){
+    const p=(menu.variants||[])[0]?.price;
+    return p!=null&&p!==""?money(p):"Harga varian";
+  }
+  return money(menu.price)
 }
-function showVariantSettings(){
-  currentView="variant";
-  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
-  if(!m)return showPartners();
-  const vars=m.variants.map((v,i)=>`
+function openMenus(mid,push=true){
+  const m=merchantById(mid);if(!m){toast("Mitra tidak ditemukan");return}
+  currentPage="menus:"+mid;
+  const list=(m.menus||[]).map(menu=>`
+    <div class="card menu-card">
+      <div class="menu-name">${esc(menu.name)}</div>
+      <div class="price">${menuDisplayPrice(menu)}</div>
+      ${menu.variants?.length?`<div class="muted" style="margin-top:5px">${menu.variants.length} varian</div>`:""}
+      <div class="menu-actions">
+        <button class="btn small outline" onclick="openPage('editMenu:${menu.id}')">EDIT</button>
+        <button class="btn small danger" onclick="deleteMenu('${mid}','${menu.id}')">HAPUS</button>
+      </div>
+    </div>`).join("");
+  render(screen(m.name,`
+    <div class="section-title center">DAFTAR MENU</div>
+    ${list||`<div class="empty">Belum ada menu.</div>`}
+    <button class="btn" onclick="openPage('addMenu:${mid}')">TAMBAH MENU</button>
+  `),push)
+}
+function deleteMenu(mid,menuId){
+  const m=merchantById(mid);if(!m)return;
+  m.menus=m.menus.filter(x=>x.id!==menuId);save();openMenus(mid,false)
+}
+
+/* =========================
+   MENU FORM / VARIANT RULES
+========================= */
+function newMenuDraft(){
+  return {name:"",price:"",choiceMode:"single",priceMode:"same",variants:[]}
+}
+const drafts={};
+
+function openAddMenu(mid,push=true){
+  drafts.add=newMenuDraft();drafts.add.mid=mid;
+  currentPage="addMenu:"+mid;
+  renderAddMenu(mid,false,push)
+}
+function renderAddMenu(mid,showSettings,push=true){
+  const d=drafts.add||newMenuDraft();
+  const priceVisible=d.priceMode==="same";
+  const variants=d.variants||[];
+  let variantHtml="";
+  if(showSettings){
+    variantHtml=variants.map((v,i)=>`
+      <div class="variant-box">
+        <div class="variant-head">Varian ${i+1}</div>
+        <label>Nama Varian</label>
+        <input class="add-v-name" data-index="${i}" value="${esc(v.name)}">
+        ${d.priceMode==="different"?`
+          <label>Harga</label>
+          <input class="add-v-price" data-index="${i}" inputmode="numeric" value="${esc(v.price)}">
+        `:""}
+      </div>`).join("");
+  }
+  render(screen("TAMBAH MENU",`
     <div class="card">
-      <div class="label">Nama Varian</div><input id="vn${i}" value="${esc(v.name)}">
-      <div class="label">Harga Varian</div><input id="vp${i}" inputmode="numeric" value="${v.price||""}">
-      <button class="btn small danger" onclick="removeVariant(${i})">HAPUS VARIAN</button>
-    </div>`).join("");
-  render(`<div class="screen">${header("PENGATURAN VARIAN",true)}
-    <div class="label">Jumlah Pemilihan</div>
-    <div class="grid2">
-      <button class="btn ${m.pickRule==="single"?"primary":""}" onclick="setTempPick('single')">Hanya pilih satu</button>
-      <button class="btn ${m.pickRule==="multi"?"primary":""}" onclick="setTempPick('multi')">Bisa pilih lebih dari satu</button>
+      <label>Nama Menu</label><input id="addMenuName" value="${esc(d.name)}" oninput="drafts.add.name=this.value">
+      ${priceVisible?`<label>Harga</label><input id="addMenuPrice" value="${esc(d.price)}" inputmode="numeric" oninput="drafts.add.price=this.value">`:""}
+      ${showSettings?`
+        <div class="setting-box">
+          <div class="setting-title">PENGATURAN VARIAN</div>
+          <div class="radio-line"><input type="radio" name="addChoice" ${d.choiceMode==="single"?"checked":""} onchange="setAddChoice('single')"><span>Hanya pilih satu</span></div>
+          <div class="radio-line"><input type="radio" name="addChoice" ${d.choiceMode==="multiple"?"checked":""} onchange="setAddChoice('multiple')"><span>Bisa pilih lebih dari satu</span></div>
+          <hr>
+          <div class="setting-title">Harga Varian</div>
+          <div class="radio-line"><input type="radio" name="addPriceMode" ${d.priceMode==="different"?"checked":""} onchange="setAddPriceMode('different')"><span>Harga tiap varian berbeda</span></div>
+          <div class="radio-line"><input type="radio" name="addPriceMode" ${d.priceMode==="same"?"checked":""} onchange="setAddPriceMode('same')"><span>Harga tiap varian sama</span></div>
+        </div>
+        ${variantHtml}
+        <button class="btn secondary" onclick="addVariant('add')">TAMBAH VARIAN</button>
+      `:`<button class="btn secondary" onclick="showAddVariantSettings()">TAMBAH VARIAN</button>`}
+      <button class="btn" onclick="saveNewMenu('${mid}')">SIMPAN</button>
     </div>
-    <div class="label">Aturan Harga Menu</div>
-    <div class="grid2">
-      <button class="btn ${m.priceRule==="different"?"primary":""}" onclick="setTempPrice('different')">Harga tiap varian beda</button>
-      <button class="btn ${m.priceRule==="same"?"primary":""}" onclick="setTempPrice('same')">Harga tiap varian sama</button>
-    </div>
-    <div class="label">Daftar Varian</div>${vars||`<div class="muted">Belum ada varian.</div>`}
-    <button class="btn" onclick="addVariant()">TAMBAH VARIAN</button>
-    <button class="btn primary" onclick="saveVariants()">SIMPAN MENU</button>
-  </div>`);
+  `),push)
 }
-function syncVariantInputs(){
-  const p=state.partners.find(x=>x.id===editingPartnerId);
-  const m=p?.menus.find(x=>x.id===editingMenuId);
-  if(!m||!Array.isArray(m.variants))return;
-  m.variants=m.variants.map((v,i)=>({
-    ...v,
-    name:document.getElementById("vn"+i)?.value.trim() ?? v.name ?? "",
-    price:(document.getElementById("vp"+i)?.value ?? "")!==""
-      ? (Number(document.getElementById("vp"+i).value.replace(/\D/g,""))||0)
-      : (v.price ?? m.basePrice)
-  }));
+function showAddVariantSettings(){
+  const d=drafts.add;
+  d.name=document.getElementById("addMenuName").value.trim();
+  const p=document.getElementById("addMenuPrice");if(p)d.price=p.value;
+  renderAddMenu(d.mid,true,false)
 }
-function setTempPick(v){
-  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
-  if(!m)return;
-  syncVariantInputs();
-  m.pickRule=v;
-  showVariantSettings();
+function setAddChoice(v){drafts.add.choiceMode=v;syncAddDraft();renderAddMenu(drafts.add.mid,true,false)}
+function setAddPriceMode(v){
+  syncAddDraft();drafts.add.priceMode=v;
+  if(v==="same"){
+    drafts.add.variants.forEach(x=>x.price="")
+  }
+  renderAddMenu(drafts.add.mid,true,false)
 }
-function setTempPrice(v){
-  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
-  if(!m)return;
-  syncVariantInputs();
-  m.priceRule=v;
-  showVariantSettings();
+function syncAddDraft(){
+  const d=drafts.add;
+  const n=document.getElementById("addMenuName");if(n)d.name=n.value.trim();
+  const p=document.getElementById("addMenuPrice");if(p)d.price=p.value.trim();
+  document.querySelectorAll(".add-v-name").forEach(x=>d.variants[Number(x.dataset.index)].name=x.value);
+  document.querySelectorAll(".add-v-price").forEach(x=>d.variants[Number(x.dataset.index)].price=x.value);
 }
-function addVariant(){
-  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
-  if(!m)return;
-  syncVariantInputs();
-  m.variants.push({id:uid("var"),name:"",price:m.basePrice});
-  showVariantSettings();
+function addVariant(type){
+  if(type==="add"){
+    syncAddDraft();drafts.add.variants.push({name:"",price:""});
+    renderAddMenu(drafts.add.mid,true,false)
+  }else{
+    syncEditDraft();
+    drafts.edit.variants.push({name:"",price:""});
+    renderEditMenu(drafts.edit.mid,drafts.edit.menuId,false)
+  }
 }
-function removeVariant(i){
-  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
-  if(!m)return;
-  syncVariantInputs();
-  m.variants.splice(i,1);
-  showVariantSettings();
-}
-async function saveVariants(){
-  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===editingMenuId);
-  if(!m)return;
-  syncVariantInputs();
-  m.variants=m.variants.map((v,i)=>({
-    id:v.id||uid("var"),
-    name:(v.name||"").trim()||("Varian "+(i+1)),
-    price:Number(v.price)||m.basePrice
-  }));
-  if(!m.variants.length)return toast("Tambahkan minimal satu varian.");
-  try{await save();showMenuForm(true)}catch(e){toast(e.message)}
-}
-async function toggleMenuStatus(mid){
-  const p=state.partners.find(x=>x.id===editingPartnerId),m=p?.menus.find(x=>x.id===mid);if(!m)return;
-  m.status=m.status==="TERSEDIA"?"HABIS":"TERSEDIA";
-  await save();showMenuForm(true);
-}
-async function deleteMenu(pid,mid){
-  if(!confirm("Hapus menu ini?"))return;
-  const p=state.partners.find(x=>x.id===pid);p.menus=p.menus.filter(m=>m.id!==mid);
-  try{await save();showPartnerDetail(pid)}catch(e){toast(e.message)}
+function saveNewMenu(mid){
+  syncAddDraft();const d=drafts.add;
+  if(!d.name){toast("Nama Menu wajib diisi");return}
+  if(d.priceMode==="same"&&!d.price){toast("Harga wajib diisi");return}
+  if(d.variants.length){
+    if(d.variants.some(v=>!v.name)){toast("Nama varian wajib diisi");return}
+    if(d.priceMode==="different"&&d.variants.some(v=>!v.price)){toast("Harga setiap varian wajib diisi");return}
+  }
+  const m=merchantById(mid);if(!m)return;
+  m.menus.push({
+    id:id("menu"),name:d.name,price:d.price,choiceMode:d.choiceMode,
+    priceMode:d.priceMode,variants:d.variants.map(v=>({name:v.name,price:d.priceMode==="different"?v.price:""}))
+  });
+  save();delete drafts.add;toast("Menu berhasil disimpan");openMenus(mid,false)
 }
 
-/* ---------- PARTNER PUBLIC / ORDERS ---------- */
-function renderPartnerPublic(){
-  publicMode="partner";currentView="partnerPublic";
-  const p=state.partners.find(x=>x.id===currentPartnerId);
-  if(!p)return render(`<div class="screen">${header("MITRA USAHA",false)}<div class="notice">Mitra tidak ditemukan.</div></div>`);
-  const menus=p.menus.map(m=>`
-    <div class="menu-item">
-      <div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="price">${rupiah(m.basePrice)}</div></div>
-      <div class="status ${m.status==="TERSEDIA"?"available":"sold"}">${m.status}</div>
+/* =========================
+   EDIT MENU
+========================= */
+function openEditMenu(menuId,push=true){
+  let found=null;
+  for(const m of state.merchants){
+    const menu=(m.menus||[]).find(x=>x.id===menuId);
+    if(menu){found={m,menu};break}
+  }
+  if(!found){toast("Menu tidak ditemukan");return}
+  drafts.edit={
+    mid:found.m.id,menuId,
+    name:found.menu.name,price:found.menu.price||"",
+    choiceMode:found.menu.choiceMode||"single",
+    priceMode:found.menu.priceMode||"same",
+    variants:(found.menu.variants||[]).map(v=>({name:v.name||"",price:v.price||""}))
+  };
+  currentPage="editMenu:"+menuId;
+  renderEditMenu(found.m.id,menuId,push)
+}
+function renderEditMenu(mid,menuId,push=true){
+  const d=drafts.edit;
+  const variantHtml=d.variants.map((v,i)=>`
+    <div class="variant-box">
+      <div class="variant-head">Varian ${i+1}</div>
+      <label>Nama Varian</label>
+      <input class="edit-v-name" data-index="${i}" value="${esc(v.name)}">
+      ${d.priceMode==="different"?`
+        <label>Harga</label>
+        <input class="edit-v-price" data-index="${i}" inputmode="numeric" value="${esc(v.price)}">
+      `:""}
     </div>`).join("");
-  render(`<div class="screen">${header(esc(p.name),false)}
-    <div class="muted center">DAFTAR MENU</div>
-    <div class="card">${menus||`<div class="muted center">Belum ada menu.</div>`}</div>
-    <button class="btn" onclick="showPartnerOrdersPublic()">PESANAN MASUK</button>
-  </div>`);
+  render(screen("EDIT MENU",`
+    <div class="card">
+      <label>Nama Menu</label><input id="editMenuName" value="${esc(d.name)}">
+      ${d.priceMode==="same"?`<label>Harga</label><input id="editMenuPrice" inputmode="numeric" value="${esc(d.price)}">`:""}
+      <div class="setting-box">
+        <div class="setting-title">PENGATURAN VARIAN</div>
+        ${variantHtml||`<div class="muted">Belum ada varian.</div>`}
+        <button class="btn secondary" onclick="addVariant('edit')">TAMBAH VARIAN</button>
+        <hr>
+        <div class="setting-title">Pengaturan Pilihan</div>
+        <div class="radio-line"><input type="radio" name="editChoice" ${d.choiceMode==="single"?"checked":""} onchange="setEditChoice('single')"><span>Hanya pilih satu</span></div>
+        <div class="radio-line"><input type="radio" name="editChoice" ${d.choiceMode==="multiple"?"checked":""} onchange="setEditChoice('multiple')"><span>Bisa pilih lebih dari satu</span></div>
+        <hr>
+        <div class="setting-title">Harga Varian</div>
+        <div class="radio-line"><input type="radio" name="editPriceMode" ${d.priceMode==="different"?"checked":""} onchange="setEditPriceMode('different')"><span>Harga tiap varian berbeda</span></div>
+        <div class="radio-line"><input type="radio" name="editPriceMode" ${d.priceMode==="same"?"checked":""} onchange="setEditPriceMode('same')"><span>Harga tiap varian sama</span></div>
+      </div>
+      <button class="btn" onclick="saveEditedMenu('${mid}','${menuId}')">SIMPAN</button>
+    </div>
+  `),push)
 }
-function showPartnerOrdersPublic(){
-  currentView="partnerOrdersPublic";
-  const p=state.partners.find(x=>x.id===currentPartnerId);
-  const orders=state.orders.filter(o=>o.partnerIds?.includes(p.id)&&o.status==="SENT_TO_PARTNER");
-  render(`<div class="screen">${header("PESANAN MASUK",true)}
-    ${orders.map(o=>`<div class="card"><b>${esc(o.customer?.name||"Pelanggan")}</b><div class="muted">Pesanan telah dikirim</div><button class="btn" onclick="partnerCheck('${o.id}')">LIHAT PESANAN</button></div>`).join("")||`<div class="notice">Belum ada pesanan masuk.</div>`}
-  </div>`);
+function syncEditDraft(){
+  const d=drafts.edit;if(!d)return;
+  const n=document.getElementById("editMenuName");if(n)d.name=n.value.trim();
+  const p=document.getElementById("editMenuPrice");if(p)d.price=p.value.trim();
+  document.querySelectorAll(".edit-v-name").forEach(x=>d.variants[Number(x.dataset.index)].name=x.value);
+  document.querySelectorAll(".edit-v-price").forEach(x=>d.variants[Number(x.dataset.index)].price=x.value);
 }
-function partnerCheck(oid){
-  currentOrderId=oid;
-  const o=state.orders.find(x=>x.id===oid),p=state.partners.find(x=>x.id===currentPartnerId);
-  const lines=o.items.filter(i=>i.partnerId===p.id);
-  render(`<div class="screen">${header("PENGECEKAN PRODUK",true)}
-    ${lines.map((i,idx)=>`<div class="card"><b>${esc(i.menuName)}${i.variantName?" · "+esc(i.variantName):""}</b><div class="muted">Jumlah: ${i.qty}</div>
-      <div class="btnrow" style="margin-top:8px">
-        <button class="btn small ${i.check!=="KOSONG"?"primary":""}" onclick="setCheck('${oid}',${idx},'ADA')">ADA</button>
-        <button class="btn small ${i.check==="KOSONG"?"primary":""}" onclick="setCheck('${oid}',${idx},'KOSONG')">KOSONG</button>
-      </div></div>`).join("")}
-    <button class="btn primary" onclick="sendCheck('${oid}','${p.id}')">KIRIM HASIL PENGECEKAN</button>
-  </div>`);
+function setEditChoice(v){syncEditDraft();drafts.edit.choiceMode=v;renderEditMenu(drafts.edit.mid,drafts.edit.menuId,false)}
+function setEditPriceMode(v){
+  syncEditDraft();drafts.edit.priceMode=v;
+  if(v==="same")drafts.edit.variants.forEach(x=>x.price="");
+  renderEditMenu(drafts.edit.mid,drafts.edit.menuId,false)
 }
-function setCheck(oid,idx,v){
-  const o=state.orders.find(x=>x.id===oid);
-  const p=state.partners.find(x=>x.id===currentPartnerId);
-  const lines=o.items.filter(i=>i.partnerId===p.id);lines[idx].check=v;renderPartnerCheckKeep(o,p)
-}
-function renderPartnerCheckKeep(o,p){partnerCheck(o.id)}
-async function sendCheck(oid,pid){
-  const o=state.orders.find(x=>x.id===oid);
-  const lines=o.items.filter(i=>i.partnerId===pid);
-  if(lines.some(i=>!i.check))return toast("Tentukan ADA/KOSONG untuk semua produk.");
-  const allDone=o.partnerIds.every(pid2=>o.items.filter(i=>i.partnerId===pid2).every(i=>i.check));
-  o.partnerChecks=o.partnerChecks||{};
-  o.partnerChecks[pid]=true;
-  if(allDone)o.status="CHECKED";
-  try{await save();toast("Hasil pengecekan dikirim.");renderPartnerPublic()}catch(e){toast(e.message)}
+function saveEditedMenu(mid,menuId){
+  syncEditDraft();const d=drafts.edit,m=merchantById(mid);
+  const menu=m?.menus.find(x=>x.id===menuId);
+  if(!menu)return;
+  if(!d.name){toast("Nama Menu wajib diisi");return}
+  if(d.priceMode==="same"&&!d.price){toast("Harga wajib diisi");return}
+  if(d.variants.some(v=>!v.name)){toast("Nama varian wajib diisi");return}
+  if(d.priceMode==="different"&&d.variants.some(v=>!v.price)){toast("Harga setiap varian wajib diisi");return}
+  menu.name=d.name;menu.price=d.price;menu.choiceMode=d.choiceMode;menu.priceMode=d.priceMode;
+  menu.variants=d.variants.map(v=>({name:v.name,price:d.priceMode==="different"?v.price:""}));
+  save();delete drafts.edit;toast("Menu berhasil diperbarui");openMenus(mid,false)
 }
 
-/* ---------- CUSTOMER ---------- */
-function customerHeader(){
-  const c=selectedCustomer||state.customers.find(x=>x.id===localStorage.getItem("KS_CUSTOMER_"+rowId));
-  if(!c)return "";
-  return `<div class="card">
-    <div class="smalltext">AKUN PELANGGAN</div>
-    <div><b>Nama</b> ${esc(c.name)}</div>
-    <div><b>Nomor WA</b> ${esc(c.wa)}</div>
-    <div><b>Alamat</b> ${esc(c.location?.display||[c.location?.village,c.location?.district,c.location?.regency,c.location?.province].filter(Boolean).join(", "))}</div>
-    <button class="btn small" style="margin-top:9px" onclick="customerRelocate()">BAGIKAN ULANG LOKASI</button>
+/* =========================
+   PESANAN KURIR
+========================= */
+function openOrders(push=true){
+  if(!ensureCourier())return;
+  currentPage="orders";
+  const orders=state.orders.filter(o=>o.courierId===state.courier.id);
+  const html=orders.length?orders.map(orderCardCourier).join(""):`<div class="empty">Belum ada pesanan baru.</div>`;
+  render(screen("PESANAN BARU",html),push)
+}
+function orderCardCourier(o){
+  return `<div class="order-card">
+    <div class="order-label">${esc(o.label||"PESANAN")}</div>
+    <div><b>Nama Pelanggan</b><div style="margin-top:4px">${esc(o.customerName)}</div></div>
+    <button class="btn secondary" onclick="openPage('location:${o.id}')">LIHAT LOKASI PEMESAN</button>
+    <button class="btn secondary" onclick="openPage('orderDetail:${o.id}')">LIHAT PESANAN</button>
+    <label>Ongkir</label>
+    <input inputmode="numeric" value="${o.shipping?esc(o.shipping):""}" placeholder="Rp __________" onchange="setShipping('${o.id}',this.value)">
+    ${o.completed?`<div class="notice">Pesanan selesai.</div>`:`<button class="btn success" onclick="completeOrder('${o.id}')">SELESAI</button>`}
+    <div class="timestamp">${esc(o.time)}</div>
+  </div>`
+}
+function setShipping(oid,val){
+  const o=orderById(oid);if(!o)return;
+  o.shipping=Number(String(val).replace(/\D/g,""))||0;
+  save();toast("Ongkir disimpan")
+}
+function completeOrder(oid){
+  const o=orderById(oid);if(!o)return;
+  if(!o.shipping){toast("Masukkan ongkir terlebih dahulu");return}
+  o.completed=true;o.completedAt=nowText();save();openOrders(false)
+}
+function openLocation(oid,push=true){
+  const o=orderById(oid);if(!o)return;
+  currentPage="location:"+oid;
+  render(screen("LIHAT LOKASI PEMESAN",`
+    <div class="map-box">
+      <div class="pin">📍</div>
+      <div class="map-label">LOKASI PELANGGAN</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <b>${esc(o.customerName)}</b>
+      <div class="muted" style="margin-top:5px">${esc(o.locationText||"Lokasi pelanggan terbaru")}</div>
+    </div>
+  `),push)
+}
+function orderItemsTotal(o){
+  return (o.merchants||[]).reduce((sum,mo)=>sum+(mo.items||[]).reduce((a,i)=>a+Number(i.price||0)*Number(i.qty||0),0),0)
+}
+function openOrderDetail(oid,push=true){
+  const o=orderById(oid);if(!o)return;
+  currentPage="orderDetail:"+oid;
+  const blocks=(o.merchants||[]).map(mo=>`
+    <div class="order-block">
+      <b>${esc(mo.merchantName)}</b>
+      ${(mo.items||[]).map(i=>`<div style="margin-top:5px">${esc(i.menuName)}${i.variantName?` — ${esc(i.variantName)}`:""} × ${i.qty}</div>`).join("")}
+    </div>`).join("");
+  render(screen("PESANAN BARU",`
+    <div class="order-card">
+      <div class="order-label">${esc(o.label||"PESANAN")}</div>
+      <div><b>Nama Pelanggan</b><div style="margin-top:4px">${esc(o.customerName)}</div></div>
+      <button class="btn secondary" onclick="openPage('location:${o.id}')">LIHAT LOKASI PEMESAN</button>
+      <div class="section-title">PESANAN</div>
+      ${blocks}
+      <div class="order-block"><b>Ongkir</b><div style="margin-top:4px">${o.shipping?money(o.shipping):"Rp __________"}</div></div>
+      ${o.completed?`<div class="notice">Selesai.</div>`:`<button class="btn success" onclick="completeOrder('${o.id}')">SELESAI</button>`}
+      <div class="timestamp">${esc(o.time)}</div>
+    </div>
+  `),push)
+}
+
+/* =========================
+   GRUP
+========================= */
+function getGroup(){
+  let g=state.groups.find(x=>x.courierId===state.courier.id);
+  if(!g){
+    g={id:id("group"),courierId:state.courier.id,name:"NAMA UTAMA",courierName:state.courier.name,marked:[]};
+    state.groups.push(g);save()
+  }
+  return g
+}
+function openGroup(push=true){
+  if(!ensureCourier())return;
+  const g=getGroup();currentPage="group";
+  const orders=state.orders.filter(o=>o.courierId===state.courier.id);
+  const cards=orders.length?orders.map(o=>groupOrderCard(o,g)).join(""):`
+    <div class="empty"><b>BELUM ADA PESANAN</b><div style="margin-top:9px">Pesanan pelanggan akan muncul di sini.</div></div>`;
+  render(screen("GRUP",`
+    <div class="group-header">
+      <div class="group-name" id="groupName">${esc(g.name)}</div>
+      <div class="courier-name" style="margin-top:5px">${esc(g.courierName)}</div>
+      <div class="longpress-note">Tekan dan tahan nama grup sekitar 1 detik untuk mengedit.</div>
+    </div>
+    ${cards}
+  `),push);
+  enableGroupLongPress(g)
+}
+function enableGroupLongPress(g){
+  const el=document.getElementById("groupName");if(!el)return;
+  let timer;
+  const start=()=>{timer=setTimeout(()=>editGroupName(g),850)}
+  const stop=()=>clearTimeout(timer);
+  el.addEventListener("touchstart",start);el.addEventListener("touchend",stop);el.addEventListener("touchcancel",stop);
+  el.addEventListener("mousedown",start);el.addEventListener("mouseup",stop);el.addEventListener("mouseleave",stop)
+}
+function editGroupName(g){
+  const el=document.getElementById("groupName");if(!el)return;
+  const input=document.createElement("input");input.value=g.name;
+  el.replaceWith(input);input.focus();input.select();
+  const done=()=>{
+    const v=input.value.trim();if(v)g.name=v;save();openGroup(false)
+  };
+  input.addEventListener("blur",done);input.addEventListener("keydown",e=>{if(e.key==="Enter")done()})
+}
+function groupOrderCard(o,g){
+  const marked=(g.marked||[]).includes(o.id);
+  return `<div class="order-card">
+    <div class="order-label">${esc(o.label||"PESANAN")}</div>
+    <div><b>Nama Pelanggan</b><div style="margin-top:4px">${esc(o.customerName)}</div></div>
+    <button class="btn secondary" onclick="openPage('location:${o.id}')">LIHAT LOKASI PEMESAN</button>
+    <button class="btn secondary" onclick="openPage('groupDetail:${o.id}')">LIHAT PESANAN</button>
+    <label class="check-line"><input type="checkbox" ${marked?"checked":""} onchange="toggleMarked('${o.id}',this.checked)"> ${marked?"☑":"□"} TANDAI PESANAN</label>
+    ${marked?`<button class="btn outline" onclick="openPage('sharePartners:${o.id}')">BAGIKAN PESANAN VIA WHATSAPP</button>`:""}
+    <div class="timestamp">${esc(o.time)} <span style="float:right">Ongkir ${o.shipping?money(o.shipping):"Rp —"}</span></div>
+  </div>`
+}
+function toggleMarked(oid,checked){
+  const g=getGroup();g.marked=g.marked||[];
+  if(checked&&!g.marked.includes(oid))g.marked.push(oid);
+  if(!checked)g.marked=g.marked.filter(x=>x!==oid);
+  save();openGroup(false)
+}
+function openGroupDetail(oid,push=true){
+  const o=orderById(oid);if(!o)return;
+  currentPage="groupDetail:"+oid;
+  const g=getGroup();const marked=g.marked.includes(oid);
+  render(screen("GRUP",`
+    <div class="order-card">
+      <div class="order-label">${esc(o.label||"PESANAN")}</div>
+      <div><b>Nama Pelanggan</b><div style="margin-top:4px">${esc(o.customerName)}</div></div>
+      <button class="btn secondary" onclick="openPage('location:${o.id}')">LIHAT LOKASI PEMESAN</button>
+      <div class="section-title">PESANAN</div>
+      ${(o.merchants||[]).map(mo=>`
+        <div class="order-block"><b>${esc(mo.merchantName)}</b>
+          ${(mo.items||[]).map(i=>`<div style="margin-top:5px">${esc(i.menuName)}${i.variantName?` — ${esc(i.variantName)}`:""} × ${i.qty}</div>`).join("")}
+        </div>`).join("")}
+      <label class="check-line"><input type="checkbox" ${marked?"checked":""} onchange="toggleMarked('${o.id}',this.checked)"> ${marked?"☑":"□"} TANDAI PESANAN</label>
+      <div class="timestamp">${esc(o.time)} <span style="float:right">Ongkir ${o.shipping?money(o.shipping):"Rp —"}</span></div>
+    </div>
+  `),push)
+}
+
+/* =========================
+   PILIH MITRA UNTUK BERBAGI
+========================= */
+function openSharePartners(oid,push=true){
+  const o=orderById(oid);if(!o)return;
+  currentPage="sharePartners:"+oid;
+  render(screen("GRUP",`
+    <div class="order-card">
+      <div class="order-label">${esc(o.label||"PESANAN")}</div>
+      <div><b>Nama Pelanggan</b><div style="margin-top:4px">${esc(o.customerName)}</div></div>
+      <div class="section-title">PILIH MITRA UNTUK BERBAGI</div>
+      <div class="share-choice">
+        ${(o.merchants||[]).map(mo=>`<button class="btn outline" onclick="openPage('shareDetail:${o.id}:${mo.merchantId}')">BAGIKAN PESANAN KE ${esc(mo.merchantName)}</button>`).join("")}
+      </div>
+      <div class="timestamp">${esc(o.time)} <span style="float:right">Ongkir ${o.shipping?money(o.shipping):"Rp —"}</span></div>
+    </div>
+  `),push)
+}
+function openShareDetail(raw,push=true){
+  const parts=raw.split(":");const oid=parts[0],mid=parts.slice(1).join(":");
+  const o=orderById(oid);if(!o)return;
+  const mo=(o.merchants||[]).find(x=>x.merchantId===mid);if(!mo)return;
+  currentPage="shareDetail:"+raw;
+  render(screen("DETAIL PESANAN",`
+    <div class="detail-wide">
+      <h3 style="margin-top:0">${esc(mo.merchantName)}</h3>
+      <div><b>Nama Pelanggan:</b> ${esc(o.customerName)}</div>
+      <hr>
+      ${(mo.items||[]).map(i=>`
+        <div class="detail-line">
+          <span>${esc(i.menuName)}${i.variantName?` — ${esc(i.variantName)}`:""} × ${i.qty}</span>
+          <span>${money(Number(i.price||0)*Number(i.qty||0))}</span>
+        </div>`).join("")}
+      <div class="order-total">TOTAL BELANJA: ${money((mo.items||[]).reduce((a,i)=>a+Number(i.price||0)*Number(i.qty||0),0))}</div>
+      <div class="timestamp">${esc(o.label||"PESANAN")} │ Belum dibagikan</div>
+      <button class="btn" onclick="shareMerchantOrder('${oid}','${mid}')">BAGIKAN</button>
+    </div>
+  `),push)
+}
+async function shareMerchantOrder(oid,mid){
+  const o=orderById(oid),mo=(o?.merchants||[]).find(x=>x.merchantId===mid);if(!o||!mo)return;
+  const lines=[
+    "DETAIL PESANAN",
+    "",
+    mo.merchantName,
+    "Nama Pelanggan: "+o.customerName,
+    "",
+    ...(mo.items||[]).map(i=>`${i.menuName}${i.variantName?" — "+i.variantName:""} × ${i.qty} = ${money(Number(i.price||0)*Number(i.qty||0))}`),
+    "",
+    "TOTAL BELANJA: "+money((mo.items||[]).reduce((a,i)=>a+Number(i.price||0)*Number(i.qty||0),0))
+  ];
+  const text=lines.join("\n");
+  if(navigator.share){
+    try{await navigator.share({title:"DETAIL PESANAN",text});toast("Pesanan siap dibagikan");return}catch(e){}
+  }
+  showShareSheet(text)
+}
+function showShareSheet(text){
+  const old=document.querySelector(".modal-backdrop");if(old)old.remove();
+  const b=document.createElement("div");b.className="modal-backdrop";
+  b.innerHTML=`<div class="modal">
+    <h3>BAGIKAN</h3>
+    <div class="muted">Bagikan dengan...</div>
+    <button class="share-sheet-btn" onclick="shareWhatsAppManual()">WhatsApp</button>
+    <button class="share-sheet-btn" onclick="copyText(window.__shareText)">Salin teks pesanan</button>
+    <button class="share-sheet-btn" onclick="document.querySelector('.modal-backdrop').remove()">Tutup</button>
   </div>`;
+  document.body.appendChild(b);window.__shareText=text
 }
-function renderCustomer(){
-  publicMode="customer";
-  const c=state.customers.find(x=>x.id===localStorage.getItem("KS_CUSTOMER_"+rowId));
-  selectedCustomer=c||null;
-  if(!c)return renderCustomerAccount();
-  renderCustomerPick();
+function shareWhatsAppManual(){
+  const text=window.__shareText||"";
+  window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank")
 }
-function renderCustomerAccount(){
-  currentView="customerAccount";
-  render(`<div class="screen">
-    ${header("AKUN PELANGGAN",false)}
-    <div class="label">Nama</div><input id="cuName">
-    <div class="label">Nomor WA</div><input id="cuWa" inputmode="numeric" maxlength="12">
-    ${selectedCustomer?.location?`<div class="label">Alamat Lengkap</div>${addressBox(selectedCustomer.location)}`:`<button class="btn" onclick="customerShareLocation()">BAGIKAN LOKASI</button>`}
-    <button class="btn primary" onclick="saveCustomerAccount()">SIMPAN</button>
-  </div>`);
+
+/* =========================
+   KODE PELANGGAN
+========================= */
+function openCustomerCode(push=true){
+  currentPage="customerCode";
+  const active=state.customerCodes.filter(c=>c.courierId===state.courier.id);
+  render(screen("KODE PELANGGAN",`
+    <div class="card">
+      <label>Nama Pelanggan</label><input id="codeCustomerName">
+      <button class="btn" onclick="createCustomerCode()">BUAT KODE</button>
+    </div>
+    <div class="card">
+      ${active.length?active.map(c=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--line)">
+          <b>${esc(c.customerName)}</b>
+          <div class="code-box" style="font-size:23px">${esc(c.code)}</div>
+          <div class="muted">${c.used?"Sudah digunakan":"Belum digunakan"}</div>
+        </div>`).join(""):`<div class="empty">Belum ada kode pelanggan.</div>`}
+    </div>
+  `),push)
 }
-async function customerShareLocation(){
-  selectedCustomer=selectedCustomer||{};
-  await getLocation(selectedCustomer);
-  renderCustomerAccount();
+function createCustomerCode(){
+  const name=document.getElementById("codeCustomerName").value.trim();if(!name){toast("Nama pelanggan wajib diisi");return}
+  let code="";
+  do{code=String(Math.floor(1000+Math.random()*9000))}while(state.customerCodes.some(c=>c.code===code));
+  state.customerCodes.push({id:id("code"),courierId:state.courier.id,customerName:name,code,used:false,active:false});
+  save();openCustomerCode(false)
 }
-async function saveCustomerAccount(){
-  const name=document.getElementById("cuName").value.trim();
-  const wa=document.getElementById("cuWa").value.replace(/\D/g,"");
-  if(!name||wa.length!==12)return toast("Nama dan WA 12 digit wajib diisi.");
-  if(!selectedCustomer?.location)return toast("Bagikan lokasi terlebih dahulu.");
-  let c=state.customers.find(x=>x.id===selectedCustomer.id);
-  if(!c){c={id:uid("cust"),name,wa,location:selectedCustomer.location};state.customers.push(c)}
-  else{c.name=name;c.wa=wa;c.location=selectedCustomer.location}
-  selectedCustomer=c;localStorage.setItem("KS_CUSTOMER_"+rowId,c.id);
-  try{await save();renderCustomerPick()}catch(e){toast(e.message)}
+
+/* =========================
+   CUSTOMER LOGIN / REGISTRATION
+========================= */
+function openCustomerLogin(push=true){
+  currentPage="publicCustomer";
+  render(screen("LOGIN PELANGGAN",`
+    <div class="card">
+      <label>Kode Pelanggan</label>
+      <input id="customerCodeInput" inputmode="numeric" maxlength="4" placeholder="4 digit">
+      <button class="btn" onclick="verifyCustomerCode()">MASUK</button>
+    </div>
+  `),push)
 }
-async function customerRelocate(){
-  const ok=await getLocation(selectedCustomer);
-  if(!ok)return;
-  const c=state.customers.find(x=>x.id===selectedCustomer.id);if(c){c.location=selectedCustomer.location;await save()}
-  renderCustomerPick();
+function verifyCustomerCode(){
+  const code=document.getElementById("customerCodeInput").value.trim();
+  if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
+  const c=state.customerCodes.find(x=>x.code===code);
+  if(!c){toast("Kode tidak valid");return}
+  if(c.used){toast("Kode sudah digunakan");return}
+  c.used=true;c.active=false;
+  const customer={id:id("cust"),courierId:c.courierId,name:c.customerName,codeId:c.id,location:null,registered:true,firstOrderDone:false};
+  state.customers.push(customer);save();
+  localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
+  openCustomerRegister(customer.id,true)
 }
-function renderCustomerPick(){
-  currentView="customerPick";
-  const partners=state.partners.map(p=>`
-    <div class="card ${p.status==="CLOSED"?"disabled":""}" onclick="${p.status==="OPEN"?`customerOpenPartner('${p.id}')`:""}">
-      <b>${esc(p.name)}</b><div class="status ${p.status==="OPEN"?"open":"closed"}">${p.status}</div>
-    </div>`).join("");
-  render(`<div class="screen">
-    ${customerHeader()}
-    <hr class="sep">
-    <div class="title">PILIH MITRA USAHA</div>
-    ${partners||`<div class="notice">Belum ada Mitra Usaha.</div>`}
-    <button class="btn" onclick="renderCustomerOrders()">LIHAT PESANAN</button>
-  </div>`);
+function openCustomerRegister(cid,push=true){
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  currentPage="customerRegister:"+cid;
+  render(screen("DAFTAR PELANGGAN",`
+    <div class="card">
+      <label>Nama Pelanggan</label>
+      <input id="custName" value="${esc(c.name)}">
+      <div class="section-title">LOKASI</div>
+      <div class="muted">Bagikan lokasi terbaru agar kurir dapat melihat lokasi pemesan.</div>
+      <button class="btn" onclick="shareCustomerLocation('${cid}')">BAGIKAN LOKASI</button>
+      <div id="locationStatus" class="muted" style="margin-top:8px">${c.location?"Lokasi sudah tersimpan.":"Lokasi belum dibagikan."}</div>
+      <button class="btn success" onclick="finishCustomerRegistration('${cid}')">SELESAI</button>
+    </div>
+  `),push)
 }
-function customerOpenPartner(pid){
-  currentPartnerId=pid;customerCart={};renderCustomerMenu();
+function shareCustomerLocation(cid){
+  if(!navigator.geolocation){toast("Perangkat tidak mendukung lokasi");return}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const c=state.customers.find(x=>x.id===cid);if(!c)return;
+    c.location={lat:pos.coords.latitude,lng:pos.coords.longitude,updatedAt:nowText()};
+    save();document.getElementById("locationStatus").textContent="Lokasi sudah tersimpan: "+c.location.lat.toFixed(5)+", "+c.location.lng.toFixed(5)
+  },()=>toast("Izin lokasi belum diberikan"))
 }
-function renderCustomerMenu(){
-  currentView="customerMenu";
-  const p=state.partners.find(x=>x.id===currentPartnerId);if(!p)return renderCustomerPick();
-  let html=p.menus.map(m=>customerMenuHTML(m)).join("");
-  render(`<div class="screen">
-    ${customerHeader()}
-    <hr class="sep"><div class="title">${esc(p.name)}</div>
-    <div>${html||`<div class="notice">Belum ada menu.</div>`}</div>
-    <div class="totalbar"><div class="totalrow"><span>TOTAL</span><span>${rupiah(cartPartnerTotal(p.id))}</span></div><button class="btn primary" onclick="saveCustomerPartnerOrder()">SIMPAN</button></div>
-  </div>`);
+function finishCustomerRegistration(cid){
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  c.name=document.getElementById("custName").value.trim()||c.name;save();
+  openCustomerHome(cid,false)
 }
-function customerMenuHTML(m){
-  const qv=customerCart[m.id]?.qty||0;
-  if(m.status==="HABIS")return `<div class="menu-item disabled"><div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="price">${rupiah(m.basePrice)}</div></div><div class="status sold">HABIS</div></div>`;
-  if(!m.hasVariants)return `<div class="menu-item"><div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="qty"><button onclick="event.stopPropagation();changeCart('${m.id}',null,-1)">−</button><span>${qv}</span><button onclick="event.stopPropagation();changeCart('${m.id}',null,1)">+</button></div></div><div class="price">${rupiah(m.basePrice)}</div></div>`;
-  if(m.pickRule==="single"){
-    const sel=customerCart[m.id]?.variantId||"";
-    return `<div class="menu-item"><div class="menu-head"><div class="menu-name">${esc(m.name)}</div><div class="qty"><button onclick="changeCart('${m.id}',null,-1)">−</button><span>${customerCart[m.id]?.qty||0}</span><button onclick="changeCart('${m.id}',null,1)">+</button></div></div>
-      ${m.variants.map(v=>`<label class="variant"><input type="radio" name="rv_${m.id}" value="${v.id}" ${sel===v.id?"checked":""} onchange="selectVariant('${m.id}','${v.id}')"><span class="grow">${esc(v.name)}</span><span>${rupiah(m.priceRule==="different"?v.price:m.basePrice)}</span></label>`).join("")}</div>`;
+function customerCurrent(){
+  const idc=localStorage.getItem("KURIR_SIMPLE_CURRENT_CUSTOMER");
+  return state.customers.find(c=>c.id===idc)
+}
+
+/* =========================
+   CUSTOMER HOME / MENUS
+========================= */
+const carts={};
+function getCart(cid){
+  if(!carts[cid])carts[cid]={};
+  return carts[cid]
+}
+function cartForMerchant(cid,mid){
+  const cart=getCart(cid);
+  if(!cart[mid])cart[mid]=[];
+  return cart[mid]
+}
+function findCartItem(cid,mid,menuId,variantName){
+  return cartForMerchant(cid,mid).find(i=>i.menuId===menuId&&i.variantName===variantName)
+}
+function cartMerchantHas(cid,mid){
+  return cartForMerchant(cid,mid).length>0
+}
+function openCustomerHome(cid,push=true){
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  currentPage="customerHome:"+cid;
+  const merchants=state.merchants.filter(m=>m.courierId===c.courierId);
+  const openId=window.customerOpenMerchant||null;
+  const cards=merchants.map(m=>{
+    const isOpen=m.status==="OPEN",expanded=openId===m.id;
+    return `<div class="customer-merchant ${isOpen?"":"closed"}">
+      <div class="customer-merchant-head" onclick="${isOpen?`customerOpenMerchant('${cid}','${m.id}')`:"toast('Mitra sedang CLOSED')"}">
+        <div class="merchant-name">${esc(m.name)}</div>
+        <div style="margin-top:5px"><span class="status ${isOpen?"open":"closed"}">${m.status}</span></div>
+        ${cartMerchantHas(cid,m.id)?`<div style="margin-top:6px;color:var(--success);font-weight:800">✓ SUDAH DIPESAN</div>`:""}
+      </div>
+      ${expanded&&isOpen?renderCustomerMenus(cid,m):""}
+    </div>`
+  }).join("");
+  const hasAny=Object.values(getCart(cid)).some(a=>a.length);
+  render(screen("PILIH MITRA USAHA",`
+    <div class="card">
+      <b>${esc(c.name)}</b>
+      <div class="muted" style="margin-top:5px">${c.location?"Lokasi sudah dibagikan":"Lokasi belum dibagikan"}</div>
+      <button class="btn secondary" onclick="shareCustomerLocation('${cid}')">BAGIKAN LOKASI</button>
+    </div>
+    ${cards||`<div class="empty">Belum ada mitra usaha.</div>`}
+    <button class="btn ${hasAny?"":"secondary"}" ${hasAny?"":"disabled"} onclick="openPage('customerCart:${cid}')">LIHAT PESAN</button>
+  `),push)
+}
+function customerOpenMerchant(cid,mid){
+  window.customerOpenMerchant=window.customerOpenMerchant===mid?null:mid;
+  openCustomerHome(cid,false)
+}
+function renderCustomerMenus(cid,m){
+  return `<div class="customer-menu-list">
+    ${(m.menus||[]).length?(m.menus||[]).map(menu=>renderCustomerMenu(cid,m,menu)).join(""):`<div class="empty">Belum ada menu.</div>`}
+  </div>`
+}
+function renderCustomerMenu(cid,m,menu){
+  const cart=cartForMerchant(cid,m.id);
+  if(menu.choiceMode==="multiple"){
+    const rows=(menu.variants||[]).map((v,i)=>{
+      const item=cart.find(x=>x.menuId===menu.id&&x.variantName===v.name);
+      const q=item?.qty||0;
+      const price=menu.priceMode==="different"?Number(v.price||0):Number(menu.price||0);
+      return `<div class="variant-option">
+        <div class="grow"><b>${esc(v.name)}</b>${price?`<div class="muted">${money(price)}</div>`:""}</div>
+        <div class="variant-qty qty">
+          <button onclick="changeMultiQty('${cid}','${m.id}','${menu.id}','${esc(v.name)}',-1)">−</button>
+          <strong>${q}</strong>
+          <button onclick="changeMultiQty('${cid}','${m.id}','${menu.id}','${esc(v.name)}',1)">+</button>
+        </div>
+      </div>`
+    }).join("");
+    return `<div class="customer-menu"><div class="menu-main-row"><div class="grow"><div class="menu-name">${esc(menu.name)}</div>${menu.priceMode==="same"?`<div class="price">${money(menu.price)}</div>`:""}</div></div>${rows}</div>`
   }
-  return `<div class="menu-item"><div class="menu-name">${esc(m.name)}</div>
-    ${m.variants.map(v=>{const q2=customerCart[m.id]?.variants?.[v.id]||0;return `<div class="variant"><span class="grow">${esc(v.name)}</span><span>${rupiah(m.priceRule==="different"?v.price:m.basePrice)}</span><span class="qty"><button onclick="changeCart('${m.id}','${v.id}',-1)">−</button><span>${q2}</span><button onclick="changeCart('${m.id}','${v.id}',1)">+</button></span></div>`}).join("")}</div>`;
+  const selected=cart.find(x=>x.menuId===menu.id);
+  const qty=selected?.qty||0;
+  const selectedName=selected?.variantName||"";
+  const rows=(menu.variants||[]).map(v=>{
+    const price=menu.priceMode==="different"?Number(v.price||0):Number(menu.price||0);
+    return `<label class="variant-option">
+      <input type="radio" name="single_${menu.id}" ${selectedName===v.name?"checked":""} onchange="selectSingleVariant('${cid}','${m.id}','${menu.id}','${esc(v.name)}')">
+      <div class="grow"><b>${esc(v.name)}</b>${menu.priceMode==="different"?`<div class="muted">${money(price)}</div>`:""}</div>
+    </label>`
+  }).join("");
+  return `<div class="customer-menu">
+    <div class="menu-main-row">
+      <div class="grow"><div class="menu-name">${esc(menu.name)}</div>${menu.priceMode==="same"?`<div class="price">${money(menu.price)}</div>`:""}</div>
+      <div class="qty"><button onclick="changeSingleQty('${cid}','${m.id}','${menu.id}',-1)">−</button><strong>${qty}</strong><button onclick="changeSingleQty('${cid}','${m.id}','${menu.id}',1)">+</button></div>
+    </div>
+    ${rows}
+  </div>`
 }
-function selectVariant(mid,vid){customerCart[mid]=customerCart[mid]||{qty:0};customerCart[mid].variantId=vid;renderCustomerMenu()}
-function changeCart(mid,vid,delta){
-  const p=state.partners.find(x=>x.id===currentPartnerId),m=p.menus.find(x=>x.id===mid);
-  customerCart[mid]=customerCart[mid]||{};
-  if(!m.hasVariants){customerCart[mid].qty=Math.max(0,(customerCart[mid].qty||0)+delta)}
-  else if(m.pickRule==="single"){customerCart[mid].qty=Math.max(0,(customerCart[mid].qty||0)+delta)}
-  else{
-    customerCart[mid].variants=customerCart[mid].variants||{};
-    customerCart[mid].variants[vid]=Math.max(0,(customerCart[mid].variants[vid]||0)+delta);
+function selectSingleVariant(cid,mid,menuId,variantName){
+  const cart=cartForMerchant(cid,mid);
+  const menu=merchantById(mid).menus.find(x=>x.id===menuId);
+  const old=cart.find(x=>x.menuId===menuId);
+  const price=menu.priceMode==="different"?Number(menu.variants.find(v=>v.name===variantName)?.price||0):Number(menu.price||0);
+  if(old){old.variantName=variantName;old.price=price}
+  else cart.push({menuId,menuName:menu.name,variantName,qty:1,price});
+  openCustomerHome(cid,false)
+}
+function changeSingleQty(cid,mid,menuId,delta){
+  const cart=cartForMerchant(cid,mid);let item=cart.find(x=>x.menuId===menuId);
+  const menu=merchantById(mid).menus.find(x=>x.id===menuId);
+  if(!item&&delta>0){
+    toast("Pilih varian terlebih dahulu");return
   }
-  renderCustomerMenu();
+  if(item){
+    item.qty+=delta;if(item.qty<=0)cart.splice(cart.indexOf(item),1)
+  }
+  openCustomerHome(cid,false)
 }
-function cartPartnerTotal(pid){
-  const p=state.partners.find(x=>x.id===pid),cart=customerCart;
+function changeMultiQty(cid,mid,menuId,variantName,delta){
+  const cart=cartForMerchant(cid,mid);let item=cart.find(x=>x.menuId===menuId&&x.variantName===variantName);
+  const menu=merchantById(mid).menus.find(x=>x.id===menuId);
+  const v=menu.variants.find(x=>x.name===variantName);
+  const price=menu.priceMode==="different"?Number(v?.price||0):Number(menu.price||0);
+  if(!item&&delta>0){item={menuId,menuName:menu.name,variantName,qty:0,price};cart.push(item)}
+  if(item){
+    item.qty+=delta;if(item.qty<=0)cart.splice(cart.indexOf(item),1)
+  }
+  openCustomerHome(cid,false)
+}
+function saveMerchantCustomerOrder(cid,mid){
+  if(!cartMerchantHas(cid,mid)){toast("Belum ada menu yang dipilih");return}
+  window.customerOpenMerchant=null;openCustomerHome(cid,false);toast("Pesanan mitra disimpan")
+}
+
+/* =========================
+   CUSTOMER CART / SURVEY
+========================= */
+function openCustomerCart(cid,push=true){
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  currentPage="customerCart:"+cid;
+  const cart=getCart(cid);
+  const mids=Object.keys(cart).filter(mid=>cart[mid].length);
   let total=0;
-  p?.menus.forEach(m=>{
-    const c=cart[m.id];if(!c||m.status==="HABIS")return;
-    if(!m.hasVariants)total+=m.basePrice*(c.qty||0);
-    else if(m.pickRule==="single"){
-      if(c.variantId) {
-        const v=m.variants.find(x=>x.id===c.variantId);
-        total+=(m.priceRule==="different"?v?.price:m.basePrice||0)*(c.qty||0);
-      }
-    }else Object.entries(c.variants||{}).forEach(([vid,q])=>{const v=m.variants.find(x=>x.id===vid);total+=(m.priceRule==="different"?v?.price:m.basePrice||0)*q})
-  });return total;
-}
-function cartToItems(pid){
-  const p=state.partners.find(x=>x.id===pid),items=[];
-  p.menus.forEach(m=>{
-    const c=customerCart[m.id];if(!c||m.status==="HABIS")return;
-    if(!m.hasVariants && (c.qty||0)>0)items.push({id:uid("item"),partnerId:pid,menuId:m.id,menuName:m.name,variantId:null,variantName:null,qty:c.qty,unitPrice:m.basePrice,check:null});
-    else if(m.hasVariants&&m.pickRule==="single"&&c.variantId&&c.qty>0){
-      const v=m.variants.find(x=>x.id===c.variantId);items.push({id:uid("item"),partnerId:pid,menuId:m.id,menuName:m.name,variantId:v.id,variantName:v.name,qty:c.qty,unitPrice:m.priceRule==="different"?v.price:m.basePrice,check:null});
-    }else if(m.hasVariants&&m.pickRule==="multi")Object.entries(c.variants||{}).forEach(([vid,q])=>{if(q>0){const v=m.variants.find(x=>x.id===vid);items.push({id:uid("item"),partnerId:pid,menuId:m.id,menuName:m.name,variantId:v.id,variantName:v.name,qty:q,unitPrice:m.priceRule==="different"?v.price:m.basePrice,check:null})}})
-  });return items;
-}
-async function saveCustomerPartnerOrder(){
-  const items=cartToItems(currentPartnerId);if(!items.length)return toast("Pilih menu terlebih dahulu.");
-  let draft=JSON.parse(localStorage.getItem("KS_DRAFT_"+rowId)||"[]");
-  draft=draft.filter(x=>x.partnerId!==currentPartnerId);
-  draft.push({partnerId:currentPartnerId,items});
-  localStorage.setItem("KS_DRAFT_"+rowId,JSON.stringify(draft));
-  toast("Pesanan Mitra disimpan.");
-  renderCustomerPick();
-}
-function getDraft(){
-  try{return JSON.parse(localStorage.getItem("KS_DRAFT_"+rowId)||"[]")}catch{return[]}
-}
-function renderCustomerOrders(){
-  const draft=getDraft();
-  const draftBlocks=draft.map(d=>{
-    const p=state.partners.find(x=>x.id===d.partnerId),sub=d.items.reduce((s,i)=>s+i.qty*i.unitPrice,0);
-    return `<div class="card"><b>${esc(p?.name||"MITRA")}</b>${d.items.map(i=>`<div class="order-line"><span>${esc(i.menuName)}${i.variantName?" "+esc(i.variantName):""} ×${i.qty}</span><span>${rupiah(i.qty*i.unitPrice)}</span></div>`).join("")}<hr class="sep"><div class="totalrow"><span>TOTAL BELANJA MITRA</span><span>${rupiah(sub)}</span></div></div>`
+  const blocks=mids.map(mid=>{
+    const m=merchantById(mid);if(!m)return "";
+    const items=cart[mid];const sub=items.reduce((a,i)=>a+Number(i.price||0)*i.qty,0);total+=sub;
+    return `<div class="cart-merchant"><b>${esc(m.name)}</b>
+      ${items.map(i=>`<div class="cart-line"><span>${esc(i.menuName)}${i.variantName?` — ${esc(i.variantName)}`:""} × ${i.qty}</span><span>${money(i.price*i.qty)}</span></div>`).join("")}
+      <div class="order-total">Subtotal: ${money(sub)}</div>
+    </div>`
   }).join("");
-  const total=draft.reduce((s,d)=>s+d.items.reduce((a,i)=>a+i.qty*i.unitPrice,0),0);
-  const submitted=state.orders.filter(o=>o.customer?.id===selectedCustomer?.id && (o.status==="SENT_TO_PARTNER"||o.status==="CHECKED"||o.status==="READY_FOR_COURIER"));
-  const submittedBlocks=submitted.map(o=>{
-    const result=o.items.map(i=>`<div class="order-line"><span>${esc(i.menuName)}${i.variantName?" "+esc(i.variantName):""} ×${i.qty}</span><span>${esc(i.check||"MENUNGGU")}</span></div>`).join("");
-    const sub=o.items.filter(i=>i.check!=="KOSONG").reduce((s,i)=>s+i.qty*i.unitPrice,0);
-    let action="";
-    if(o.status==="CHECKED") action=`<button class="btn primary" onclick="processCheckedOrder('${o.id}')">PROSES PESANAN SAYA</button><button class="btn danger" onclick="cancelCustomerOrder('${o.id}')">BATALKAN PESANAN</button>`;
-    else if(o.status==="READY_FOR_COURIER") action=`<div class="notice">Pesanan sudah diproses dan diteruskan kepada Kurir.</div>`;
-    else action=`<div class="notice">Menunggu hasil pengecekan Mitra.</div>`;
-    return `<div class="card"><b>HASIL PENGECEKAN PESANAN</b>${result}<hr class="sep"><div class="totalrow"><span>SUBTOTAL TERSEDIA</span><span>${rupiah(sub)}</span></div>${action}</div>`;
-  }).join("");
-  render(`<div class="screen">${customerHeader()}<hr class="sep">
-    <div class="title">LIHAT PESANAN</div>
-    ${draftBlocks||`<div class="notice">Belum ada pesanan baru yang tersimpan.</div>`}
-    ${draft.length?`<div class="totalbar"><div class="totalrow"><span>TOTAL SELURUH BELANJA</span><span>${rupiah(total)}</span></div><button class="btn primary" onclick="sendCustomerOrder()">KIRIM PESANAN</button></div>`:""}
-    ${submittedBlocks}
-  </div>`);
+  render(screen("LIHAT PESAN",`
+    ${blocks||`<div class="empty">Belum ada pesanan.</div>`}
+    <div class="card">
+      <div class="cart-line"><b>TOTAL BELANJA</b><b>${money(total)}</b></div>
+      <div class="cart-line"><span>Ongkir</span><span>Rp —</span></div>
+      <div class="cart-line"><b>TOTAL PEMBAYARAN</b><b>Rp —</b></div>
+      <div class="notice">Total pembayaran akan dihitung setelah ongkir diberikan oleh kurir.</div>
+      <button class="btn" onclick="openPage('survey:${cid}')">SURVEI & KIRIM</button>
+    </div>
+  `),push)
 }
-async function processCheckedOrder(oid){
-  const o=state.orders.find(x=>x.id===oid);if(!o)return;
-  o.items=o.items.filter(i=>i.check!=="KOSONG");
-  o.status="READY_FOR_COURIER";
-  o.total=o.items.reduce((s,i)=>s+i.qty*i.unitPrice,0)+(o.shippingFee||0);
-  try{await save();toast("Pesanan diproses.");renderCustomerOrders()}catch(e){toast(e.message)}
+function openSurvey(cid,push=true){
+  currentPage="survey:"+cid;
+  render(screen("SURVEI",`
+    <div class="card">
+      <div class="notice">SURVEI WAJIB DILEWATI SEBELUM PESANAN DIKIRIM.</div>
+      <p class="muted">Isi survei yang telah ditentukan untuk pesanan ini.</p>
+      <div class="card" style="margin:12px 0 0">
+        <label>Survei</label>
+        <textarea id="surveyAnswer" placeholder="Isi jawaban survei"></textarea>
+      </div>
+      <button class="btn" onclick="submitSurveyAndOrder('${cid}')">SELESAI SURVEI</button>
+    </div>
+  `),push)
 }
-async function cancelCustomerOrder(oid){
-  const o=state.orders.find(x=>x.id===oid);if(!o)return;
-  o.status="CANCELLED";
-  try{await save();toast("Pesanan dibatalkan.");renderCustomerOrders()}catch(e){toast(e.message)}
+function submitSurveyAndOrder(cid){
+  const answer=document.getElementById("surveyAnswer").value.trim();
+  if(!answer){toast("Survei wajib diisi");return}
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  const cart=getCart(cid);const mids=Object.keys(cart).filter(mid=>cart[mid].length);
+  if(!mids.length){toast("Belum ada pesanan");return}
+  /*
+    Alur master memiliki ketergantungan ongkir sebelum KIRIM,
+    sementara ongkir diisi kurir setelah menerima pesanan.
+    Karena itu pesanan disimpan sebagai draft terkirim dengan shipping 0,
+    dan kurir mengisi ongkir sebelum SELESAI.
+  */
+  const merchants=mids.map(mid=>{
+    const m=merchantById(mid);
+    return {
+      merchantId:mid,merchantName:m.name,
+      items:cart[mid].map(i=>({menuId:i.menuId,menuName:i.menuName,variantName:i.variantName,qty:i.qty,price:i.price}))
+    }
+  });
+  const o={
+    id:id("order"),courierId:c.courierId,customerId:c.id,customerName:c.name,
+    customerLocation:c.location,locationText:c.location?`${c.location.lat}, ${c.location.lng}`:"",
+    merchants,time:nowText(),shipping:0,completed:false,label:"PESANAN "+String(state.orders.length+1).padStart(2,"0"),
+    survey:{completed:true,answer}
+  };
+  state.orders.push(o);
+  c.firstOrderDone=true;
+  const code=state.customerCodes.find(x=>x.id===c.codeId);if(code)code.active=true;
+  save();
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  openCustomerSent(cid,false)
 }
-async function sendCustomerOrder(){
-  const draft=getDraft();if(!draft.length)return toast("Belum ada pesanan.");
-  const c=selectedCustomer||state.customers.find(x=>x.id===localStorage.getItem("KS_CUSTOMER_"+rowId));
-  const items=draft.flatMap(d=>d.items);
-  const partnerIds=[...new Set(items.map(i=>i.partnerId))];
-  const order={id:uid("ord"),createdAt:now(),customer:{id:c.id,name:c.name,wa:c.wa,location:c.location},partnerIds,items,status:"SENT_TO_PARTNER",partnerChecks:{},courierId:rowId,shippingFee:0,total:items.reduce((s,i)=>s+i.qty*i.unitPrice,0)};
-  state.orders.push(order);
-  localStorage.removeItem("KS_DRAFT_"+rowId);
-  try{await save();currentOrderId=order.id;currentView="customerSend";render(`<div class="screen">${header("KIRIM PESANAN",false)}<div class="card center"><b>PESANAN AKAN DIKIRIM KE KURIR</b></div><button class="btn primary" onclick="renderCustomerPick()">KEMBALI KE PILIH MITRA USAHA</button></div>`)}catch(e){toast(e.message)}
-}
-
-/* ---------- COURIER ORDERS ---------- */
-function showCourierOrders(){
-  currentView="ordersCourier";
-  const orders=state.orders.filter(o=>o.status==="CHECKED"||o.status==="READY_FOR_COURIER");
-  render(`<div class="screen">${header("PESANAN MASUK",true)}
-    ${orders.map(o=>`<div class="card"><b>Nama Pelanggan: ${esc(o.customer?.name)}</b><div class="label">Lokasi Pelanggan</div><button class="btn" onclick="openMap('${encodeURIComponent(o.customer?.location?.lat||"")}','${encodeURIComponent(o.customer?.location?.lon||"")}')">LIHAT LOKASI</button><div class="label">Mitra Usaha</div>${o.partnerIds.map(pid=>esc(state.partners.find(p=>p.id===pid)?.name||"")).join(", ")}<div class="label">Ongkir</div><input id="ongkir_${o.id}" inputmode="numeric" value="${o.shippingFee||""}"><button class="btn primary" onclick="saveOngkir('${o.id}')">SIMPAN ONGKIR</button><button class="btn" onclick="showOrderDetail('${o.id}')">LIHAT DETAIL</button></div>`).join("")||`<div class="notice">Belum ada pesanan siap diproses Kurir.</div>`}
-  </div>`);
-}
-function openMap(lat,lon){
-  if(!lat||!lon)return toast("Lokasi belum tersedia.");
-  window.open("https://www.google.com/maps?q="+decodeURIComponent(lat)+","+decodeURIComponent(lon),"_blank");
-}
-async function saveOngkir(oid){
-  const o=state.orders.find(x=>x.id===oid),el=document.getElementById("ongkir_"+oid);
-  const fee=Number(el.value.replace(/\D/g,""));if(!fee)return toast("Ongkir wajib diisi.");
-  o.shippingFee=fee;o.total=o.items.reduce((s,i)=>s+i.qty*i.unitPrice,0)+fee;o.status="READY_FOR_COURIER";
-  state.incomes.push({id:uid("inc"),date:now(),orderId:oid,amount:fee});
-  try{await save();toast("Ongkir tersimpan.");showCourierOrders()}catch(e){toast(e.message)}
-}
-function showOrderDetail(oid){
-  currentView="orderDetail";currentOrderId=oid;
-  const o=state.orders.find(x=>x.id===oid);if(!o)return showCourierOrders();
-  const lines=o.items.map(i=>`<div class="order-line"><span>${esc(i.menuName)}${i.variantName?" "+esc(i.variantName):""} ×${i.qty}</span><span>${rupiah(i.qty*i.unitPrice)}</span></div>`).join("");
-  const sub=o.items.reduce((s,i)=>s+i.qty*i.unitPrice,0);
-  render(`<div class="screen">${header("DETAIL PESANAN",true)}
-    <div class="card"><b>${esc(state.partners.find(p=>p.id===o.partnerIds[0])?.name||"MITRA USAHA")}</b>${lines}<hr class="sep"><div class="order-line"><span>Subtotal</span><span>${rupiah(sub)}</span></div><div class="order-line"><span>Ongkir</span><span>${rupiah(o.shippingFee)}</span></div><hr class="sep"><div class="totalrow"><span>Total</span><span>${rupiah(o.total)}</span></div></div>
-  </div>`);
-}
-
-/* ---------- INCOME / ACCOUNT ---------- */
-function showIncome(){
-  currentView="income";publicMode=null;
-  const groups={};
-  state.incomes.forEach(i=>{const d=i.date.slice(0,10);(groups[d]??=[]).push(i)});
-  const html=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([d,arr])=>`<div class="card"><b>${d}</b>${arr.map(i=>`<div class="order-line"><span>Ongkir</span><span>${rupiah(i.amount)}</span></div>`).join("")}<hr class="sep"><div class="totalrow"><span>TOTAL</span><span>${rupiah(arr.reduce((s,i)=>s+i.amount,0))}</span></div></div>`).join("");
-  render(`<div class="screen">${header("RIWAYAT PEMASUKAN",true)}${html||`<div class="notice">Belum ada pemasukan.</div>`}</div>`);
-}
-function showAccount(){
-  currentView="account";publicMode=null;
-  const c=state.courier;
-  render(`<div class="screen">${header("AKUN",true)}
-    <div class="card"><div class="label">Nama</div>${esc(c.name)}<div class="label">Nomor WhatsApp</div>${esc(c.wa)}<div class="label">Alamat</div>${addressBox(c.location)}</div>
-    <button class="btn primary" onclick="showEditAccount()">EDIT AKUN</button>
-  </div>`);
-}
-function showEditAccount(){
-  currentView="editAccount";publicMode=null;const c=state.courier;
-  render(`<div class="screen">${header("EDIT AKUN KURIR",true)}
-    <div class="label">Nama</div><input id="ecName" value="${esc(c.name)}">
-    <div class="label">Nomor WhatsApp</div><input id="ecWa" inputmode="numeric" maxlength="12" value="${esc(c.wa)}">
-    <div class="label">Alamat</div>${addressBox(c.location)}
-    <button class="btn" onclick="editCourierLocation()">BAGIKAN ULANG LOKASI</button>
-    <button class="btn primary" onclick="saveAccount()">SIMPAN</button>
-  </div>`);
-}
-async function editCourierLocation(){const ok=await getLocation(state.courier);if(ok)showEditAccount()}
-async function saveAccount(){
-  const n=document.getElementById("ecName").value.trim(),w=document.getElementById("ecWa").value.replace(/\D/g,"");
-  if(!n||w.length!==12)return toast("Nama dan WA 12 digit wajib diisi.");
-  state.courier.name=n;state.courier.wa=w;
-  try{await save();showAccount()}catch(e){toast(e.message)}
-}
-async function copyText(text){
-  try{await navigator.clipboard.writeText(text);toast("Link berhasil disalin.");}
-  catch{const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();toast("Link berhasil disalin.");}
+function openCustomerSent(cid,push=true){
+  currentPage="customerSent:"+cid;
+  render(screen("PESANAN TERKIRIM",`
+    <div class="card center">
+      <div style="font-size:42px">✓</div>
+      <h3>Pesanan berhasil dikirim</h3>
+      <p class="muted">Pesanan sudah diteruskan kepada kurir.</p>
+      <button class="btn" onclick="openCustomerHome('${cid}')">KEMBALI KE MENU</button>
+    </div>
+  `),push)
 }
 
-/* ---------- ERROR / EXTRAS ---------- */
-window.addEventListener("unhandledrejection",e=>console.error(e.reason));
-boot();
+/* =========================
+   PUBLIC LINKS
+========================= */
+function openPublicMerchant(mid,push=true){
+  const m=merchantById(mid);if(!m)return;
+  currentPage="publicMerchant:"+mid;
+  const menus=(m.menus||[]).map(menu=>`
+    <div class="card">
+      <div class="menu-name">${esc(menu.name)}</div>
+      ${menu.priceMode==="same"?`<div class="price">${money(menu.price)}</div>`:`<div class="muted" style="margin-top:5px">Harga mengikuti varian</div>`}
+      ${(menu.variants||[]).map(v=>`<div style="padding:6px 0;border-top:1px solid var(--line);margin-top:6px">
+        ${esc(v.name)} ${menu.priceMode==="different"?`— ${money(v.price)}`:""}
+      </div>`).join("")}
+    </div>`).join("");
+  render(screen(m.name,`
+    <div class="card">
+      <span class="status ${m.status==="OPEN"?"open":"closed"}">${m.status}</span>
+      ${m.status==="CLOSED"?`<div class="notice">Mitra sedang CLOSED dan tidak dapat menerima pesanan.</div>`:""}
+    </div>
+    <div class="section-title center">DAFTAR MENU</div>
+    ${menus||`<div class="empty">Belum ada menu.</div>`}
+  `),push)
+}
+
+/* =========================
+   ROUTER
+========================= */
+function route(){
+  const hash=location.hash||"";
+  if(!hash){return state.courier?begin("dashboard"):openRegister()}
+  if(hash.startsWith("#mitra=")){
+    const mid=decodeURIComponent(hash.slice(7));return begin("publicMerchant:"+mid)
+  }
+  if(hash.startsWith("#pelanggan=")||hash==="#pelanggan"){
+    const cid=customerCurrent()?.id;
+    if(cid)return begin("customerHome:"+cid);
+    return begin("publicCustomer")
+  }
+  if(hash==="#dashboard")return begin("dashboard");
+  if(state.courier)return begin("dashboard");
+  openRegister()
+}
+window.addEventListener("hashchange",route);
+
+/* =========================
+   INIT
+========================= */
+if(state.courier)begin("dashboard");else openRegister();
 </script>
 </body>
 </html>
