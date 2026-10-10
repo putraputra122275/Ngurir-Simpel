@@ -170,11 +170,36 @@ function fallbackCopy(text){
   try{document.execCommand("copy");toast("Link berhasil disalin")}catch(e){toast("Link: "+text)}
   t.remove()
 }
-function appLink(hash){
-  return location.href.split("#")[0]+hash
+/*
+   LINK PUBLIK UNIVERSAL
+   Isi APP_PUBLIC_URL jika aplikasi ditempatkan pada alamat web tertentu.
+   Contoh: https://contoh-domain-anda.com/
+   Jika dikosongkan, alamat halaman yang sedang dibuka akan dipakai.
+*/
+const APP_PUBLIC_URL = "";
+function publicBaseUrl(){
+  if(APP_PUBLIC_URL.trim()) return APP_PUBLIC_URL.trim().replace(/[?#]+$/g, "");
+  // file:// saat dijalankan dari Acode: pertahankan alamat file lokal untuk pengujian di HP yang sama.
+  // http(s):// saat di-hosting: gunakan URL publik, termasuk subfolder GitHub Pages.
+  if(window.location.protocol === "file:"){
+    return window.location.href.split("?")[0].split("#")[0];
+  }
+  return window.location.origin + window.location.pathname;
 }
-function courierCustomerLink(){return appLink("#pelanggan="+encodeURIComponent(state.courier.id))}
-function merchantLink(mid){return appLink("#mitra="+encodeURIComponent(mid))}
+function appLink(params){
+  const base=publicBaseUrl();
+  const u=new URL(base,window.location.href);
+  u.hash="";
+  Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,v));
+  return u.toString();
+}
+function courierCustomerLink(){return appLink({pelanggan:state.courier.id})}
+function merchantLink(mid){return appLink({mitra:mid})}
+function setPendingMerchant(mid){localStorage.setItem("KURIR_SIMPLE_PENDING_MERCHANT",mid)}
+function getPendingMerchant(){return localStorage.getItem("KURIR_SIMPLE_PENDING_MERCHANT")}
+function clearPendingMerchant(){localStorage.removeItem("KURIR_SIMPLE_PENDING_MERCHANT")}
+function setPendingCourier(cid){if(cid)localStorage.setItem("KURIR_SIMPLE_PENDING_COURIER",cid);else localStorage.removeItem("KURIR_SIMPLE_PENDING_COURIER")}
+function getPendingCourier(){return localStorage.getItem("KURIR_SIMPLE_PENDING_COURIER")}
 function formatDate(d){return d||nowText()}
 
 /* =========================
@@ -804,6 +829,18 @@ function verifyCustomerCode(){
   const c=state.customerCodes.find(x=>x.code===code);
   if(!c){toast("Kode tidak valid");return}
   if(c.used){toast("Kode sudah digunakan");return}
+  const pending=getPendingMerchant();
+  const merchant=pending?merchantById(pending):null;
+  const pendingCourier=getPendingCourier();
+  if(pendingCourier&&pendingCourier!==c.courierId){
+    setPendingCourier(null);
+    toast("Kode pelanggan tidak sesuai dengan link kurir ini");return
+  }
+  if(merchant&&merchant.courierId!==c.courierId){
+    clearPendingMerchant();
+    toast("Link mitra bukan milik kode pelanggan ini");return
+  }
+  setPendingCourier(null);
   c.used=true;c.active=false;
   const customer={id:id("cust"),courierId:c.courierId,name:c.customerName,codeId:c.id,location:null,registered:true,firstOrderDone:false};
   state.customers.push(customer);save();
@@ -835,6 +872,7 @@ function shareCustomerLocation(cid){
 }
 function finishCustomerRegistration(cid){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  if(!c.location){toast("Bagikan lokasi terlebih dahulu");return}
   c.name=document.getElementById("custName").value.trim()||c.name;save();
   openCustomerHome(cid,false)
 }
@@ -866,6 +904,11 @@ function openCustomerHome(cid,push=true){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
   currentPage="customerHome:"+cid;
   const merchants=state.merchants.filter(m=>m.courierId===c.courierId);
+  const pending=getPendingMerchant();
+  if(pending&&merchants.some(m=>m.id===pending)){
+    window.customerOpenMerchant=pending;
+    clearPendingMerchant();
+  }
   const openId=window.customerOpenMerchant||null;
   const cards=merchants.map(m=>{
     const isOpen=m.status==="OPEN",expanded=openId===m.id;
@@ -894,8 +937,10 @@ function customerOpenMerchant(cid,mid){
   openCustomerHome(cid,false)
 }
 function renderCustomerMenus(cid,m){
+  const hasMenus=(m.menus||[]).length>0;
   return `<div class="customer-menu-list">
-    ${(m.menus||[]).length?(m.menus||[]).map(menu=>renderCustomerMenu(cid,m,menu)).join(""):`<div class="empty">Belum ada menu.</div>`}
+    ${hasMenus?(m.menus||[]).map(menu=>renderCustomerMenu(cid,m,menu)).join(""):`<div class="empty">Belum ada menu.</div>`}
+    ${hasMenus?`<button class="btn" onclick="saveMerchantCustomerOrder('${cid}','${m.id}')">SIMPAN</button>`:""}
   </div>`
 }
 function renderCustomerMenu(cid,m,menu){
@@ -1060,40 +1105,63 @@ function openCustomerSent(cid,push=true){
    PUBLIC LINKS
 ========================= */
 function openPublicMerchant(mid,push=true){
-  const m=merchantById(mid);if(!m)return;
-  currentPage="publicMerchant:"+mid;
-  const menus=(m.menus||[]).map(menu=>`
-    <div class="card">
-      <div class="menu-name">${esc(menu.name)}</div>
-      ${menu.priceMode==="same"?`<div class="price">${money(menu.price)}</div>`:`<div class="muted" style="margin-top:5px">Harga mengikuti varian</div>`}
-      ${(menu.variants||[]).map(v=>`<div style="padding:6px 0;border-top:1px solid var(--line);margin-top:6px">
-        ${esc(v.name)} ${menu.priceMode==="different"?`— ${money(v.price)}`:""}
-      </div>`).join("")}
-    </div>`).join("");
-  render(screen(m.name,`
-    <div class="card">
-      <span class="status ${m.status==="OPEN"?"open":"closed"}">${m.status}</span>
-      ${m.status==="CLOSED"?`<div class="notice">Mitra sedang CLOSED dan tidak dapat menerima pesanan.</div>`:""}
-    </div>
-    <div class="section-title center">DAFTAR MENU</div>
-    ${menus||`<div class="empty">Belum ada menu.</div>`}
-  `),push)
+  const m=merchantById(mid);
+  if(!m){
+    currentPage="publicMerchantMissing:"+mid;
+    return render(screen("MITRA USAHA",`
+      <div class="card center">
+        <h3>Mitra tidak ditemukan</h3>
+        <p class="muted">Data mitra dengan ID ini belum tersedia di penyimpanan aplikasi yang sedang dibuka.</p>
+        <p class="muted">Untuk membuka data mitra dari HP lain, aplikasi harus memakai database online bersama.</p>
+        <button class="btn" onclick="location.href=publicBaseUrl()">KEMBALI</button>
+      </div>
+    `),push);
+  }
+  const c=customerCurrent();
+  setPendingMerchant(mid);
+  setPendingCourier(m.courierId);
+  if(c&&c.courierId===m.courierId){
+    return openCustomerHome(c.id,push);
+  }
+  return openCustomerLogin(push);
 }
 
 /* =========================
    ROUTER
 ========================= */
 function route(){
+  const params=new URLSearchParams(window.location.search||"");
   const hash=location.hash||"";
-  if(!hash){return state.courier?begin("dashboard"):openRegister()}
-  if(hash.startsWith("#mitra=")){
-    const mid=decodeURIComponent(hash.slice(7));return begin("publicMerchant:"+mid)
+
+  // Format link publik utama: ?mitra=ID_MITRA
+  if(params.has("mitra")){
+    const mid=params.get("mitra");
+    return begin("publicMerchant:"+mid)
   }
-  if(hash.startsWith("#pelanggan=")||hash==="#pelanggan"){
-    const cid=customerCurrent()?.id;
-    if(cid)return begin("customerHome:"+cid);
+
+  // Link pelanggan selalu masuk ke tampilan pelanggan: pelanggan terdaftar ke beranda,
+  // pelanggan baru ke login kode. ID kurir ikut diperiksa saat kode dimasukkan.
+  if(params.has("pelanggan")){
+    const courierId=params.get("pelanggan");
+    const c=customerCurrent();
+    if(c&&c.courierId===courierId)return begin("customerHome:"+c.id);
+    setPendingCourier(courierId);
     return begin("publicCustomer")
   }
+
+  // Dukungan sementara untuk link lama berbentuk #mitra= / #pelanggan=.
+  if(hash.startsWith("#mitra=")){
+    const mid=decodeURIComponent(hash.slice(7));
+    return begin("publicMerchant:"+mid)
+  }
+  if(hash.startsWith("#pelanggan=" )||hash==="#pelanggan"){
+    const courierId=hash.startsWith("#pelanggan=")?decodeURIComponent(hash.slice(11)):null;
+    const c=customerCurrent();
+    if(c&&(!courierId||c.courierId===courierId))return begin("customerHome:"+c.id);
+    setPendingCourier(courierId);
+    return begin("publicCustomer")
+  }
+
   if(hash==="#dashboard")return begin("dashboard");
   if(state.courier)return begin("dashboard");
   openRegister()
@@ -1102,8 +1170,10 @@ window.addEventListener("hashchange",route);
 
 /* =========================
    INIT
+   Baca parameter URL saat aplikasi pertama kali dibuka, baik dari
+   file lokal Acode maupun dari alamat web seperti GitHub Pages.
 ========================= */
-if(state.courier)begin("dashboard");else openRegister();
+route();
 </script>
 </body>
 </html>
