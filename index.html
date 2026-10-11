@@ -7,37 +7,37 @@
 <style>
 *{box-sizing:border-box}
 :root{
-  --bg:#f4f6f8;--card:#fff;--text:#17202a;--muted:#68727d;
-  --line:#dfe4e8;--primary:#1667d9;--primary2:#0e56bd;
-  --success:#16834a;--danger:#c73535;--closed:#9aa1a8;
+  --bg:#f3f7fc;--card:#ffffff;--text:#172033;--muted:#718096;
+  --line:#dce5f0;--primary:#0b74e8;--primary2:#075fc5;
+  --success:#18a957;--danger:#e34848;--closed:#a9b3c0;
 }
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+html,body{margin:0;padding:0;background:#eaf1f8;color:var(--text);font-family:Arial,Helvetica,sans-serif;font-size:15px}
 body{min-height:100vh}
 button,input,textarea{font:inherit}
 button{cursor:pointer}
-#app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--bg)}
-.screen{min-height:100vh;padding:16px 14px 28px}
-.header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.back{border:0;background:transparent;padding:8px 4px;font-weight:700;color:var(--primary)}
-.title{font-size:21px;font-weight:800;text-align:center;flex:1}
-.home-title{text-align:center;font-size:22px;font-weight:800;margin:18px 0 30px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+#app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);box-shadow:0 0 30px rgba(25,65,105,.10)}
+.screen{min-height:100vh;padding:16px 14px 30px;background:var(--bg)}
+.header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;margin:-16px -14px 18px;padding:10px 12px;min-height:58px;background:linear-gradient(135deg,#0876ec,#0964cf);color:#fff;box-shadow:0 2px 10px rgba(0,74,160,.18)}
+.back{border:0;background:rgba(255,255,255,.12);border-radius:9px;padding:9px 10px;font-size:12px;font-weight:800;color:#fff;white-space:nowrap}
+.title{font-size:16px;font-weight:900;text-align:center;flex:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-title{text-align:center;font-size:22px;font-weight:900;margin:18px 0 23px;color:#174a7c;letter-spacing:-.2px}
+.card{background:var(--card);border:1px solid #e1e8f0;border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 5px 18px rgba(28,72,120,.08)}
 label{display:block;font-size:14px;font-weight:700;margin:12px 0 7px}
 input,textarea{
-  width:100%;border:1px solid #cfd6dc;border-radius:10px;padding:12px 11px;
+  width:100%;border:1px solid #d3ddea;border-radius:11px;padding:12px 11px;
   background:#fff;color:var(--text);outline:none
 }
-input:focus,textarea:focus{border-color:var(--primary)}
+input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(11,116,232,.10)}
 textarea{min-height:90px;resize:vertical}
 .btn{
-  width:100%;border:0;border-radius:10px;padding:12px 13px;margin-top:10px;
-  background:var(--primary);color:#fff;font-weight:800
+  width:100%;border:0;border-radius:11px;padding:12px 13px;margin-top:10px;min-height:45px;
+  background:linear-gradient(180deg,#1684f4,#0869dc);color:#fff;font-weight:900;box-shadow:0 4px 10px rgba(8,105,220,.16)
 }
 .btn:active{transform:translateY(1px)}
-.btn.secondary{background:#eef3f8;color:#1b2733}
+.btn.secondary{background:#e5edf6;color:#285174;box-shadow:none}
 .btn.success{background:var(--success)}
 .btn.danger{background:var(--danger)}
-.btn.outline{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn.outline{background:#fff;color:#145ea9;border:1.5px solid #b9c8d9;box-shadow:0 2px 7px rgba(28,72,120,.05)}
 .btn.small{width:auto;margin:0;padding:8px 10px;font-size:13px}
 .row{display:flex;gap:8px;align-items:center}
 .row>*{flex:1}
@@ -194,7 +194,11 @@ function appLink(params){
   return u.toString();
 }
 function courierCustomerLink(){return appLink({pelanggan:state.courier.id})}
-function merchantLink(mid){return appLink({mitra:mid})}
+function merchantLink(mid){
+  const m=merchantById(mid);
+  // Link khusus pemilik mitra untuk mengelola menu usaha miliknya.
+  return appLink({kelola:mid,kurir:m?.courierId||state.courier?.id||""})
+}
 function setPendingMerchant(mid){localStorage.setItem("KURIR_SIMPLE_PENDING_MERCHANT",mid)}
 function getPendingMerchant(){return localStorage.getItem("KURIR_SIMPLE_PENDING_MERCHANT")}
 function clearPendingMerchant(){localStorage.removeItem("KURIR_SIMPLE_PENDING_MERCHANT")}
@@ -259,20 +263,32 @@ function ensureCourier(){
 function openRegister(){
   currentPage="register";
   render(`<div class="screen">
-    <div class="home-title">DAFTAR AKUN</div>
+    <div class="home-title">DAFTAR KURIR</div>
     <div class="card">
-      <label>Nama</label><input id="regName" placeholder="">
-      <label>Nomor Telepon</label><input id="regPhone" inputmode="numeric" maxlength="15" placeholder="">
-      <button class="btn" onclick="saveCourier()">SIMPAN</button>
+      <label>Nama Kurir</label><input id="regName" placeholder="Masukkan nama lengkap">
+      <label>Nomor WhatsApp (12 digit)</label><input id="regPhone" inputmode="numeric" maxlength="12" placeholder="12 digit nomor WhatsApp">
+      <button class="btn" onclick="shareCourierLocation()">BAGIKAN LOKASI</button>
+      <div id="courierLocation" class="variant-box muted">Alamat akan muncul setelah lokasi dibagikan.</div>
+      <button class="btn success" onclick="saveCourier()">SELESAI</button>
     </div>
   </div>`,false)
+}
+let courierLocationDraft=null;
+function shareCourierLocation(){
+  if(!navigator.geolocation){toast("Perangkat tidak mendukung lokasi");return}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    courierLocationDraft={lat:pos.coords.latitude,lng:pos.coords.longitude,updatedAt:nowText()};
+    const el=document.getElementById("courierLocation");if(el)el.textContent=`Lokasi berhasil diambil: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+    toast("Lokasi berhasil dibagikan")
+  },()=>toast("Izin lokasi belum diberikan"),{enableHighAccuracy:true,timeout:10000})
 }
 function saveCourier(){
   const name=document.getElementById("regName").value.trim();
   const phone=document.getElementById("regPhone").value.trim();
-  if(!name||!phone){toast("Nama dan nomor telepon wajib diisi");return}
+  if(!name||!/^\d{12}$/.test(phone)){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
+  if(!courierLocationDraft&& !state.courier?.location){toast("Bagikan lokasi terlebih dahulu");return}
   state.courier=state.courier||{id:id("kurir"),name:"",phone:""};
-  state.courier.name=name;state.courier.phone=phone;save();
+  state.courier.name=name;state.courier.phone=phone;state.courier.location=courierLocationDraft||state.courier.location;save();
   toast("Akun berhasil disimpan");begin("dashboard")
 }
 
@@ -292,8 +308,8 @@ function openDashboard(push=true){
     <div class="card">
       <div style="font-weight:800">${esc(state.courier.name)}</div>
       <div class="muted" style="margin-top:4px">${esc(state.courier.phone)}</div>
-      <button class="btn outline" onclick="openPage('customerCode')">KODE PELANGGAN</button>
       <button class="btn secondary" onclick="copyText(courierCustomerLink())">SALIN LINK PELANGGAN</button>
+      <button class="btn outline" onclick="openPage('customerCode')">KODE PELANGGAN</button>
     </div>
   </div>`,push)
 }
@@ -328,7 +344,7 @@ function openAddMerchant(push=true){
   render(screen("TAMBAH MITRA USAHA",`
     <div class="card">
       <label>Nama Mitra Usaha</label><input id="mName">
-      <label>Nomor WhatsApp</label><input id="mPhone" inputmode="numeric">
+      <label>Nomor WhatsApp</label><input id="mPhone" inputmode="numeric" maxlength="12" placeholder="12 digit nomor WhatsApp">
       <button class="btn" onclick="saveMerchant()">SIMPAN</button>
     </div>
   `),push)
@@ -336,7 +352,7 @@ function openAddMerchant(push=true){
 function saveMerchant(){
   const name=document.getElementById("mName").value.trim();
   const phone=document.getElementById("mPhone").value.trim();
-  if(!name||!phone){toast("Data mitra belum lengkap");return}
+  if(!name||!/^\d{12}$/.test(phone)){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
   state.merchants.push({
     id:id("mitra"),courierId:state.courier.id,name,phone,status:"CLOSED",menus:[]
   });
@@ -360,6 +376,7 @@ function openMenus(mid,push=true){
     <div class="card menu-card">
       <div class="menu-name">${esc(menu.name)}</div>
       <div class="price">${menuDisplayPrice(menu)}</div>
+      <div style="margin-top:7px"><span class="status ${menu.status==='HABIS'?'closed':'open'}">${esc(menu.status||'TERSEDIA')}</span></div>
       ${menu.variants?.length?`<div class="muted" style="margin-top:5px">${menu.variants.length} varian</div>`:""}
       <div class="menu-actions">
         <button class="btn small outline" onclick="openPage('editMenu:${menu.id}')">EDIT</button>
@@ -381,7 +398,7 @@ function deleteMenu(mid,menuId){
    MENU FORM / VARIANT RULES
 ========================= */
 function newMenuDraft(){
-  return {name:"",price:"",choiceMode:"single",priceMode:"same",variants:[]}
+  return {name:"",price:"",choiceMode:"single",priceMode:"same",status:"TERSEDIA",variants:[]}
 }
 const drafts={};
 
@@ -470,7 +487,7 @@ function saveNewMenu(mid){
   const m=merchantById(mid);if(!m)return;
   m.menus.push({
     id:id("menu"),name:d.name,price:d.price,choiceMode:d.choiceMode,
-    priceMode:d.priceMode,variants:d.variants.map(v=>({name:v.name,price:d.priceMode==="different"?v.price:""}))
+    priceMode:d.priceMode,status:d.status||"TERSEDIA",variants:d.variants.map(v=>({name:v.name,price:d.priceMode==="different"?v.price:""}))
   });
   save();delete drafts.add;toast("Menu berhasil disimpan");openMenus(mid,false)
 }
@@ -490,6 +507,7 @@ function openEditMenu(menuId,push=true){
     name:found.menu.name,price:found.menu.price||"",
     choiceMode:found.menu.choiceMode||"single",
     priceMode:found.menu.priceMode||"same",
+    status:found.menu.status||"TERSEDIA",
     variants:(found.menu.variants||[]).map(v=>({name:v.name||"",price:v.price||""}))
   };
   currentPage="editMenu:"+menuId;
@@ -524,6 +542,11 @@ function renderEditMenu(mid,menuId,push=true){
         <div class="radio-line"><input type="radio" name="editPriceMode" ${d.priceMode==="different"?"checked":""} onchange="setEditPriceMode('different')"><span>Harga tiap varian berbeda</span></div>
         <div class="radio-line"><input type="radio" name="editPriceMode" ${d.priceMode==="same"?"checked":""} onchange="setEditPriceMode('same')"><span>Harga tiap varian sama</span></div>
       </div>
+      <label>Status Menu</label>
+      <select id="editMenuStatus" onchange="drafts.edit.status=this.value" style="width:100%;padding:12px;border:1px solid #d3ddea;border-radius:11px;background:#fff;color:var(--text)">
+        <option value="TERSEDIA" ${d.status!=="HABIS"?"selected":""}>TERSEDIA</option>
+        <option value="HABIS" ${d.status==="HABIS"?"selected":""}>HABIS</option>
+      </select>
       <button class="btn" onclick="saveEditedMenu('${mid}','${menuId}')">SIMPAN</button>
     </div>
   `),push)
@@ -532,6 +555,7 @@ function syncEditDraft(){
   const d=drafts.edit;if(!d)return;
   const n=document.getElementById("editMenuName");if(n)d.name=n.value.trim();
   const p=document.getElementById("editMenuPrice");if(p)d.price=p.value.trim();
+  const st=document.getElementById("editMenuStatus");if(st)d.status=st.value;
   document.querySelectorAll(".edit-v-name").forEach(x=>d.variants[Number(x.dataset.index)].name=x.value);
   document.querySelectorAll(".edit-v-price").forEach(x=>d.variants[Number(x.dataset.index)].price=x.value);
 }
@@ -549,7 +573,7 @@ function saveEditedMenu(mid,menuId){
   if(d.priceMode==="same"&&!d.price){toast("Harga wajib diisi");return}
   if(d.variants.some(v=>!v.name)){toast("Nama varian wajib diisi");return}
   if(d.priceMode==="different"&&d.variants.some(v=>!v.price)){toast("Harga setiap varian wajib diisi");return}
-  menu.name=d.name;menu.price=d.price;menu.choiceMode=d.choiceMode;menu.priceMode=d.priceMode;
+  menu.name=d.name;menu.price=d.price;menu.choiceMode=d.choiceMode;menu.priceMode=d.priceMode;menu.status=d.status||"TERSEDIA";
   menu.variants=d.variants.map(v=>({name:v.name,price:d.priceMode==="different"?v.price:""}));
   save();delete drafts.edit;toast("Menu berhasil diperbarui");openMenus(mid,false)
 }
@@ -789,7 +813,7 @@ function openCustomerCode(push=true){
   const active=state.customerCodes.filter(c=>c.courierId===state.courier.id);
   render(screen("KODE PELANGGAN",`
     <div class="card">
-      <label>Nama Pelanggan</label><input id="codeCustomerName">
+      <div class="muted">Buat kode 4 digit untuk satu pendaftaran pelanggan baru.</div>
       <button class="btn" onclick="createCustomerCode()">BUAT KODE</button>
     </div>
     <div class="card">
@@ -803,10 +827,9 @@ function openCustomerCode(push=true){
   `),push)
 }
 function createCustomerCode(){
-  const name=document.getElementById("codeCustomerName").value.trim();if(!name){toast("Nama pelanggan wajib diisi");return}
   let code="";
   do{code=String(Math.floor(1000+Math.random()*9000))}while(state.customerCodes.some(c=>c.code===code));
-  state.customerCodes.push({id:id("code"),courierId:state.courier.id,customerName:name,code,used:false,active:false});
+  state.customerCodes.push({id:id("code"),courierId:state.courier.id,customerName:"",code,used:false,active:false});
   save();openCustomerCode(false)
 }
 
@@ -852,9 +875,11 @@ function openCustomerRegister(cid,push=true){
   currentPage="customerRegister:"+cid;
   render(screen("DAFTAR PELANGGAN",`
     <div class="card">
-      <label>Nama Pelanggan</label>
-      <input id="custName" value="${esc(c.name)}">
-      <div class="section-title">LOKASI</div>
+      <label>Nama</label>
+      <input id="custName" value="${esc(c.name)}" placeholder="Masukkan nama Anda">
+      <label>Nomor WhatsApp (12 digit)</label>
+      <input id="custPhone" inputmode="numeric" maxlength="12" value="${esc(c.phone||"")}" placeholder="12 digit nomor WhatsApp">
+      <div class="section-title">ALAMAT LENGKAP</div>
       <div class="muted">Bagikan lokasi terbaru agar kurir dapat melihat lokasi pemesan.</div>
       <button class="btn" onclick="shareCustomerLocation('${cid}')">BAGIKAN LOKASI</button>
       <div id="locationStatus" class="muted" style="margin-top:8px">${c.location?"Lokasi sudah tersimpan.":"Lokasi belum dibagikan."}</div>
@@ -873,7 +898,10 @@ function shareCustomerLocation(cid){
 function finishCustomerRegistration(cid){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
   if(!c.location){toast("Bagikan lokasi terlebih dahulu");return}
-  c.name=document.getElementById("custName").value.trim()||c.name;save();
+  const name=document.getElementById("custName").value.trim();
+  const phone=document.getElementById("custPhone").value.trim();
+  if(!name||!/^\d{12}$/.test(phone)){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
+  c.name=name;c.phone=phone;save();
   openCustomerHome(cid,false)
 }
 function customerCurrent(){
@@ -924,13 +952,21 @@ function openCustomerHome(cid,push=true){
   const hasAny=Object.values(getCart(cid)).some(a=>a.length);
   render(screen("PILIH MITRA USAHA",`
     <div class="card">
-      <b>${esc(c.name)}</b>
-      <div class="muted" style="margin-top:5px">${c.location?"Lokasi sudah dibagikan":"Lokasi belum dibagikan"}</div>
-      <button class="btn secondary" onclick="shareCustomerLocation('${cid}')">BAGIKAN LOKASI</button>
+      <label>Nama</label><input value="${esc(c.name)}" onchange="saveCustomerProfile('${cid}','name',this.value)" aria-label="Nama pelanggan">
+      <label>Nomor WhatsApp</label><input inputmode="numeric" maxlength="12" value="${esc(c.phone||'')}" onchange="saveCustomerProfile('${cid}','phone',this.value)" aria-label="Nomor WhatsApp pelanggan">
+      <div class="muted" style="margin-top:5px">${c.location?`Alamat dari lokasi: ${Number(c.location.lat).toFixed(5)}, ${Number(c.location.lng).toFixed(5)}`:"Alamat belum dibagikan"}</div>
+      <button class="btn secondary" onclick="shareCustomerLocation('${cid}')">BAGIKAN ULANG LOKASI</button>
     </div>
     ${cards||`<div class="empty">Belum ada mitra usaha.</div>`}
     <button class="btn ${hasAny?"":"secondary"}" ${hasAny?"":"disabled"} onclick="openPage('customerCart:${cid}')">LIHAT PESAN</button>
   `),push)
+}
+function saveCustomerProfile(cid,field,value){
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  const v=String(value||"").trim();
+  if(field==="phone"&&!/^\d{12}$/.test(v)){toast("Nomor WhatsApp harus tepat 12 digit");openCustomerHome(cid,false);return}
+  if(!v){toast("Data tidak boleh kosong");openCustomerHome(cid,false);return}
+  c[field]=v;save();toast("Data akun diperbarui")
 }
 function customerOpenMerchant(cid,mid){
   window.customerOpenMerchant=window.customerOpenMerchant===mid?null:mid;
@@ -945,6 +981,7 @@ function renderCustomerMenus(cid,m){
 }
 function renderCustomerMenu(cid,m,menu){
   const cart=cartForMerchant(cid,m.id);
+  if(menu.status==="HABIS") return `<div class="customer-menu"><div class="menu-main-row"><div class="grow"><div class="menu-name">${esc(menu.name)}</div><div class="price">${menu.priceMode==="different"?"Harga sesuai varian":money(menu.price)}</div></div><span class="status closed">HABIS</span></div></div>`;
   if(menu.choiceMode==="multiple"){
     const rows=(menu.variants||[]).map((v,i)=>{
       const item=cart.find(x=>x.menuId===menu.id&&x.variantName===v.name);
@@ -1039,7 +1076,7 @@ function openCustomerCart(cid,push=true){
       <div class="cart-line"><span>Ongkir</span><span>Rp —</span></div>
       <div class="cart-line"><b>TOTAL PEMBAYARAN</b><b>Rp —</b></div>
       <div class="notice">Total pembayaran akan dihitung setelah ongkir diberikan oleh kurir.</div>
-      <button class="btn" onclick="openPage('survey:${cid}')">SURVEI & KIRIM</button>
+      <button class="btn" onclick="submitOrderDirect('${cid}')">KIRIM PESANAN</button>
     </div>
   `),push)
 }
@@ -1089,6 +1126,21 @@ function submitSurveyAndOrder(cid){
   Object.keys(cart).forEach(k=>delete cart[k]);
   openCustomerSent(cid,false)
 }
+
+function submitOrderDirect(cid){
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  const cart=getCart(cid);const mids=Object.keys(cart).filter(mid=>cart[mid].length);
+  if(!mids.length){toast("Belum ada pesanan");return}
+  const merchants=mids.map(mid=>{
+    const m=merchantById(mid);if(!m)return null;
+    return {merchantId:mid,merchantName:m.name,items:cart[mid].map(i=>({menuId:i.menuId,menuName:i.menuName,variantName:i.variantName,qty:i.qty,price:i.price}))}
+  }).filter(Boolean);
+  const o={id:id("order"),courierId:c.courierId,customerId:c.id,customerName:c.name,customerLocation:c.location,locationText:c.location?`${c.location.lat}, ${c.location.lng}`:"",merchants,time:nowText(),shipping:null,completed:false,label:"PESANAN "+String(state.orders.length+1).padStart(2,"0")};
+  state.orders.push(o);c.firstOrderDone=true;
+  const code=state.customerCodes.find(x=>x.id===c.codeId);if(code)code.active=true;
+  save();Object.keys(cart).forEach(k=>delete cart[k]);openCustomerSent(cid,false)
+}
+
 function openCustomerSent(cid,push=true){
   currentPage="customerSent:"+cid;
   render(screen("PESANAN TERKIRIM",`
@@ -1105,22 +1157,16 @@ function openCustomerSent(cid,push=true){
    PUBLIC LINKS
 ========================= */
 function openPublicMerchant(mid,push=true){
-  const m=merchantById(mid);
-  if(!m){
-    currentPage="publicMerchantMissing:"+mid;
-    return render(screen("MITRA USAHA",`
-      <div class="card center">
-        <h3>Mitra tidak ditemukan</h3>
-        <p class="muted">Data mitra dengan ID ini belum tersedia di penyimpanan aplikasi yang sedang dibuka.</p>
-        <p class="muted">Untuk membuka data mitra dari HP lain, aplikasi harus memakai database online bersama.</p>
-        <button class="btn" onclick="location.href=publicBaseUrl()">KEMBALI</button>
-      </div>
-    `),push);
-  }
-  const c=customerCurrent();
+  // Jangan memeriksa data Mitra sebelum kode dimasukkan. Link Mitra harus lebih dulu
+  // menampilkan permintaan kode pelanggan, lalu mengarahkan pelanggan ke Mitra tersebut.
   setPendingMerchant(mid);
-  setPendingCourier(m.courierId);
-  if(c&&c.courierId===m.courierId){
+  const params=new URLSearchParams(window.location.search||"");
+  const courierId=params.get("kurir")||params.get("pelanggan")||"";
+  if(courierId)setPendingCourier(courierId);
+  const c=customerCurrent();
+  if(c&&courierId&&c.courierId===courierId){
+    window.customerOpenMerchant=mid;
+    clearPendingMerchant();
     return openCustomerHome(c.id,push);
   }
   return openCustomerLogin(push);
@@ -1133,26 +1179,45 @@ function route(){
   const params=new URLSearchParams(window.location.search||"");
   const hash=location.hash||"";
 
-  // Format link publik utama: ?mitra=ID_MITRA
-  if(params.has("mitra")){
-    const mid=params.get("mitra");
-    return begin("publicMerchant:"+mid)
+  // Link Mitra: selalu minta kode terlebih dahulu untuk pelanggan baru.
+  // Format: ?mitra=ID_MITRA&kurir=ID_KURIR
+  if(params.has("kelola")){
+    const mid=params.get("kelola");
+    const m=merchantById(mid);
+    if(!m){return render(screen("MITRA USAHA",`<div class="card"><div class="empty">Data mitra tidak tersedia di perangkat ini. Link pengelolaan memerlukan database online bersama.</div></div>`,false),false)}
+    window.ownerMerchantId=mid;
+    return begin("menus:"+mid);
   }
 
-  // Link pelanggan selalu masuk ke tampilan pelanggan: pelanggan terdaftar ke beranda,
-  // pelanggan baru ke login kode. ID kurir ikut diperiksa saat kode dimasukkan.
+  if(params.has("mitra")){
+    const mid=params.get("mitra");
+    setPendingMerchant(mid);
+    const courierId=params.get("kurir")||params.get("pelanggan")||"";
+    if(courierId)setPendingCourier(courierId);
+    const c=customerCurrent();
+    if(c&&courierId&&c.courierId===courierId){
+      window.customerOpenMerchant=mid;
+      clearPendingMerchant();
+      return begin("customerHome:"+c.id);
+    }
+    return begin("publicCustomer");
+  }
+
+  // Link Pelanggan: pelanggan baru wajib memasukkan kode 4 angka.
+  // Pelanggan yang sudah terdaftar diarahkan ke halaman pelanggan milik Kurir tersebut.
   if(params.has("pelanggan")){
     const courierId=params.get("pelanggan");
     const c=customerCurrent();
     if(c&&c.courierId===courierId)return begin("customerHome:"+c.id);
     setPendingCourier(courierId);
-    return begin("publicCustomer")
+    return begin("publicCustomer");
   }
 
   // Dukungan sementara untuk link lama berbentuk #mitra= / #pelanggan=.
   if(hash.startsWith("#mitra=")){
     const mid=decodeURIComponent(hash.slice(7));
-    return begin("publicMerchant:"+mid)
+    setPendingMerchant(mid);
+    return begin("publicCustomer");
   }
   if(hash.startsWith("#pelanggan=" )||hash==="#pelanggan"){
     const courierId=hash.startsWith("#pelanggan=")?decodeURIComponent(hash.slice(11)):null;
