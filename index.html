@@ -123,6 +123,8 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
   .title{font-size:19px}
 }
 </style>
+<!-- Supabase JS client: ditambahkan tanpa mengubah tampilan aplikasi -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -132,6 +134,14 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
 /* =========================
    DATA
 ========================= */
+// Konfigurasi Supabase yang diberikan pengguna
+const SUPABASE_URL = "https://xkysusfemehvdaqkyzhg.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_JDmN5TndzBue7Rsmeiphtw_K2MzPcbA";
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
 const KEY="KURIR_SIMPLE_MASTER_V3";
 const state=JSON.parse(localStorage.getItem(KEY)||"null")||{
   courier:null,
