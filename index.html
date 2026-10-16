@@ -818,8 +818,25 @@ function shareWhatsAppManual(){
 /* =========================
    KODE PELANGGAN
 ========================= */
-function openCustomerCode(push=true){
+async function openCustomerCode(push=true){
   currentPage="customerCode";
+  // Ambil kode milik kurir ini dari Supabase supaya daftar tetap sama di perangkat lain.
+  try{
+    const {data,error}=await supabaseClient
+      .from("kurir_simple_customer_codes")
+      .select("id,courier_id,customer_name,code,used,active")
+      .eq("courier_id",state.courier.id);
+    if(error) throw error;
+    const remote=(data||[]).map(r=>({
+      id:r.id,courierId:r.courier_id,customerName:r.customer_name||"",
+      code:String(r.code),used:!!r.used,active:!!r.active
+    }));
+    state.customerCodes=state.customerCodes.filter(c=>c.courierId!==state.courier.id).concat(remote);
+    save();
+  }catch(e){
+    console.error("Gagal mengambil kode pelanggan dari Supabase:",e);
+    toast("Kode online belum dapat dimuat. Periksa tabel dan akses Supabase.");
+  }
   const active=state.customerCodes.filter(c=>c.courierId===state.courier.id);
   render(screen("KODE PELANGGAN",`
     <div class="card">
@@ -836,11 +853,22 @@ function openCustomerCode(push=true){
     </div>
   `),push)
 }
-function createCustomerCode(){
+async function createCustomerCode(){
+  if(!state.courier?.id){toast("Akun kurir tidak ditemukan");return}
   let code="";
-  do{code=String(Math.floor(1000+Math.random()*9000))}while(state.customerCodes.some(c=>c.code===code));
-  state.customerCodes.push({id:id("code"),courierId:state.courier.id,customerName:"",code,used:false,active:false});
-  save();openCustomerCode(false)
+  for(let attempt=0;attempt<30;attempt++){
+    const candidate=String(Math.floor(1000+Math.random()*9000));
+    const {data,error}=await supabaseClient
+      .from("kurir_simple_customer_codes").select("id").eq("code",candidate).maybeSingle();
+    if(error){console.error("Pemeriksaan kode Supabase gagal:",error);toast("Tidak dapat membuat kode. Periksa tabel dan akses Supabase.");return}
+    if(!data){code=candidate;break}
+  }
+  if(!code){toast("Gagal membuat kode unik. Coba lagi.");return}
+  const record={id:id("code"),courier_id:state.courier.id,customer_name:"",code,used:false,active:false};
+  const {error}=await supabaseClient.from("kurir_simple_customer_codes").insert(record);
+  if(error){console.error("Simpan kode Supabase gagal:",error);toast("Kode gagal disimpan online. Periksa tabel dan akses Supabase.");return}
+  state.customerCodes.push({id:record.id,courierId:record.courier_id,customerName:"",code,used:false,active:false});
+  save();toast("Kode pelanggan berhasil dibuat");await openCustomerCode(false)
 }
 
 /* =========================
@@ -856,12 +884,30 @@ function openCustomerLogin(push=true){
     </div>
   `),push)
 }
-function verifyCustomerCode(){
-  const code=document.getElementById("customerCodeInput").value.trim();
+async function verifyCustomerCode(){
+  const input=document.getElementById("customerCodeInput");
+  const code=input?input.value.trim():"";
   if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
-  const c=state.customerCodes.find(x=>x.code===code);
+
+  // Cari kode di Supabase, bukan hanya localStorage perangkat pelanggan.
+  const {data,error}=await supabaseClient
+    .from("kurir_simple_customer_codes")
+    .select("id,courier_id,customer_name,code,used,active")
+    .eq("code",code)
+    .maybeSingle();
+  if(error){
+    console.error("Pemeriksaan kode pelanggan gagal:",error);
+    toast("Tidak dapat memeriksa kode online. Periksa koneksi dan akses Supabase.");
+    return;
+  }
+  const remoteCode=data?{
+    id:data.id,courierId:data.courier_id,customerName:data.customer_name||"",
+    code:String(data.code),used:!!data.used,active:!!data.active
+  }:null;
+  const c=remoteCode||state.customerCodes.find(x=>String(x.code)===code);
   if(!c){toast("Kode tidak valid");return}
   if(c.used){toast("Kode sudah digunakan");return}
+
   const pending=getPendingMerchant();
   const merchant=pending?merchantById(pending):null;
   const pendingCourier=getPendingCourier();
@@ -873,9 +919,28 @@ function verifyCustomerCode(){
     clearPendingMerchant();
     toast("Link mitra bukan milik kode pelanggan ini");return
   }
+
+  // Tandai kode sebagai terpakai di cloud sebelum melanjutkan pendaftaran.
+  if(remoteCode){
+    const {data:updated,error:updateError}=await supabaseClient
+      .from("kurir_simple_customer_codes")
+      .update({used:true,active:false})
+      .eq("id",remoteCode.id)
+      .eq("used",false)
+      .select("id")
+      .maybeSingle();
+    if(updateError){
+      console.error("Gagal memperbarui status kode:",updateError);
+      toast("Status kode gagal diperbarui. Coba lagi.");
+      return;
+    }
+    if(!updated){toast("Kode sudah digunakan");return}
+  }
+
   setPendingCourier(null);
   c.used=true;c.active=false;
   const customer={id:id("cust"),courierId:c.courierId,name:c.customerName,codeId:c.id,location:null,registered:true,firstOrderDone:false};
+  state.customerCodes=state.customerCodes.map(x=>x.id===c.id?{...x,used:true,active:false}:x);
   state.customers.push(customer);save();
   localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
   openCustomerRegister(customer.id,true)
