@@ -171,6 +171,7 @@ function toast(msg){
   document.body.appendChild(d);setTimeout(()=>d.remove(),2200)
 }
 function copyText(text){
+  if(!text) return;
   if(navigator.clipboard&&window.isSecureContext){
     navigator.clipboard.writeText(text).then(()=>toast("Link berhasil disalin")).catch(()=>fallbackCopy(text))
   }else fallbackCopy(text)
@@ -181,33 +182,62 @@ function fallbackCopy(text){
   t.remove()
 }
 /*
-   LINK PUBLIK UNIVERSAL
-   Isi APP_PUBLIC_URL jika aplikasi ditempatkan pada alamat web tertentu.
-   Contoh: https://contoh-domain-anda.com/
-   Jika dikosongkan, alamat halaman yang sedang dibuka akan dipakai.
+   PEMBUAT LINK PUBLIK V4
+   Saat aplikasi dibuka melalui alamat HTTPS, semua link pelanggan/mitra
+   memakai alamat website yang sama dan membuang query/hash lama terlebih dahulu.
+   Jika file dibuka sebagai file lokal di Acode, tidak ada alamat publik untuk dibagikan.
+
+   Jika alamat hosting tetap dan berbeda dari alamat halaman saat ini, isi APP_PUBLIC_URL
+   dengan URL publik yang BENAR, contoh: https://username.github.io/nama-repo/
 */
 const APP_PUBLIC_URL = "";
 function publicBaseUrl(){
-  if(APP_PUBLIC_URL.trim()) return APP_PUBLIC_URL.trim().replace(/[?#]+$/g, "");
-  // file:// saat dijalankan dari Acode: pertahankan alamat file lokal untuk pengujian di HP yang sama.
-  // http(s):// saat di-hosting: gunakan URL publik, termasuk subfolder GitHub Pages.
-  if(window.location.protocol === "file:"){
-    return window.location.href.split("?")[0].split("#")[0];
+  const configured = String(APP_PUBLIC_URL || "").trim();
+  if(configured){
+    try {
+      const fixed = new URL(configured);
+      if(fixed.protocol !== "https:" && fixed.protocol !== "http:") return null;
+      fixed.search = "";
+      fixed.hash = "";
+      if(!fixed.pathname.endsWith("/")) fixed.pathname += "/";
+      return fixed.toString();
+    } catch(e) { return null; }
   }
-  return window.location.origin + window.location.pathname;
+  if(window.location.protocol !== "https:" && window.location.protocol !== "http:") return null;
+  const u = new URL(window.location.href);
+  u.search = "";
+  u.hash = "";
+  // /index.html menjadi direktori website, agar parameter link tidak menumpuk.
+  if(u.pathname.endsWith("/index.html")) u.pathname = u.pathname.slice(0, -"index.html".length);
+  else if(!u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, u.pathname.lastIndexOf("/") + 1);
+  return u.toString();
 }
 function appLink(params){
   const base=publicBaseUrl();
-  const u=new URL(base,window.location.href);
-  u.hash="";
-  Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,v));
-  return u.toString();
+  if(!base){
+    toast("Link publik belum tersedia. Buka aplikasi melalui website HTTPS yang sudah diterbitkan, bukan file lokal Acode.");
+    return "";
+  }
+  try {
+    const u=new URL(base);
+    u.search="";
+    u.hash="";
+    Object.entries(params||{}).forEach(([k,v])=>{
+      if(v!==undefined && v!==null && String(v)!=="") u.searchParams.set(k,String(v));
+    });
+    return u.toString();
+  } catch(e) {
+    toast("Alamat website belum benar. Periksa URL hosting KURIR SIMPLE.");
+    return "";
+  }
 }
-function courierCustomerLink(){return appLink({pelanggan:state.courier.id})}
+function courierCustomerLink(){
+  return appLink({pelanggan:state.courier?.id||""});
+}
 function merchantLink(mid){
   const m=merchantById(mid);
-  // Link khusus pemilik mitra untuk mengelola menu usaha miliknya.
-  return appLink({kelola:mid,kurir:m?.courierId||state.courier?.id||""})
+  // Link publik mitra untuk pelanggan, bukan link kelola internal di perangkat kurir.
+  return appLink({mitra:mid,kurir:m?.courierId||state.courier?.id||""});
 }
 function setPendingMerchant(mid){localStorage.setItem("KURIR_SIMPLE_PENDING_MERCHANT",mid)}
 function getPendingMerchant(){return localStorage.getItem("KURIR_SIMPLE_PENDING_MERCHANT")}
@@ -820,22 +850,45 @@ function shareWhatsAppManual(){
 ========================= */
 async function openCustomerCode(push=true){
   currentPage="customerCode";
-  // Ambil kode milik kurir ini dari Supabase supaya daftar tetap sama di perangkat lain.
+  // Migrasikan kode lokal lama ke Supabase SEBELUM menyegarkan daftar dari cloud.
+  // Ini mencegah kode lokal terhapus saat tabel online masih kosong.
   try{
+    const localCodes=state.customerCodes.filter(c=>c.courierId===state.courier.id);
+    for(const c of localCodes){
+      const {data:existing,error:findError}=await supabaseClient
+        .from("kurir_simple_customer_codes")
+        .select("id,used")
+        .eq("code",String(c.code))
+        .maybeSingle();
+      if(findError) throw findError;
+      if(!existing){
+        const {error:insertError}=await supabaseClient
+          .from("kurir_simple_customer_codes")
+          .insert({id:String(c.id),courier_id:String(c.courierId),customer_name:c.customerName||"",code:String(c.code),used:!!c.used,active:!!c.active});
+        if(insertError) throw insertError;
+      }
+    }
     const {data,error}=await supabaseClient
       .from("kurir_simple_customer_codes")
       .select("id,courier_id,customer_name,code,used,active")
-      .eq("courier_id",state.courier.id);
+      .eq("courier_id",String(state.courier.id));
     if(error) throw error;
     const remote=(data||[]).map(r=>({
       id:r.id,courierId:r.courier_id,customerName:r.customer_name||"",
       code:String(r.code),used:!!r.used,active:!!r.active
     }));
-    state.customerCodes=state.customerCodes.filter(c=>c.courierId!==state.courier.id).concat(remote);
-    save();
+    // Jangan menghapus kode lokal jika sinkronisasi gagal atau hasil cloud kosong.
+    if(remote.length){
+      const keepOtherCouriers=state.customerCodes.filter(c=>c.courierId!==state.courier.id);
+      const merged=new Map();
+      localCodes.forEach(c=>merged.set(String(c.code),c));
+      remote.forEach(c=>merged.set(String(c.code),c));
+      state.customerCodes=keepOtherCouriers.concat(Array.from(merged.values()));
+      save();
+    }
   }catch(e){
-    console.error("Gagal mengambil kode pelanggan dari Supabase:",e);
-    toast("Kode online belum dapat dimuat. Periksa tabel dan akses Supabase.");
+    console.error("Sinkronisasi kode pelanggan ke Supabase gagal:",e);
+    toast("Sinkronisasi kode gagal. Periksa tabel, kolom, dan akses Supabase.");
   }
   const active=state.customerCodes.filter(c=>c.courierId===state.courier.id);
   render(screen("KODE PELANGGAN",`
