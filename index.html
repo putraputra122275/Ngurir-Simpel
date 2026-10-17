@@ -143,16 +143,128 @@ const supabaseClient = window.supabase.createClient(
 );
 
 const KEY="KURIR_SIMPLE_MASTER_V3";
-const state=JSON.parse(localStorage.getItem(KEY)||"null")||{
-  courier:null,
-  merchants:[],
-  orders:[],
-  groups:[],
-  customerCodes:[],
-  customers:[]
-};
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-function id(prefix="id"){return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7)}
+const EMPTY_STATE={courier:null,merchants:[],orders:[],groups:[],customerCodes:[],customers:[]};
+/* Pemuatan data lokal + sinkronisasi cloud untuk tabel inti. */
+function loadLocalState(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw)return {...EMPTY_STATE};
+    const parsed=JSON.parse(raw);
+    if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))return {...EMPTY_STATE};
+    return {...EMPTY_STATE,...parsed,
+      courier:parsed.courier&&typeof parsed.courier==="object"?parsed.courier:null,
+      merchants:Array.isArray(parsed.merchants)?parsed.merchants:[],
+      orders:Array.isArray(parsed.orders)?parsed.orders:[],
+      groups:Array.isArray(parsed.groups)?parsed.groups:[],
+      customerCodes:Array.isArray(parsed.customerCodes)?parsed.customerCodes:[],
+      customers:Array.isArray(parsed.customers)?parsed.customers:[]};
+  }catch(err){console.error("KURIR SIMPLE: data lokal tidak dapat dibaca",err);return {...EMPTY_STATE};}
+}
+const state=loadLocalState();
+function persistLocal(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));return true;}
+  catch(err){console.error("KURIR SIMPLE: data lokal gagal disimpan",err);toast("Penyimpanan perangkat gagal. Periksa ruang penyimpanan browser.");return false;}
+}
+function save(){
+  if(!persistLocal())return false;
+  if(state.courier) syncCoreDataToSupabase().catch(err=>{
+    console.error("KURIR SIMPLE: sinkronisasi Supabase gagal",err);
+    showCloudStatus("Data tersimpan di perangkat, tetapi sinkronisasi Supabase gagal: "+(err?.message||"kesalahan tidak diketahui"));
+  });
+  return true;
+}
+let cloudSyncBusy=false;
+let cloudSyncQueued=false;
+function showCloudStatus(message){
+  let el=document.getElementById("cloudStatus");
+  if(!el){el=document.createElement("div");el.id="cloudStatus";el.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;padding:10px 12px;border-radius:10px;background:#fff4d6;border:1px solid #e4c56a;color:#594500;font-size:12px;box-shadow:0 3px 16px #0002";document.body.appendChild(el)}
+  el.textContent=message;
+}
+async function ensureSupabaseSession(){
+  const {data,error}=await supabaseClient.auth.getSession();
+  if(error)throw error;
+  if(data.session)return data.session;
+  const signed=await supabaseClient.auth.signInAnonymously();
+  if(signed.error)throw new Error("Tidak dapat membuat sesi Supabase. Pastikan Anonymous Sign-Ins aktif: "+signed.error.message);
+  if(!signed.data?.session)throw new Error("Supabase tidak mengembalikan sesi autentikasi.");
+  return signed.data.session;
+}
+function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||""))}
+function normalizeCoreIds(){
+  // Migrasikan ID lokal lama ke UUID dan perbarui relasi lokal inti.
+  // Link lama dengan ID non-UUID mungkin perlu dibagikan ulang.
+  const map=new Map();
+  const fix=obj=>{if(!obj)return;const old=String(obj.id||"");if(!isUuid(old)){const fresh=id();if(old)map.set(old,fresh);obj.id=fresh;}};
+  fix(state.courier);
+  state.merchants.forEach(m=>{fix(m);(m.menus||[]).forEach(menu=>{fix(menu);(menu.variants||[]).forEach(fix);});});
+  const replace=v=>map.has(String(v))?map.get(String(v)):v;
+  state.merchants.forEach(m=>{m.courierId=state.courier?.id||m.courierId;(m.menus||[]).forEach(menu=>(menu.variants||[]).forEach(v=>{}));});
+  state.orders.forEach(o=>{if(o.merchantId)o.merchantId=replace(o.merchantId);if(o.courierId)o.courierId=replace(o.courierId);});
+  state.customers.forEach(c=>{if(c.courierId)c.courierId=replace(c.courierId);});
+  persistLocal();
+}
+async function restoreCoreDataFromSupabase(session){
+  if(state.courier)return false;
+  const {data:c,error:cErr}=await supabaseClient.from("couriers").select("*").eq("auth_user_id",session.user.id).maybeSingle();
+  if(cErr)throw new Error("Membaca akun Kurir: "+cErr.message);
+  if(!c)return false;
+  const {data:merchantRows,error:mErr}=await supabaseClient.from("merchants").select("*").eq("courier_id",c.id);
+  if(mErr)throw new Error("Membaca Mitra Usaha: "+mErr.message);
+  const mids=(merchantRows||[]).map(m=>m.id);
+  let menuRows=[];
+  if(mids.length){const {data,error}=await supabaseClient.from("menus").select("*").in("merchant_id",mids);if(error)throw new Error("Membaca Menu: "+error.message);menuRows=data||[];}
+  const menuIds=menuRows.map(m=>m.id);let variantRows=[];
+  if(menuIds.length){const {data,error}=await supabaseClient.from("menu_variants").select("*").in("menu_id",menuIds);if(error)throw new Error("Membaca Varian: "+error.message);variantRows=data||[];}
+  const location={lat:c.latitude,lng:c.longitude,province:c.province,regency:c.regency,district:c.district,village:c.village,hamlet:c.hamlet};
+  state.courier={id:c.id,name:c.full_name,phone:c.whatsapp,location,authUserId:c.auth_user_id};
+  state.merchants=(merchantRows||[]).map(m=>({id:m.id,courierId:m.courier_id,name:m.merchant_name,phone:m.whatsapp,status:m.business_status||"CLOSED",menus:menuRows.filter(x=>x.merchant_id===m.id).map(menu=>({id:menu.id,name:menu.menu_name,price:Number(menu.base_price||0),status:menu.availability||"TERSEDIA",choiceMode:menu.variant_selection||"single",priceMode:menu.variant_price_mode||"same",variants:variantRows.filter(v=>v.menu_id===menu.id).sort((a,b)=>a.display_order-b.display_order).map(v=>({id:v.id,name:v.variant_name,price:Number(v.price||0)}))}))}));
+  persistLocal();return true;
+}
+async function syncCoreDataToSupabase(){
+  if(!state.courier)return;
+  if(cloudSyncBusy){cloudSyncQueued=true;return;}
+  cloudSyncBusy=true;
+  try{
+    const session=await ensureSupabaseSession();
+    normalizeCoreIds();
+    const c=state.courier,loc=c.location||{};
+    const courierRow={id:c.id,auth_user_id:session.user.id,full_name:c.name,whatsapp:c.phone,
+      province:loc.province||null,regency:loc.regency||null,district:loc.district||null,village:loc.village||null,hamlet:loc.hamlet||null,
+      latitude:Number.isFinite(Number(loc.lat))&&loc.lat!==null?Number(loc.lat):null,
+      longitude:Number.isFinite(Number(loc.lng))&&loc.lng!==null?Number(loc.lng):null,
+      account_status:"active",updated_at:new Date().toISOString()};
+    const {error:cError}=await supabaseClient.from("couriers").upsert(courierRow,{onConflict:"id"});
+    if(cError)throw new Error("Tabel couriers: "+cError.message);
+    for(const m of state.merchants){
+      const merchantRow={id:m.id,courier_id:c.id,merchant_name:m.name,whatsapp:m.phone,business_status:m.status||"CLOSED",updated_at:new Date().toISOString()};
+      const {error}=await supabaseClient.from("merchants").upsert(merchantRow,{onConflict:"id"});
+      if(error)throw new Error("Tabel merchants: "+error.message);
+      for(const menu of (m.menus||[])){
+        const basePrice=Number(menu.price||0);
+        const {error:menuError}=await supabaseClient.from("menus").upsert({id:menu.id,merchant_id:m.id,menu_name:menu.name,base_price:basePrice,availability:menu.status||"TERSEDIA",has_variants:!!(menu.variants||[]).length,variant_selection:menu.choiceMode||"single",variant_price_mode:menu.priceMode||"same",updated_at:new Date().toISOString()},{onConflict:"id"});
+        if(menuError)throw new Error("Tabel menus: "+menuError.message);
+        for(let i=0;i<(menu.variants||[]).length;i++){
+          const v=menu.variants[i];
+          const price=menu.priceMode==="different"?Number(v.price||0):basePrice;
+          const {error:variantError}=await supabaseClient.from("menu_variants").upsert({id:v.id,menu_id:menu.id,variant_name:v.name,price,display_order:i},{onConflict:"id"});
+          if(variantError)throw new Error("Tabel menu_variants: "+variantError.message);
+        }
+      }
+    }
+    persistLocal();
+    const el=document.getElementById("cloudStatus");if(el)el.remove();
+  }finally{
+    cloudSyncBusy=false;
+    if(cloudSyncQueued){cloudSyncQueued=false;queueMicrotask(()=>syncCoreDataToSupabase().catch(err=>showCloudStatus("Sinkronisasi Supabase gagal: "+err.message)));}
+  }
+}
+
+function id(prefix="id"){
+  // Supabase memakai UUID untuk primary key. Prefix lama tetap diterima agar
+  // pemanggil tidak perlu diubah; nilai ID baru sekarang UUID valid.
+  if(window.crypto&&typeof crypto.randomUUID==="function")return crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:(r&3|8)).toString(16)})
+}
 function money(n){return "Rp "+Number(n||0).toLocaleString("id-ID")}
 function esc(v){
   return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))
@@ -171,7 +283,6 @@ function toast(msg){
   document.body.appendChild(d);setTimeout(()=>d.remove(),2200)
 }
 function copyText(text){
-  if(!text){return}
   if(navigator.clipboard&&window.isSecureContext){
     navigator.clipboard.writeText(text).then(()=>toast("Link berhasil disalin")).catch(()=>fallbackCopy(text))
   }else fallbackCopy(text)
@@ -181,46 +292,27 @@ function fallbackCopy(text){
   try{document.execCommand("copy");toast("Link berhasil disalin")}catch(e){toast("Link: "+text)}
   t.remove()
 }
-/* =========================
-   LINK PUBLIK - KURIR SIMPLE
-   Setelah upload ke GitHub Pages/hosting, link publik akan diambil otomatis
-   dari alamat hosting yang sedang dibuka.
-   Jika aplikasi sedang dibuka melalui localhost atau file:// di Acode,
-   isi APP_PUBLIC_URL dengan URL hosting publik milik aplikasi.
-   Contoh format: https://username.github.io/nama-repositori/
-   Jangan isi dengan localhost atau alamat file lokal.
-========================= */
-const APP_PUBLIC_URL = ""; // Isi setelah URL GitHub Pages tersedia.
-function isLocalAppAddress(){
-  const host=String(window.location.hostname||"").toLowerCase();
-  return window.location.protocol === "file:" || host === "localhost" || host === "127.0.0.1" || host === "::1" || host.endsWith(".local");
-}
+/*
+   LINK PUBLIK UNIVERSAL
+   Isi APP_PUBLIC_URL jika aplikasi ditempatkan pada alamat web tertentu.
+   Contoh: https://contoh-domain-anda.com/
+   Jika dikosongkan, alamat halaman yang sedang dibuka akan dipakai.
+*/
+const APP_PUBLIC_URL = "";
 function publicBaseUrl(){
-  const configured=String(APP_PUBLIC_URL||"").trim();
-  if(configured){
-    try{
-      const u=new URL(configured);
-      if(u.protocol!=="https:" && u.protocol!=="http:") return "";
-      if(u.hostname==="localhost" || u.hostname==="127.0.0.1") return "";
-      u.search="";u.hash="";
-      return u.toString();
-    }catch(e){return ""}
+  if(APP_PUBLIC_URL.trim()) return APP_PUBLIC_URL.trim().replace(/[?#]+$/g, "");
+  // file:// saat dijalankan dari Acode: pertahankan alamat file lokal untuk pengujian di HP yang sama.
+  // http(s):// saat di-hosting: gunakan URL publik, termasuk subfolder GitHub Pages.
+  if(window.location.protocol === "file:"){
+    return window.location.href.split("?")[0].split("#")[0];
   }
-  if(isLocalAppAddress()) return "";
-  // Saat sudah dihosting, pertahankan nama file dan subfolder hosting.
-  const u=new URL(window.location.href);
-  u.search="";u.hash="";
-  return u.toString();
+  return window.location.origin + window.location.pathname;
 }
 function appLink(params){
   const base=publicBaseUrl();
-  if(!base){
-    toast("Link publik belum diatur. Hosting aplikasi terlebih dahulu, lalu isi APP_PUBLIC_URL.");
-    return "";
-  }
-  const u=new URL(base);
+  const u=new URL(base,window.location.href);
   u.hash="";
-  Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,String(v??"")));
+  Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,v));
   return u.toString();
 }
 function courierCustomerLink(){return appLink({pelanggan:state.courier.id})}
@@ -299,6 +391,7 @@ function openRegister(){
       <label>Nomor WhatsApp (12 digit)</label><input id="regPhone" inputmode="numeric" maxlength="12" placeholder="12 digit nomor WhatsApp">
       <button class="btn" onclick="shareCourierLocation()">BAGIKAN LOKASI</button>
       <div id="courierLocation" class="variant-box muted">Alamat akan muncul setelah lokasi dibagikan.</div>
+      <div class="muted" style="font-size:12px;line-height:1.5;margin-top:10px">Catatan: versi HTML ini masih menyimpan data di browser/perangkat ini. Data belum otomatis tersinkron ke perangkat lain.</div>
       <button class="btn success" onclick="saveCourier()">SELESAI</button>
     </div>
   </div>`,false)
@@ -318,8 +411,9 @@ function saveCourier(){
   if(!name||!/^\d{12}$/.test(phone)){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
   if(!courierLocationDraft&& !state.courier?.location){toast("Bagikan lokasi terlebih dahulu");return}
   state.courier=state.courier||{id:id("kurir"),name:"",phone:""};
-  state.courier.name=name;state.courier.phone=phone;state.courier.location=courierLocationDraft||state.courier.location;save();
-  toast("Akun berhasil disimpan");begin("dashboard")
+  state.courier.name=name;state.courier.phone=phone;state.courier.location=courierLocationDraft||state.courier.location;
+  if(!save())return;
+  toast("Akun tersimpan di perangkat ini; sinkronisasi Supabase sedang dicoba");begin("dashboard")
 }
 
 /* =========================
@@ -1268,7 +1362,22 @@ window.addEventListener("hashchange",route);
    Baca parameter URL saat aplikasi pertama kali dibuka, baik dari
    file lokal Acode maupun dari alamat web seperti GitHub Pages.
 ========================= */
-route();
+async function initializeKurirSimple(){
+  try{
+    const session=await ensureSupabaseSession();
+    if(!state.courier){
+      await restoreCoreDataFromSupabase(session);
+    }else{
+      // Akun lokal terikat ke sesi Auth yang aktif; sinkronkan data inti.
+      await syncCoreDataToSupabase();
+    }
+  }catch(err){
+    console.error("KURIR SIMPLE: inisialisasi cloud gagal",err);
+    showCloudStatus("Supabase belum tersambung: "+(err?.message||"periksa koneksi dan konfigurasi Auth"));
+  }
+  route();
+}
+initializeKurirSimple();
 </script>
 </body>
 </html>
