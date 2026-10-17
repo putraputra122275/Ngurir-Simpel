@@ -1015,7 +1015,8 @@ async function verifyCustomerCode(){
     openCustomerRegister(customer.id,true);
   }catch(err){
     console.error("KURIR SIMPLE: verifikasi kode pelanggan gagal",err);
-    toast("Tidak dapat memeriksa kode. Periksa koneksi Supabase.");
+    const detail=[err?.message,err?.details,err?.hint,err?.code].filter(Boolean).join(" | ");
+    toast("Gagal memeriksa kode: "+(detail||"Error tidak diketahui"));
   }
 }
 function openCustomerRegister(cid,push=true){
