@@ -315,7 +315,12 @@ function appLink(params){
   Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,v));
   return u.toString();
 }
-function courierCustomerLink(){return appLink({pelanggan:state.courier.id})}
+// Link Pelanggan adalah tautan publik yang berdiri sendiri dari sesi akun Kurir.
+// Saat dibuka, parameter ?pelanggan=ID diprioritaskan oleh router sebelum dashboard akun.
+function courierCustomerLink(){
+  if(!state.courier?.id){toast("Akun Kurir belum tersedia");return ""}
+  return appLink({pelanggan:state.courier.id});
+}
 function merchantLink(mid){
   const m=merchantById(mid);
   // Link khusus pemilik mitra untuk mengelola menu usaha miliknya.
@@ -1346,8 +1351,10 @@ function route(){
     return begin("publicCustomer");
   }
 
-  // Link Pelanggan: pelanggan baru wajib memasukkan kode 4 angka.
-  // Pelanggan yang sudah terdaftar diarahkan ke halaman pelanggan milik Kurir tersebut.
+  // LINK PELANGGAN PUBLIK:
+  // Selalu periksa tautan ini SEBELUM fallback ke dashboard akun Kurir.
+  // Jadi tautan tetap membuka alur Pelanggan meskipun browser masih memiliki sesi akun.
+  // Pelanggan baru wajib memasukkan kode 4 angka; pelanggan terdaftar diarahkan ke berandanya.
   if(params.has("pelanggan")){
     const courierId=params.get("pelanggan");
     const c=customerCurrent();
