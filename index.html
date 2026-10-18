@@ -315,12 +315,7 @@ function appLink(params){
   Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,v));
   return u.toString();
 }
-// Link Pelanggan adalah tautan publik yang berdiri sendiri dari sesi akun Kurir.
-// Saat dibuka, parameter ?pelanggan=ID diprioritaskan oleh router sebelum dashboard akun.
-function courierCustomerLink(){
-  if(!state.courier?.id){toast("Akun Kurir belum tersedia");return ""}
-  return appLink({pelanggan:state.courier.id});
-}
+function courierCustomerLink(){return appLink({pelanggan:state.courier.id})}
 function merchantLink(mid){
   const m=merchantById(mid);
   // Link khusus pemilik mitra untuk mengelola menu usaha miliknya.
@@ -956,19 +951,28 @@ function openCustomerCode(push=true){
   `),push)
 }
 async function createCustomerCode(){
-  if(!state.courier){toast("Akun Kurir belum tersedia");return}
+  if(!state.courier?.id){toast("Akun Kurir belum tersedia");return}
   try{
+    // Kode dibuat di Supabase agar bisa diverifikasi dari perangkat/link pelanggan lain.
     const {data,error}=await supabaseClient.rpc("create_customer_code");
     if(error)throw error;
     const row=Array.isArray(data)?data[0]:data;
     if(!row||!row.code)throw new Error("Supabase tidak mengembalikan kode pelanggan.");
-    const saved={id:row.id,courierId:row.courier_id,customerName:row.customer_name||"",code:String(row.code),used:!!row.is_used,active:!row.is_used};
+    const saved={
+      id:row.id,
+      courierId:row.courier_id||state.courier.id,
+      customerId:row.customer_id||null,
+      customerName:row.customer_name||"",
+      code:String(row.code),
+      used:String(row.status||"").toLowerCase()==="used"||row.is_used===true,
+      active:String(row.status||"").toLowerCase()==="active"
+    };
     state.customerCodes=state.customerCodes.filter(x=>x.id!==saved.id);
     state.customerCodes.unshift(saved);
     persistLocal();openCustomerCode(false);toast("Kode pelanggan berhasil dibuat");
   }catch(err){
     console.error("KURIR SIMPLE: gagal membuat kode pelanggan",err);
-    toast("Gagal membuat kode: "+(err?.message||"periksa pengaturan Supabase"));
+    toast("Gagal membuat kode: "+(err?.message||"periksa fungsi create_customer_code di Supabase"));
   }
 }
 
@@ -989,34 +993,37 @@ async function verifyCustomerCode(){
   const input=document.getElementById("customerCodeInput");
   const code=(input?.value||"").trim();
   if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
+  const pending=getPendingMerchant();
+  const merchant=pending?merchantById(pending):null;
+  const pendingCourier=getPendingCourier();
   try{
+    // RPC melakukan penandaan sekali pakai secara atomik di Supabase.
     const {data,error}=await supabaseClient.rpc("redeem_customer_code",{p_code:code});
     if(error)throw error;
     const row=Array.isArray(data)?data[0]:data;
     if(!row||!row.id){toast("Kode tidak valid atau sudah digunakan");return}
-    const c={id:row.id,courierId:row.courier_id,customerName:row.customer_name||"",code:String(row.code||code),used:true,active:false};
-    const pending=getPendingMerchant();
-    const merchant=pending?merchantById(pending):null;
-    const pendingCourier=getPendingCourier();
-    if(pendingCourier&&pendingCourier!==c.courierId){
+    const courierId=row.courier_id;
+    // Validasi pemilik dilakukan sebelum membuat akun lokal pelanggan.
+    if(pendingCourier&&pendingCourier!==courierId){
       setPendingCourier(null);
       toast("Kode pelanggan tidak sesuai dengan link kurir ini");return
     }
-    if(merchant&&merchant.courierId!==c.courierId){
+    if(merchant&&merchant.courierId!==courierId){
       clearPendingMerchant();
       toast("Link mitra bukan milik kode pelanggan ini");return
     }
     setPendingCourier(null);
-    state.customerCodes=state.customerCodes.filter(x=>x.id!==c.id);
-    state.customerCodes.unshift(c);
-    const customer={id:id("cust"),courierId:c.courierId,name:c.customerName,codeId:c.id,location:null,registered:true,firstOrderDone:false};
+    const customerId=row.customer_id||id("cust");
+    const customer={id:customerId,courierId,name:row.customer_name||"",codeId:row.id,location:null,registered:true,firstOrderDone:false};
+    state.customerCodes=state.customerCodes.filter(x=>x.id!==row.id);
+    state.customerCodes.unshift({id:row.id,courierId,customerId:row.customer_id||null,customerName:customer.name,code:String(row.code||code),used:true,active:false,status:row.status||"used"});
+    state.customers=state.customers.filter(x=>x.id!==customer.id);
     state.customers.push(customer);persistLocal();
     localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
-    openCustomerRegister(customer.id,true);
+    openCustomerRegister(customer.id,true)
   }catch(err){
     console.error("KURIR SIMPLE: verifikasi kode pelanggan gagal",err);
-    const detail=[err?.message,err?.details,err?.hint,err?.code].filter(Boolean).join(" | ");
-    toast("Gagal memeriksa kode: "+(detail||"Error tidak diketahui"));
+    toast("Gagal memeriksa kode: "+(err?.message||"periksa fungsi redeem_customer_code di Supabase"));
   }
 }
 function openCustomerRegister(cid,push=true){
@@ -1062,6 +1069,45 @@ function customerCurrent(){
    CUSTOMER HOME / MENUS
 ========================= */
 const carts={};
+// Katalog pelanggan dimuat dari Supabase melalui RPC publik yang hanya
+// mengembalikan informasi katalog (nama/status mitra dan menu), bukan nomor WA.
+const publicCatalogCache = new Map();
+const publicCatalogLoading = new Set();
+const publicCatalogErrors = new Map();
+async function loadPublicCatalogForCourier(courierId, customerId){
+  if(!courierId || publicCatalogLoading.has(courierId)) return;
+  publicCatalogLoading.add(courierId);
+  publicCatalogErrors.delete(courierId);
+  try{
+    const {data,error}=await supabaseClient.rpc('public_customer_catalog',{p_courier_id:courierId});
+    if(error) throw new Error(error.message);
+    const rows=Array.isArray(data)?data:(data?.merchants||[]);
+    const catalog=rows.map(m=>({
+      id:m.id, courierId:m.courier_id||courierId, name:m.merchant_name||m.name||'',
+      // Data pelanggan hanya membutuhkan status OPEN/CLOSED dan menu.
+      status:String(m.business_status||m.status||'CLOSED').toUpperCase(),
+      menus:(m.menus||[]).map(menu=>({
+        id:menu.id, name:menu.menu_name||menu.name||'', price:Number(menu.base_price??menu.price??0),
+        status:String(menu.availability||menu.status||'TERSEDIA').toUpperCase(),
+        choiceMode:menu.variant_selection||menu.choiceMode||'single',
+        priceMode:menu.variant_price_mode||menu.priceMode||'same',
+        variants:(menu.variants||[]).map(v=>({id:v.id,name:v.variant_name||v.name||'',price:Number(v.price||0)}))
+      }))
+    }));
+    publicCatalogCache.set(courierId,catalog);
+    // Sinkronkan katalog cloud ke tampilan lokal tanpa mengubah data mitra
+    // milik kurir lain atau menimpa data inti lokal yang sedang dikelola Kurir.
+    state.merchants=state.merchants.filter(m=>m.courierId!==courierId).concat(catalog);
+    persistLocal();
+  }catch(err){
+    console.error('KURIR SIMPLE: gagal memuat katalog pelanggan dari Supabase',err);
+    publicCatalogErrors.set(courierId,err?.message||'Kesalahan tidak diketahui');
+  }finally{
+    publicCatalogLoading.delete(courierId);
+    const c=state.customers.find(x=>x.id===customerId);
+    if(c && currentPage==='customerHome:'+customerId) openCustomerHome(customerId,false,true);
+  }
+}
 function getCart(cid){
   if(!carts[cid])carts[cid]={};
   return carts[cid]
@@ -1077,10 +1123,16 @@ function findCartItem(cid,mid,menuId,variantName){
 function cartMerchantHas(cid,mid){
   return cartForMerchant(cid,mid).length>0
 }
-function openCustomerHome(cid,push=true){
+function openCustomerHome(cid,push=true,skipFetch=false){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
   currentPage="customerHome:"+cid;
-  const merchants=state.merchants.filter(m=>m.courierId===c.courierId);
+  const cached=publicCatalogCache.get(c.courierId);
+  const localMerchants=state.merchants.filter(m=>m.courierId===c.courierId);
+  const merchants=cached||localMerchants;
+  if(!skipFetch && !publicCatalogCache.has(c.courierId) && !publicCatalogLoading.has(c.courierId)){
+    // Tampilkan indikator saat katalog dimuat; jangan langsung menyimpulkan kosong.
+    queueMicrotask(()=>loadPublicCatalogForCourier(c.courierId,cid));
+  }
   const pending=getPendingMerchant();
   if(pending&&merchants.some(m=>m.id===pending)){
     window.customerOpenMerchant=pending;
@@ -1106,9 +1158,16 @@ function openCustomerHome(cid,push=true){
       <div class="muted" style="margin-top:5px">${c.location?`Alamat dari lokasi: ${Number(c.location.lat).toFixed(5)}, ${Number(c.location.lng).toFixed(5)}`:"Alamat belum dibagikan"}</div>
       <button class="btn secondary" onclick="shareCustomerLocation('${cid}')">BAGIKAN ULANG LOKASI</button>
     </div>
-    ${cards||`<div class="empty">Belum ada mitra usaha.</div>`}
+    ${publicCatalogLoading.has(c.courierId)?`<div class="empty">Memuat mitra usaha...</div>`:
+      (publicCatalogErrors.has(c.courierId)?`<div class="card"><div class="empty">Mitra belum dapat dimuat dari server.</div><div class="muted" style="margin-top:8px">${esc(publicCatalogErrors.get(c.courierId))}</div><button class="btn" onclick="retryPublicCatalog('${cid}')">COBA LAGI</button></div>`:
+      (cards||`<div class="empty">Belum ada mitra usaha.</div>`))}
     <button class="btn ${hasAny?"":"secondary"}" ${hasAny?"":"disabled"} onclick="openPage('customerCart:${cid}')">LIHAT PESAN</button>
   `),push)
+}
+function retryPublicCatalog(cid){
+  const c=state.customers.find(x=>x.id===cid);if(!c)return;
+  publicCatalogCache.delete(c.courierId);publicCatalogErrors.delete(c.courierId);
+  openCustomerHome(cid,false);
 }
 function saveCustomerProfile(cid,field,value){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
@@ -1352,10 +1411,8 @@ function route(){
     return begin("publicCustomer");
   }
 
-  // LINK PELANGGAN PUBLIK:
-  // Selalu periksa tautan ini SEBELUM fallback ke dashboard akun Kurir.
-  // Jadi tautan tetap membuka alur Pelanggan meskipun browser masih memiliki sesi akun.
-  // Pelanggan baru wajib memasukkan kode 4 angka; pelanggan terdaftar diarahkan ke berandanya.
+  // Link Pelanggan: pelanggan baru wajib memasukkan kode 4 angka.
+  // Pelanggan yang sudah terdaftar diarahkan ke halaman pelanggan milik Kurir tersebut.
   if(params.has("pelanggan")){
     const courierId=params.get("pelanggan");
     const c=customerCurrent();
