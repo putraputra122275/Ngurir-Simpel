@@ -346,8 +346,37 @@ function render(html,push=true){
   window.scrollTo(0,0)
 }
 function goBack(){
+  // Koreksi navigasi yang diminta:
+  // Daftar mitra -> dashboard utama kurir.
+  if(currentPage==="merchants"){
+    historyStack=[];
+    openDashboard(false);
+    return;
+  }
+  // Daftar menu mitra -> daftar mitra usaha.
+  if(currentPage.startsWith("menus:")){
+    historyStack=[];
+    openMerchants(false);
+    return;
+  }
+  // Pesanan yang diterima kurir -> dashboard utama kurir.
+  if(currentPage==="orders"){
+    historyStack=[];
+    openDashboard(false);
+    return;
+  }
+  // Link publik pelanggan/mitra tidak boleh menuju dashboard kurir.
+  const params=new URLSearchParams(window.location.search||"");
+  if(params.has("pelanggan")||params.has("mitra")||params.has("kelola")||
+     currentPage==="publicCustomer"||currentPage.startsWith("publicMerchant:")||
+     currentPage.startsWith("customerHome:")||currentPage.startsWith("customerCart:")||
+     currentPage.startsWith("customerRegister:")||currentPage.startsWith("survey:")){
+    const p=historyStack.pop();
+    if(p){openPage(p,false);return;}
+    return;
+  }
   const p=historyStack.pop();
-  if(p){openPage(p,false);return}
+  if(p){openPage(p,false);return;}
   openDashboard(false)
 }
 function openPage(page,push=true){
@@ -480,7 +509,11 @@ function saveMerchant(){
   state.merchants.push({
     id:id("mitra"),courierId:state.courier.id,name,phone,status:"CLOSED",menus:[]
   });
-  save();toast("Mitra berhasil ditambahkan");openMerchants(false)
+  save();toast("Mitra berhasil ditambahkan");
+  // Setelah SIMPAN, daftar mitra menjadi halaman tujuan utama;
+  // tombol KEMBALI dari daftar ini langsung ke dashboard.
+  historyStack=[];
+  openMerchants(false)
 }
 
 /* =========================
@@ -950,30 +983,11 @@ function openCustomerCode(push=true){
     </div>
   `),push)
 }
-async function createCustomerCode(){
-  if(!state.courier?.id){toast("Akun Kurir belum tersedia");return}
-  try{
-    // Kode dibuat di Supabase agar bisa diverifikasi dari perangkat/link pelanggan lain.
-    const {data,error}=await supabaseClient.rpc("create_customer_code");
-    if(error)throw error;
-    const row=Array.isArray(data)?data[0]:data;
-    if(!row||!row.code)throw new Error("Supabase tidak mengembalikan kode pelanggan.");
-    const saved={
-      id:row.id,
-      courierId:row.courier_id||state.courier.id,
-      customerId:row.customer_id||null,
-      customerName:row.customer_name||"",
-      code:String(row.code),
-      used:String(row.status||"").toLowerCase()==="used"||row.is_used===true,
-      active:String(row.status||"").toLowerCase()==="active"
-    };
-    state.customerCodes=state.customerCodes.filter(x=>x.id!==saved.id);
-    state.customerCodes.unshift(saved);
-    persistLocal();openCustomerCode(false);toast("Kode pelanggan berhasil dibuat");
-  }catch(err){
-    console.error("KURIR SIMPLE: gagal membuat kode pelanggan",err);
-    toast("Gagal membuat kode: "+(err?.message||"periksa fungsi create_customer_code di Supabase"));
-  }
+function createCustomerCode(){
+  let code="";
+  do{code=String(Math.floor(1000+Math.random()*9000))}while(state.customerCodes.some(c=>c.code===code));
+  state.customerCodes.push({id:id("code"),courierId:state.courier.id,customerName:"",code,used:false,active:false});
+  save();openCustomerCode(false)
 }
 
 /* =========================
@@ -989,42 +1003,29 @@ function openCustomerLogin(push=true){
     </div>
   `),push)
 }
-async function verifyCustomerCode(){
-  const input=document.getElementById("customerCodeInput");
-  const code=(input?.value||"").trim();
+function verifyCustomerCode(){
+  const code=document.getElementById("customerCodeInput").value.trim();
   if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
+  const c=state.customerCodes.find(x=>x.code===code);
+  if(!c){toast("Kode tidak valid");return}
+  if(c.used){toast("Kode sudah digunakan");return}
   const pending=getPendingMerchant();
   const merchant=pending?merchantById(pending):null;
   const pendingCourier=getPendingCourier();
-  try{
-    // RPC melakukan penandaan sekali pakai secara atomik di Supabase.
-    const {data,error}=await supabaseClient.rpc("redeem_customer_code",{p_code:code});
-    if(error)throw error;
-    const row=Array.isArray(data)?data[0]:data;
-    if(!row||!row.id){toast("Kode tidak valid atau sudah digunakan");return}
-    const courierId=row.courier_id;
-    // Validasi pemilik dilakukan sebelum membuat akun lokal pelanggan.
-    if(pendingCourier&&pendingCourier!==courierId){
-      setPendingCourier(null);
-      toast("Kode pelanggan tidak sesuai dengan link kurir ini");return
-    }
-    if(merchant&&merchant.courierId!==courierId){
-      clearPendingMerchant();
-      toast("Link mitra bukan milik kode pelanggan ini");return
-    }
+  if(pendingCourier&&pendingCourier!==c.courierId){
     setPendingCourier(null);
-    const customerId=row.customer_id||id("cust");
-    const customer={id:customerId,courierId,name:row.customer_name||"",codeId:row.id,location:null,registered:true,firstOrderDone:false};
-    state.customerCodes=state.customerCodes.filter(x=>x.id!==row.id);
-    state.customerCodes.unshift({id:row.id,courierId,customerId:row.customer_id||null,customerName:customer.name,code:String(row.code||code),used:true,active:false,status:row.status||"used"});
-    state.customers=state.customers.filter(x=>x.id!==customer.id);
-    state.customers.push(customer);persistLocal();
-    localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
-    openCustomerRegister(customer.id,true)
-  }catch(err){
-    console.error("KURIR SIMPLE: verifikasi kode pelanggan gagal",err);
-    toast("Gagal memeriksa kode: "+(err?.message||"periksa fungsi redeem_customer_code di Supabase"));
+    toast("Kode pelanggan tidak sesuai dengan link kurir ini");return
   }
+  if(merchant&&merchant.courierId!==c.courierId){
+    clearPendingMerchant();
+    toast("Link mitra bukan milik kode pelanggan ini");return
+  }
+  setPendingCourier(null);
+  c.used=true;c.active=false;
+  const customer={id:id("cust"),courierId:c.courierId,name:c.customerName,codeId:c.id,location:null,registered:true,firstOrderDone:false};
+  state.customers.push(customer);save();
+  localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
+  openCustomerRegister(customer.id,true)
 }
 function openCustomerRegister(cid,push=true){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
