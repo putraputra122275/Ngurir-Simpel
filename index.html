@@ -44,22 +44,25 @@ textarea{min-height:90px;resize:vertical}
 .center{text-align:center}
 .muted{color:var(--muted)}
 .empty{text-align:center;color:var(--muted);padding:35px 12px}
-.merchant-card.closed{opacity:.6}
-.merchant-name{font-size:18px;font-weight:800}
-.status-row{display:flex;gap:7px;margin-top:10px}
-.status-row button{flex:1}
+.merchant-card{padding:9px 10px;margin-bottom:8px}
+.merchant-card.closed{opacity:1}
+.merchant-name{font-size:16px;font-weight:800}
+.status-row{display:flex;gap:5px;margin-top:7px;align-items:stretch}
+.status-row button{flex:1;min-width:0;padding:7px 4px;font-size:12px}
+.status-row .btn.selected-open{background:var(--success);color:#fff}
+.status-row .btn.selected-closed{background:var(--danger);color:#fff}
 .status{
   display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:800;
 }
 .status.open{background:#e2f5e9;color:#14753f}
 .status.closed{background:#eceef0;color:#697078}
-.link-btn{margin-top:9px}
-.menu-card{padding:13px}
-.menu-name{font-weight:800;font-size:16px}
-.price{font-weight:800;margin-top:4px}
-.menu-actions{display:flex;gap:8px;margin-top:10px}
+.link-btn{margin-top:0;flex:1;min-width:0;padding:7px 4px;font-size:11px}
+.menu-card{padding:9px 10px;margin-bottom:8px}
+.menu-name{font-weight:800;font-size:15px}
+.price{font-weight:800;margin-top:3px}
+.menu-actions{display:flex;gap:6px;margin-top:7px}
 .menu-actions button{flex:1}
-.section-title{font-size:15px;font-weight:800;margin:18px 0 8px}
+.section-title{font-size:15px;font-weight:800;margin:12px 0 6px}
 .variant-box{border:1px solid var(--line);border-radius:11px;padding:11px;margin-top:9px;background:#fafbfc}
 .variant-head{font-weight:800;margin-bottom:8px}
 .radio-line{display:flex;gap:9px;align-items:center;margin:8px 0}
@@ -341,9 +344,15 @@ let historyStack=[];
 let currentPage="";
 
 function render(html,push=true){
+  const preserveCustomerScroll = currentPage.startsWith("customerHome:");
+  const previousScrollY = window.scrollY || window.pageYOffset || 0;
   if(push&&currentPage)historyStack.push(currentPage);
   document.getElementById("app").innerHTML=html;
-  window.scrollTo(0,0)
+  if(preserveCustomerScroll){
+    requestAnimationFrame(()=>window.scrollTo(0,previousScrollY));
+  }else{
+    window.scrollTo(0,0);
+  }
 }
 function goBack(){
   // Koreksi navigasi yang diminta:
@@ -373,6 +382,9 @@ function goBack(){
      currentPage.startsWith("customerRegister:")||currentPage.startsWith("survey:")){
     const p=historyStack.pop();
     if(p){openPage(p,false);return;}
+    if(currentPage.startsWith("customerCart:")){
+      const cid=currentPage.split(":")[1];openCustomerHome(cid,false);return;
+    }
     return;
   }
   const p=historyStack.pop();
@@ -476,13 +488,12 @@ function openMerchants(push=true){
   const cards=state.merchants.map(m=>`
     <div class="card merchant-card ${m.status==='OPEN'?'':'closed'}" onclick="openPage('menus:${m.id}')">
       <div class="merchant-name">${esc(m.name)}</div>
-      <div class="muted" style="margin-top:5px">WhatsApp: ${esc(m.phone)}</div>
+      <div class="muted" style="margin-top:3px;font-size:12px">WhatsApp: ${esc(m.phone)}</div>
       <div class="status-row" onclick="event.stopPropagation()">
-        <button class="btn small ${m.status==='OPEN'?'success':''}" onclick="setMerchantStatus('${m.id}','OPEN')">OPEN</button>
-        <button class="btn small ${m.status==='CLOSED'?'danger':''}" onclick="setMerchantStatus('${m.id}','CLOSED')">CLOSED</button>
+        <button class="btn small ${m.status==='OPEN'?'selected-open':'outline'}" onclick="setMerchantStatus('${m.id}','OPEN')">OPEN</button>
+        <button class="btn small ${m.status==='CLOSED'?'selected-closed':'outline'}" onclick="setMerchantStatus('${m.id}','CLOSED')">CLOSED</button>
+        <button class="btn outline link-btn" onclick="event.stopPropagation();copyText(merchantLink('${m.id}'))">SALIN LINK</button>
       </div>
-      <button class="btn outline link-btn" onclick="event.stopPropagation();copyText(merchantLink('${m.id}'))">SALIN LINK</button>
-      <button class="btn danger link-btn" onclick="event.stopPropagation();deleteMerchant('${m.id}')">HAPUS MITRA USAHA</button>
     </div>`).join("");
   render(screen("MITRA USAHA",`
     ${cards||`<div class="empty">Belum ada mitra usaha.</div>`}
@@ -492,17 +503,6 @@ function openMerchants(push=true){
 function setMerchantStatus(mid,status){
   const m=merchantById(mid);if(!m)return;
   m.status=status;save();openMerchants(false)
-}
-async function deleteMerchant(mid){
-  const m=merchantById(mid);if(!m)return;
-  if(!confirm(`Hapus mitra usaha "${m.name}" beserta menu dan variannya?`))return;
-  try{
-    const {error}=await supabaseClient.rpc("delete_courier_merchant",{p_merchant_id:mid});
-    if(error)throw error;
-    state.merchants=state.merchants.filter(x=>x.id!==mid);
-    state.orders=state.orders.map(o=>({...o,merchants:(o.merchants||[]).filter(x=>x.merchantId!==mid)}));
-    persistLocal();toast("Mitra usaha berhasil dihapus");openMerchants(false);
-  }catch(err){console.error(err);toast("Mitra belum dihapus dari Supabase: "+(err.message||"periksa SQL dan akses"));}
 }
 function openAddMerchant(push=true){
   currentPage="addMerchant";
@@ -977,15 +977,8 @@ function shareWhatsAppManual(){
 /* =========================
    KODE PELANGGAN
 ========================= */
-async function openCustomerCode(push=true){
+function openCustomerCode(push=true){
   currentPage="customerCode";
-  try{
-    const {data,error}=await supabaseClient.rpc("list_courier_customer_codes");
-    if(error)throw error;
-    const rows=Array.isArray(data)?data:(data?.codes||[]);
-    state.customerCodes=state.customerCodes.filter(c=>c.courierId!==state.courier.id).concat(rows.map(r=>({id:r.id,courierId:r.courier_id||state.courier.id,customerName:r.customer_name||"",code:String(r.code),used:r.status==="used",active:r.status==="available",status:r.status})));
-    persistLocal();
-  }catch(err){console.error("Gagal memuat kode pelanggan",err);toast("Daftar kode dari Supabase belum dapat dimuat: "+(err.message||"periksa koneksi"));}
   const active=state.customerCodes.filter(c=>c.courierId===state.courier.id);
   render(screen("KODE PELANGGAN",`
     <div class="card">
@@ -997,34 +990,16 @@ async function openCustomerCode(push=true){
         <div style="padding:10px 0;border-bottom:1px solid var(--line)">
           <b>${esc(c.customerName)}</b>
           <div class="code-box" style="font-size:23px">${esc(c.code)}</div>
-          <div class="muted">${c.used?"Sudah digunakan":(c.status==="inactive"?"Dinonaktifkan":"Belum digunakan")}</div>
-          ${!c.used&&c.status!=="inactive"?`<button class="btn danger" onclick="deleteCustomerCode('${c.id}','${esc(c.code)}')">HAPUS KODE</button>`:""}
+          <div class="muted">${c.used?"Sudah digunakan":"Belum digunakan"}</div>
         </div>`).join(""):`<div class="empty">Belum ada kode pelanggan.</div>`}
     </div>
   `),push)
 }
-async function deleteCustomerCode(codeId,code){
-  if(!confirm(`Hapus kode pelanggan ${code}? Kode yang sudah digunakan tidak bisa dihapus.`))return;
-  try{
-    const {data,error}=await supabaseClient.rpc("delete_unused_customer_code",{p_code_id:codeId});
-    if(error)throw error;
-    if(data!==true && data?.deleted!==true)throw new Error(data?.message||"Kode tidak dapat dihapus");
-    state.customerCodes=state.customerCodes.filter(c=>c.id!==codeId);
-    persistLocal();toast("Kode pelanggan berhasil dihapus");openCustomerCode(false);
-  }catch(err){console.error(err);toast("Kode belum dihapus: "+(err.message||"periksa SQL dan akses"));}
-}
-async function createCustomerCode(){
-  if(!state.courier?.id){toast("Akun Kurir belum siap");return}
-  try{
-    // Kode dibuat di Supabase supaya dapat dipakai dari HP pelanggan lain.
-    const {data,error}=await supabaseClient.rpc("create_customer_code");
-    if(error)throw error;
-    const row=Array.isArray(data)?data[0]:data;
-    if(!row?.code)throw new Error("Supabase tidak mengembalikan kode. Periksa fungsi create_customer_code().");
-    const existing=state.customerCodes.find(x=>x.code===String(row.code));
-    if(!existing)state.customerCodes.push({id:row.id,courierId:row.courier_id||state.courier.id,customerName:"",code:String(row.code),used:row.status==="used",active:row.status==="available"});
-    save();openCustomerCode(false);
-  }catch(err){console.error("Gagal membuat kode pelanggan",err);toast("Kode gagal dibuat di Supabase: "+(err.message||"periksa koneksi"));}
+function createCustomerCode(){
+  let code="";
+  do{code=String(Math.floor(1000+Math.random()*9000))}while(state.customerCodes.some(c=>c.code===code));
+  state.customerCodes.push({id:id("code"),courierId:state.courier.id,customerName:"",code,used:false,active:false});
+  save();openCustomerCode(false)
 }
 
 /* =========================
@@ -1040,31 +1015,29 @@ function openCustomerLogin(push=true){
     </div>
   `),push)
 }
-async function verifyCustomerCode(){
-  const input=document.getElementById("customerCodeInput");
-  const code=input?.value.trim()||"";
+function verifyCustomerCode(){
+  const code=document.getElementById("customerCodeInput").value.trim();
   if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
-  try{
-    // Pemeriksaan dilakukan di server, bukan hanya di localStorage HP ini.
-    const {data,error}=await supabaseClient.rpc("validate_customer_code",{p_code:code});
-    if(error)throw error;
-    const row=Array.isArray(data)?data[0]:data;
-    if(!row||row.valid!==true||!row.courier_id){toast(row?.message||"Kode tidak valid atau sudah digunakan");return}
-    const courierId=row.courier_id;
-    const pending=getPendingMerchant();
-    const merchant=pending?merchantById(pending):null;
-    const pendingCourier=getPendingCourier();
-    if(pendingCourier&&pendingCourier!==courierId){setPendingCourier(null);toast("Kode pelanggan tidak sesuai dengan link kurir ini");return}
-    if(merchant&&merchant.courierId!==courierId){clearPendingMerchant();toast("Link mitra bukan milik kode pelanggan ini");return}
+  const c=state.customerCodes.find(x=>x.code===code);
+  if(!c){toast("Kode tidak valid");return}
+  if(c.used){toast("Kode sudah digunakan");return}
+  const pending=getPendingMerchant();
+  const merchant=pending?merchantById(pending):null;
+  const pendingCourier=getPendingCourier();
+  if(pendingCourier&&pendingCourier!==c.courierId){
     setPendingCourier(null);
-    // Belum menandai kode terpakai di tahap ini. Penandaan dilakukan atomik
-    // saat data nama, WhatsApp, dan lokasi berhasil disimpan.
-    let customer=state.customers.find(x=>x.code===code&&x.courierId===courierId);
-    if(!customer){customer={id:id("cust"),courierId,name:"",phone:"",code,codeId:row.code_id||null,location:null,registered:true,firstOrderDone:false};state.customers.push(customer)}
-    customer.code=code;customer.courierId=courierId;
-    persistLocal();localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
-    openCustomerRegister(customer.id,true);
-  }catch(err){console.error("Verifikasi kode pelanggan gagal",err);toast("Tidak dapat memeriksa kode di Supabase: "+(err.message||"periksa koneksi"));}
+    toast("Kode pelanggan tidak sesuai dengan link kurir ini");return
+  }
+  if(merchant&&merchant.courierId!==c.courierId){
+    clearPendingMerchant();
+    toast("Link mitra bukan milik kode pelanggan ini");return
+  }
+  setPendingCourier(null);
+  c.used=true;c.active=false;
+  const customer={id:id("cust"),courierId:c.courierId,name:c.customerName,codeId:c.id,location:null,registered:true,firstOrderDone:false};
+  state.customers.push(customer);save();
+  localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
+  openCustomerRegister(customer.id,true)
 }
 function openCustomerRegister(cid,push=true){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
@@ -1091,29 +1064,14 @@ function shareCustomerLocation(cid){
     save();document.getElementById("locationStatus").textContent="Lokasi sudah tersimpan: "+c.location.lat.toFixed(5)+", "+c.location.lng.toFixed(5)
   },()=>toast("Izin lokasi belum diberikan"))
 }
-async function finishCustomerRegistration(cid){
+function finishCustomerRegistration(cid){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
   if(!c.location){toast("Bagikan lokasi terlebih dahulu");return}
   const name=document.getElementById("custName").value.trim();
   const phone=document.getElementById("custPhone").value.trim();
-  if(!name||!/\d{12}/.test(phone)||phone.length!==12){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
-  if(!c.code){toast("Kode pelanggan tidak ditemukan. Masukkan kode kembali.");return}
-  try{
-    // RPC server memasukkan pelanggan dan mengubah kode menjadi used dalam
-    // satu transaksi; kode tidak dapat dipakai ulang di perangkat lain.
-    const {data,error}=await supabaseClient.rpc("register_customer_with_code",{
-      p_code:c.code,p_full_name:name,p_whatsapp:phone,
-      p_latitude:Number(c.location.lat),p_longitude:Number(c.location.lng)
-    });
-    if(error)throw error;
-    const row=Array.isArray(data)?data[0]:data;
-    if(!row?.id)throw new Error(row?.message||"Supabase tidak mengembalikan data pelanggan");
-    c.id=row.id;c.name=row.full_name||name;c.phone=row.whatsapp||phone;c.courierId=row.courier_id||c.courierId;
-    c.registered=true;c.location={lat:row.latitude??c.location.lat,lng:row.longitude??c.location.lng};
-    const codeRow=state.customerCodes.find(x=>x.code===c.code);if(codeRow){codeRow.used=true;codeRow.active=false;codeRow.customerName=c.name}
-    persistLocal();localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",c.id);
-    openCustomerHome(c.id,false);
-  }catch(err){console.error("Pendaftaran pelanggan gagal",err);toast("Pendaftaran belum tersimpan: "+(err.message||"periksa koneksi Supabase"));}
+  if(!name||!/^\d{12}$/.test(phone)){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
+  c.name=name;c.phone=phone;save();
+  openCustomerHome(cid,false)
 }
 function customerCurrent(){
   const idc=localStorage.getItem("KURIR_SIMPLE_CURRENT_CUSTOMER");
@@ -1264,6 +1222,14 @@ function renderCustomerMenu(cid,m,menu){
   const selected=cart.find(x=>x.menuId===menu.id);
   const qty=selected?.qty||0;
   const selectedName=selected?.variantName||"";
+  if(!(menu.variants||[]).length){
+    return `<div class="customer-menu">
+      <div class="menu-main-row">
+        <div class="grow"><div class="menu-name">${esc(menu.name)}</div><div class="price">${money(menu.price)}</div></div>
+        <div class="qty"><button onclick="changeSingleQty('${cid}','${m.id}','${menu.id}',-1)">−</button><strong>${qty}</strong><button onclick="changeSingleQty('${cid}','${m.id}','${menu.id}',1)">+</button></div>
+      </div>
+    </div>`
+  }
   const rows=(menu.variants||[]).map(v=>{
     const price=menu.priceMode==="different"?Number(v.price||0):Number(menu.price||0);
     return `<label class="variant-option">
@@ -1292,7 +1258,9 @@ function changeSingleQty(cid,mid,menuId,delta){
   const cart=cartForMerchant(cid,mid);let item=cart.find(x=>x.menuId===menuId);
   const menu=merchantById(mid).menus.find(x=>x.id===menuId);
   if(!item&&delta>0){
-    toast("Pilih varian terlebih dahulu");return
+    if((menu.variants||[]).length){toast("Pilih varian terlebih dahulu");return}
+    item={menuId:menu.id,menuName:menu.name,variantName:"",qty:0,price:Number(menu.price||0)};
+    cart.push(item)
   }
   if(item){
     item.qty+=delta;if(item.qty<=0)cart.splice(cart.indexOf(item),1)
