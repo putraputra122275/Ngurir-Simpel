@@ -239,7 +239,13 @@ async function syncCoreDataToSupabase(){
     const {error:cError}=await supabaseClient.from("couriers").upsert(courierRow,{onConflict:"id"});
     if(cError)throw new Error("Tabel couriers: "+cError.message);
     for(const m of state.merchants){
-      const merchantRow={id:m.id,courier_id:c.id,merchant_name:m.name,whatsapp:m.phone,business_status:m.status||"CLOSED",updated_at:new Date().toISOString()};
+      // Data katalog publik tidak boleh ikut disinkronkan sebagai data mitra.
+      // Mitra asli wajib memiliki ID, nama, dan nomor WhatsApp.
+      if(!m || !m.id || !m.name || !String(m.phone||"").trim()){
+        console.warn("KURIR SIMPLE: data mitra dilewati karena ID/nama/WhatsApp belum lengkap",m?.id||"");
+        continue;
+      }
+      const merchantRow={id:m.id,courier_id:c.id,merchant_name:m.name,whatsapp:String(m.phone).trim(),business_status:m.status||"CLOSED",updated_at:new Date().toISOString()};
       const {error}=await supabaseClient.from("merchants").upsert(merchantRow,{onConflict:"id"});
       if(error)throw new Error("Tabel merchants: "+error.message);
       for(const menu of (m.menus||[])){
@@ -1108,9 +1114,12 @@ async function loadPublicCatalogForCourier(courierId, customerId){
       }))
     }));
     publicCatalogCache.set(courierId,catalog);
-    // Sinkronkan katalog cloud ke tampilan lokal tanpa mengubah data mitra
-    // milik kurir lain atau menimpa data inti lokal yang sedang dikelola Kurir.
-    state.merchants=state.merchants.filter(m=>m.courierId!==courierId).concat(catalog);
+    // Katalog pelanggan hanya disimpan di cache khusus. Jangan gabungkan ke
+    // state.merchants, karena daftar itu adalah data yang dikelola Kurir dan
+    // disinkronkan ke tabel merchants (yang mewajibkan kolom whatsapp).
+    // Bersihkan entri katalog lama yang pernah tersimpan tanpa nomor WhatsApp,
+    // tetapi pertahankan semua mitra lokal yang memiliki nomor WhatsApp.
+    state.merchants=state.merchants.filter(m=>!(m.courierId===courierId && !String(m.phone||"").trim()));
     persistLocal();
   }catch(err){
     console.error('KURIR SIMPLE: gagal memuat katalog pelanggan dari Supabase',err);
@@ -1487,4 +1496,4 @@ async function initializeKurirSimple(){
 initializeKurirSimple();
 </script>
 </body>
-  </html>
+</html>
