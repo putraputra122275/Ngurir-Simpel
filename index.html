@@ -249,13 +249,35 @@ async function syncCoreDataToSupabase(){
       const {error}=await supabaseClient.from("merchants").upsert(merchantRow,{onConflict:"id"});
       if(error)throw new Error("Tabel merchants: "+error.message);
       for(const menu of (m.menus||[])){
-        const basePrice=Number(menu.price||0);
-        const {error:menuError}=await supabaseClient.from("menus").upsert({id:menu.id,merchant_id:m.id,menu_name:menu.name,base_price:basePrice,availability:menu.status||"TERSEDIA",has_variants:!!(menu.variants||[]).length,variant_selection:menu.choiceMode||"single",variant_price_mode:menu.priceMode||"same",updated_at:new Date().toISOString()},{onConflict:"id"});
+        // Jangan kirim record menu yang tidak mempunyai identitas/nama.
+        // Harga kosong diperlakukan sebagai 0 agar base_price tidak menjadi NULL.
+        if(!menu || !menu.id || !String(menu.name||"").trim()){
+          console.warn("KURIR SIMPLE: menu dilewati karena ID/nama belum lengkap pada mitra",m.id);
+          continue;
+        }
+        const rawPrice=menu.price;
+        const parsedPrice=rawPrice===null || rawPrice===undefined || String(rawPrice).trim()==="" ? 0 : Number(rawPrice);
+        if(!Number.isFinite(parsedPrice)){
+          console.warn("KURIR SIMPLE: menu dilewati karena harga tidak valid",menu.id);
+          continue;
+        }
+        const basePrice=parsedPrice;
+        const {error:menuError}=await supabaseClient.from("menus").upsert({id:menu.id,merchant_id:m.id,menu_name:String(menu.name).trim(),base_price:basePrice,availability:menu.status||"TERSEDIA",has_variants:!!(menu.variants||[]).length,variant_selection:menu.choiceMode||"single",variant_price_mode:menu.priceMode||"same",updated_at:new Date().toISOString()},{onConflict:"id"});
         if(menuError)throw new Error("Tabel menus: "+menuError.message);
         for(let i=0;i<(menu.variants||[]).length;i++){
           const v=menu.variants[i];
-          const price=menu.priceMode==="different"?Number(v.price||0):basePrice;
-          const {error:variantError}=await supabaseClient.from("menu_variants").upsert({id:v.id,menu_id:menu.id,variant_name:v.name,price,display_order:i},{onConflict:"id"});
+          if(!v || !v.id || !String(v.name||"").trim()){
+            console.warn("KURIR SIMPLE: varian dilewati karena ID/nama belum lengkap pada menu",menu.id);
+            continue;
+          }
+          const rawVariantPrice=menu.priceMode==="different"?v.price:basePrice;
+          const parsedVariantPrice=rawVariantPrice===null || rawVariantPrice===undefined || String(rawVariantPrice).trim()==="" ? 0 : Number(rawVariantPrice);
+          if(!Number.isFinite(parsedVariantPrice)){
+            console.warn("KURIR SIMPLE: varian dilewati karena harga tidak valid",v.id);
+            continue;
+          }
+          const price=parsedVariantPrice;
+          const {error:variantError}=await supabaseClient.from("menu_variants").upsert({id:v.id,menu_id:menu.id,variant_name:String(v.name).trim(),price,display_order:i},{onConflict:"id"});
           if(variantError)throw new Error("Tabel menu_variants: "+variantError.message);
         }
       }
@@ -1114,13 +1136,10 @@ async function loadPublicCatalogForCourier(courierId, customerId){
       }))
     }));
     publicCatalogCache.set(courierId,catalog);
-    // Katalog pelanggan hanya disimpan di cache khusus. Jangan gabungkan ke
-    // state.merchants, karena daftar itu adalah data yang dikelola Kurir dan
-    // disinkronkan ke tabel merchants (yang mewajibkan kolom whatsapp).
-    // Bersihkan entri katalog lama yang pernah tersimpan tanpa nomor WhatsApp,
-    // tetapi pertahankan semua mitra lokal yang memiliki nomor WhatsApp.
-    state.merchants=state.merchants.filter(m=>!(m.courierId===courierId && !String(m.phone||"").trim()));
-    persistLocal();
+    // Katalog pelanggan hanya disimpan di publicCatalogCache.
+    // Jangan gabungkan katalog publik ke state.merchants dan jangan menghapus
+    // data lokal di sini. state.merchants tetap menjadi sumber data yang
+    // dikelola Kurir; sinkronisasi akan melewati entri yang tidak lengkap.
   }catch(err){
     console.error('KURIR SIMPLE: gagal memuat katalog pelanggan dari Supabase',err);
     publicCatalogErrors.set(courierId,err?.message||'Kesalahan tidak diketahui');
