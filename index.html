@@ -306,7 +306,23 @@ function nowText(){
 function currentCourier(){
   return state.courier;
 }
-function merchantById(mid){return state.merchants.find(m=>m.id===mid)}
+function merchantById(mid){
+  // Utamakan katalog Supabase agar data pelanggan yang tampil dan yang dipilih sama.
+  for(const catalog of publicCatalogCache.values()){
+    const found=(catalog||[]).find(m=>String(m.id)===String(mid));
+    if(found)return found;
+  }
+  return state.merchants.find(m=>String(m.id)===String(mid))||null;
+}
+function customerMerchantById(cid,mid){
+  const c=state.customers.find(x=>String(x.id)===String(cid));
+  if(c){
+    const catalog=publicCatalogCache.get(c.courierId)||[];
+    const found=catalog.find(m=>String(m.id)===String(mid));
+    if(found)return found;
+  }
+  return merchantById(mid);
+}
 function orderById(oid){return state.orders.find(o=>o.id===oid)}
 function toast(msg){
   const old=document.querySelector(".toast"); if(old)old.remove();
@@ -1201,7 +1217,7 @@ function openCustomerHome(cid,push=true,skipFetch=false){
     </div>
     ${publicCatalogLoading.has(c.courierId)?`<div class="empty">Memuat mitra usaha...</div>`:
       (publicCatalogErrors.has(c.courierId)?`<div class="card"><div class="empty">Mitra belum dapat dimuat dari server.</div><div class="muted" style="margin-top:8px">${esc(publicCatalogErrors.get(c.courierId))}</div><button class="btn" onclick="retryPublicCatalog('${cid}')">COBA LAGI</button></div>`:
-      (cards||`<div class="empty">Belum ada mitra usaha.</div>`))}
+      (merchants.length?cards:`<div class="empty">Belum ada mitra usaha.</div>`))}
     <button class="btn ${hasAny?"":"secondary"}" ${hasAny?"":"disabled"} onclick="openPage('customerCart:${cid}')">LIHAT PESAN</button>
   `),push)
 }
@@ -1228,10 +1244,11 @@ function renderCustomerMenus(cid,m){
     ${hasMenus?`<button class="btn" onclick="saveMerchantCustomerOrder('${cid}','${m.id}')">SIMPAN</button>`:""}
   </div>`
 }
+function jsArg(value){return String(value??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n")}
 function renderCustomerMenu(cid,m,menu){
   const cart=cartForMerchant(cid,m.id);
   if(menu.status==="HABIS") return `<div class="customer-menu"><div class="menu-main-row"><div class="grow"><div class="menu-name">${esc(menu.name)}</div><div class="price">${menu.priceMode==="different"?"Harga sesuai varian":money(menu.price)}</div></div><span class="status closed">HABIS</span></div></div>`;
-  if(menu.choiceMode==="multiple"){
+  if(["multiple","multi","bisa pilih lebih dari satu","bisa_pilih_lebih_dari_satu"].includes(String(menu.choiceMode||"").toLowerCase())){
     const rows=(menu.variants||[]).map((v,i)=>{
       const item=cart.find(x=>x.menuId===menu.id&&x.variantName===v.name);
       const q=item?.qty||0;
@@ -1239,9 +1256,9 @@ function renderCustomerMenu(cid,m,menu){
       return `<div class="variant-option">
         <div class="grow"><b>${esc(v.name)}</b>${price?`<div class="muted">${money(price)}</div>`:""}</div>
         <div class="variant-qty qty">
-          <button onclick="changeMultiQty('${cid}','${m.id}','${menu.id}','${esc(v.name)}',-1)">−</button>
+          <button onclick="changeMultiQty('${cid}','${m.id}','${menu.id}','${jsArg(v.name)}',-1)">−</button>
           <strong>${q}</strong>
-          <button onclick="changeMultiQty('${cid}','${m.id}','${menu.id}','${esc(v.name)}',1)">+</button>
+          <button onclick="changeMultiQty('${cid}','${m.id}','${menu.id}','${jsArg(v.name)}',1)">+</button>
         </div>
       </div>`
     }).join("");
@@ -1261,7 +1278,7 @@ function renderCustomerMenu(cid,m,menu){
   const rows=(menu.variants||[]).map(v=>{
     const price=menu.priceMode==="different"?Number(v.price||0):Number(menu.price||0);
     return `<label class="variant-option">
-      <input type="radio" name="single_${menu.id}" ${selectedName===v.name?"checked":""} onchange="selectSingleVariant('${cid}','${m.id}','${menu.id}','${esc(v.name)}')">
+      <input type="radio" name="single_${menu.id}" ${selectedName===v.name?"checked":""} onchange="selectSingleVariant('${cid}','${m.id}','${menu.id}','${jsArg(v.name)}')">
       <div class="grow"><b>${esc(v.name)}</b>${menu.priceMode==="different"?`<div class="muted">${money(price)}</div>`:""}</div>
     </label>`
   }).join("");
@@ -1275,8 +1292,9 @@ function renderCustomerMenu(cid,m,menu){
 }
 function selectSingleVariant(cid,mid,menuId,variantName){
   const cart=cartForMerchant(cid,mid);
-  const menu=merchantById(mid).menus.find(x=>x.id===menuId);
-  const old=cart.find(x=>x.menuId===menuId);
+  const merchant=customerMerchantById(cid,mid);const menu=merchant?.menus?.find(x=>String(x.id)===String(menuId));
+  if(!menu){toast("Menu tidak ditemukan. Muat ulang daftar mitra.");return}
+  const old=cart.find(x=>String(x.menuId)===String(menuId));
   const price=menu.priceMode==="different"?Number(menu.variants.find(v=>v.name===variantName)?.price||0):Number(menu.price||0);
   if(old){old.variantName=variantName;old.price=price}
   else cart.push({menuId,menuName:menu.name,variantName,qty:1,price});
@@ -1284,7 +1302,8 @@ function selectSingleVariant(cid,mid,menuId,variantName){
 }
 function changeSingleQty(cid,mid,menuId,delta){
   const cart=cartForMerchant(cid,mid);let item=cart.find(x=>x.menuId===menuId);
-  const menu=merchantById(mid).menus.find(x=>x.id===menuId);
+  const merchant=customerMerchantById(cid,mid);const menu=merchant?.menus?.find(x=>String(x.id)===String(menuId));
+  if(!menu){toast("Menu tidak ditemukan. Muat ulang daftar mitra.");return}
   if(!item&&delta>0){
     if((menu.variants||[]).length){toast("Pilih varian terlebih dahulu");return}
     item={menuId:menu.id,menuName:menu.name,variantName:"",qty:0,price:Number(menu.price||0)};
@@ -1297,8 +1316,9 @@ function changeSingleQty(cid,mid,menuId,delta){
 }
 function changeMultiQty(cid,mid,menuId,variantName,delta){
   const cart=cartForMerchant(cid,mid);let item=cart.find(x=>x.menuId===menuId&&x.variantName===variantName);
-  const menu=merchantById(mid).menus.find(x=>x.id===menuId);
-  const v=menu.variants.find(x=>x.name===variantName);
+  const merchant=customerMerchantById(cid,mid);const menu=merchant?.menus?.find(x=>String(x.id)===String(menuId));
+  if(!menu){toast("Menu tidak ditemukan. Muat ulang daftar mitra.");return}
+  const v=(menu.variants||[]).find(x=>x.name===variantName);
   const price=menu.priceMode==="different"?Number(v?.price||0):Number(menu.price||0);
   if(!item&&delta>0){item={menuId,menuName:menu.name,variantName,qty:0,price};cart.push(item)}
   if(item){
