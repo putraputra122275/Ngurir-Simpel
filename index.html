@@ -794,12 +794,31 @@ function saveEditedMenu(mid,menuId){
 /* =========================
    PESANAN KURIR
 ========================= */
-function openOrders(push=true){
+async function openOrders(push=true){
   if(!ensureCourier())return;
   currentPage="orders";
+  render(screen("PESANAN BARU",`<div class="muted">Memuat pesanan...</div>`),push);
+  try{await loadCourierOrdersFromSupabase()}catch(err){console.error(err);showCloudStatus("Gagal memuat pesanan Supabase: "+(err.message||"kesalahan"))}
   const orders=state.orders.filter(o=>o.courierId===state.courier.id);
   const html=orders.length?orders.map(orderCardCourier).join(""):`<div class="empty">Belum ada pesanan baru.</div>`;
-  render(screen("PESANAN BARU",html),push)
+  render(screen("PESANAN BARU",html),false)
+}
+async function loadCourierOrdersFromSupabase(){
+  const courier=state.courier;if(!courier?.id)return;
+  // Pembacaan dilakukan melalui RPC yang memverifikasi auth.uid() milik Kurir;
+  // RLS pada tabel pesanan tetap aktif dan tidak dibuka untuk publik.
+  const {data,error}=await supabaseClient.rpc("get_courier_orders");
+  if(error)throw new Error("Membaca pesanan Kurir: "+error.message);
+  const rows=Array.isArray(data)?data:(data?.orders||[]);
+  const remote=rows.map(o=>({
+    id:o.id,courierId:o.courier_id,customerId:o.customer_id,customerName:o.customer_name,
+    customerLocation:o.latitude!=null&&o.longitude!=null?{lat:o.latitude,lng:o.longitude}:null,
+    locationText:o.latitude!=null&&o.longitude!=null?`${o.latitude}, ${o.longitude}`:"",
+    merchants:(o.merchants||[]).map(m=>({merchantId:m.merchant_id,merchantName:m.merchant_name||merchantById(m.merchant_id)?.name||"Mitra",items:(m.items||[]).map(i=>({menuId:i.menu_id,menuName:i.menu_name,qty:Number(i.quantity),price:Number(i.unit_price),variantName:(i.variants||[]).map(v=>v.variant_name).join(", ")}))})),
+    time:o.ordered_at?new Date(o.ordered_at).toLocaleString("id-ID"):nowText(),shipping:null,
+    completed:o.order_status==="completed",label:"PESANAN "+String(o.order_number).padStart(2,"0"),orderNumber:o.order_number,remote:true
+  }));
+  state.orders=state.orders.filter(o=>o.courierId!==courier.id||!o.remote).concat(remote);persistLocal()
 }
 function orderCardCourier(o){
   return `<div class="order-card">
@@ -1039,11 +1058,17 @@ function openCustomerCode(push=true){
     </div>
   `),push)
 }
-function createCustomerCode(){
-  let code="";
-  do{code=String(Math.floor(1000+Math.random()*9000))}while(state.customerCodes.some(c=>c.code===code));
-  state.customerCodes.push({id:id("code"),courierId:state.courier.id,customerName:"",code,used:false,active:false});
-  save();openCustomerCode(false)
+async function createCustomerCode(){
+  if(!state.courier?.id){toast("Akun Kurir belum tersedia");return}
+  try{
+    const {data,error}=await supabaseClient.rpc("create_customer_code");
+    if(error)throw error;
+    const row=Array.isArray(data)?data[0]:data;
+    if(!row?.code||!row?.id||!row?.courier_id)throw new Error("Supabase tidak mengembalikan kode pelanggan yang lengkap");
+    const old=state.customerCodes.find(x=>x.id===row.id);
+    if(!old)state.customerCodes.push({id:row.id,courierId:row.courier_id,customerName:"",code:row.code,used:row.status!=="available",active:false});
+    persistLocal();openCustomerCode(false);toast("Kode pelanggan berhasil dibuat di Supabase")
+  }catch(err){console.error(err);toast("Gagal membuat kode pelanggan: "+(err.message||"kesalahan Supabase"))}
 }
 
 /* =========================
@@ -1059,29 +1084,23 @@ function openCustomerLogin(push=true){
     </div>
   `),push)
 }
-function verifyCustomerCode(){
+async function verifyCustomerCode(){
   const code=document.getElementById("customerCodeInput").value.trim();
   if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
-  const c=state.customerCodes.find(x=>x.code===code);
-  if(!c){toast("Kode tidak valid");return}
-  if(c.used){toast("Kode sudah digunakan");return}
-  const pending=getPendingMerchant();
-  const merchant=pending?merchantById(pending):null;
-  const pendingCourier=getPendingCourier();
-  if(pendingCourier&&pendingCourier!==c.courierId){
-    setPendingCourier(null);
-    toast("Kode pelanggan tidak sesuai dengan link kurir ini");return
-  }
-  if(merchant&&merchant.courierId!==c.courierId){
-    clearPendingMerchant();
-    toast("Link mitra bukan milik kode pelanggan ini");return
-  }
-  setPendingCourier(null);
-  c.used=true;c.active=false;
-  const customer={id:id("cust"),courierId:c.courierId,name:c.customerName,codeId:c.id,location:null,registered:true,firstOrderDone:false};
-  state.customers.push(customer);save();
-  localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
-  openCustomerRegister(customer.id,true)
+  try{
+    const {data,error}=await supabaseClient.rpc("validate_customer_code",{p_code:code});
+    if(error)throw error;
+    if(!data?.valid){toast(data?.message||"Kode tidak valid atau sudah digunakan");return}
+    const courierId=data.courier_id;
+    const pending=getPendingMerchant();
+    const pendingCourier=getPendingCourier();
+    if(pendingCourier&&pendingCourier!==courierId){setPendingCourier(null);toast("Kode pelanggan tidak sesuai dengan link kurir ini");return}
+    const customer={id:id("cust"),courierId,name:"",phone:"",code,codeId:data.code_id,location:null,registered:false,firstOrderDone:false};
+    state.customers=state.customers.filter(x=>x.code!==code);
+    state.customers.push(customer);persistLocal();setPendingCourier(null);
+    localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
+    openCustomerRegister(customer.id,true)
+  }catch(err){console.error(err);toast("Gagal memeriksa kode di Supabase: "+(err.message||"kesalahan"))}
 }
 function openCustomerRegister(cid,push=true){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
@@ -1108,14 +1127,33 @@ function shareCustomerLocation(cid){
     save();document.getElementById("locationStatus").textContent="Lokasi sudah tersimpan: "+c.location.lat.toFixed(5)+", "+c.location.lng.toFixed(5)
   },()=>toast("Izin lokasi belum diberikan"))
 }
-function finishCustomerRegistration(cid){
+async function finishCustomerRegistration(cid){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
   if(!c.location){toast("Bagikan lokasi terlebih dahulu");return}
-  const name=document.getElementById("custName").value.trim();
-  const phone=document.getElementById("custPhone").value.trim();
-  if(!name||!/^\d{12}$/.test(phone)){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
-  c.name=name;c.phone=phone;save();
-  openCustomerHome(cid,false)
+  const name=document.getElementById("custName")?.value.trim()||"";
+  const phone=document.getElementById("custPhone")?.value.trim()||"";
+  if(!name||!/^[0-9]{12}$/.test(phone)){toast("Isi nama dan nomor WhatsApp tepat 12 digit");return}
+  if(c.registering)return;
+  c.registering=true;
+  try{
+    const {data,error}=await supabaseClient.rpc("register_customer_with_code",{
+      p_code:String(c.code||""),p_full_name:name,p_whatsapp:phone,
+      p_latitude:Number(c.location.lat),p_longitude:Number(c.location.lng)
+    });
+    if(error)throw error;
+    const row=Array.isArray(data)?data[0]:data;
+    if(!row?.id||!row?.courier_id)throw new Error("Supabase tidak mengembalikan identitas pelanggan");
+    c.id=row.id;c.courierId=row.courier_id;c.name=row.full_name||name;c.phone=row.whatsapp||phone;
+    c.registered=true;c.firstOrderDone=false;c.location={lat:Number(row.latitude),lng:Number(row.longitude),updatedAt:nowText()};
+    // Update identitas yang disimpan di perangkat agar sesi memakai UUID dari Supabase.
+    localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",c.id);
+    persistLocal();
+    toast("Pendaftaran pelanggan berhasil disimpan di Supabase");
+    openCustomerHome(c.id,false);
+  }catch(err){
+    console.error("Pendaftaran pelanggan Supabase gagal",err);
+    toast("Pendaftaran belum tersimpan: "+(err?.message||"kesalahan Supabase"));
+  }finally{c.registering=false;}
 }
 function customerCurrent(){
   const idc=localStorage.getItem("KURIR_SIMPLE_CURRENT_CUSTOMER");
@@ -1349,7 +1387,7 @@ function openCustomerCart(cid,push=true){
   const mids=Object.keys(cart).filter(mid=>cart[mid].length);
   let total=0;
   const blocks=mids.map(mid=>{
-    const m=merchantById(mid);if(!m)return "";
+    const m=customerMerchantById(cid,mid);if(!m)return "";
     const items=cart[mid];const sub=items.reduce((a,i)=>a+Number(i.price||0)*i.qty,0);total+=sub;
     return `<div class="cart-merchant"><b>${esc(m.name)}</b>
       ${items.map(i=>`<div class="cart-line"><span>${esc(i.menuName)}${i.variantName?` — ${esc(i.variantName)}`:""} × ${i.qty}</span><span>${money(i.price*i.qty)}</span></div>`).join("")}
@@ -1381,51 +1419,46 @@ function openSurvey(cid,push=true){
     </div>
   `),push)
 }
-function submitSurveyAndOrder(cid){
-  const answer=document.getElementById("surveyAnswer").value.trim();
-  if(!answer){toast("Survei wajib diisi");return}
+async function persistCustomerOrder(cid, survey=null){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
-  const cart=getCart(cid);const mids=Object.keys(cart).filter(mid=>cart[mid].length);
+  if(!c.registered||!isUuid(c.id)||!isUuid(c.courierId)){toast("Akun pelanggan belum terhubung dengan Supabase");return}
+  const cart=getCart(cid), mids=Object.keys(cart).filter(mid=>cart[mid].length);
   if(!mids.length){toast("Belum ada pesanan");return}
-  /*
-    Alur master memiliki ketergantungan ongkir sebelum KIRIM,
-    sementara ongkir diisi kurir setelah menerima pesanan.
-    Karena itu pesanan disimpan sebagai draft terkirim dengan shipping 0,
-    dan kurir mengisi ongkir sebelum SELESAI.
-  */
-  const merchants=mids.map(mid=>{
-    const m=merchantById(mid);
-    return {
-      merchantId:mid,merchantName:m.name,
-      items:cart[mid].map(i=>({menuId:i.menuId,menuName:i.menuName,variantName:i.variantName,qty:i.qty,price:i.price}))
+  const payload=[];
+  for(const mid of mids){
+    const merchant=customerMerchantById(cid,mid);
+    if(!merchant){toast("Data mitra tidak ditemukan. Muat ulang katalog lalu coba lagi.");return}
+    for(const item of cart[mid]){
+      const menu=(merchant.menus||[]).find(m=>String(m.id)===String(item.menuId));
+      if(!menu){toast("Menu tidak ditemukan di katalog Supabase: "+(item.menuName||"menu"));return}
+      const variantName=String(item.variantName||"").trim();
+      const variant=(menu.variants||[]).find(v=>String(v.name).trim().toLocaleLowerCase("id-ID")===variantName.toLocaleLowerCase("id-ID"));
+      const variants=variantName?[{variant_id:variant?.id||null,variant_name:variantName,variant_price:Number(variant?.price??0)}]:[];
+      const quantity=Number(item.qty), unitPrice=Number(item.price);
+      if(!Number.isInteger(quantity)||quantity<1||!Number.isFinite(unitPrice)||unitPrice<0){toast("Jumlah atau harga menu tidak valid");return}
+      payload.push({merchant_id:mid,menu_id:item.menuId,menu_name:item.menuName,quantity,unit_price:unitPrice,variants});
     }
-  });
-  const o={
-    id:id("order"),courierId:c.courierId,customerId:c.id,customerName:c.name,
-    customerLocation:c.location,locationText:c.location?`${c.location.lat}, ${c.location.lng}`:"",
-    merchants,time:nowText(),shipping:0,completed:false,label:"PESANAN "+String(state.orders.length+1).padStart(2,"0"),
-    survey:{completed:true,answer}
-  };
-  state.orders.push(o);
-  c.firstOrderDone=true;
-  const code=state.customerCodes.find(x=>x.id===c.codeId);if(code)code.active=true;
-  save();
-  Object.keys(cart).forEach(k=>delete cart[k]);
-  openCustomerSent(cid,false)
+  }
+  try{
+    const {data,error}=await supabaseClient.rpc("submit_customer_order",{
+      p_courier_id:c.courierId,p_customer_id:c.id,p_items:payload
+    });
+    if(error)throw error;
+    if(!data?.success||!data?.order_id)throw new Error("Supabase tidak mengonfirmasi penyimpanan pesanan");
+    const merchants=mids.map(mid=>{const m=customerMerchantById(cid,mid);return {merchantId:mid,merchantName:m?.name||"Mitra",items:cart[mid].map(i=>({menuId:i.menuId,menuName:i.menuName,variantName:i.variantName,qty:i.qty,price:i.price}))}});
+    const o={id:data.order_id,courierId:c.courierId,customerId:c.id,customerName:c.name,customerLocation:c.location,locationText:c.location?`${c.location.lat}, ${c.location.lng}`:"",merchants,time:nowText(),shipping:survey?0:null,completed:false,label:"PESANAN "+String(data.order_number).padStart(2,"0"),orderNumber:data.order_number,remote:true,survey:survey?{completed:true,answer:survey}:undefined};
+    state.orders=state.orders.filter(x=>x.id!==o.id);state.orders.push(o);c.firstOrderDone=true;persistLocal();
+    Object.keys(cart).forEach(k=>delete cart[k]);
+    toast("Pesanan berhasil disimpan ke Supabase");openCustomerSent(cid,false)
+  }catch(err){console.error("Penyimpanan pesanan Supabase gagal",err);toast("Pesanan BELUM terkirim: "+(err?.message||"kesalahan Supabase"))}
 }
-
-function submitOrderDirect(cid){
-  const c=state.customers.find(x=>x.id===cid);if(!c)return;
-  const cart=getCart(cid);const mids=Object.keys(cart).filter(mid=>cart[mid].length);
-  if(!mids.length){toast("Belum ada pesanan");return}
-  const merchants=mids.map(mid=>{
-    const m=merchantById(mid);if(!m)return null;
-    return {merchantId:mid,merchantName:m.name,items:cart[mid].map(i=>({menuId:i.menuId,menuName:i.menuName,variantName:i.variantName,qty:i.qty,price:i.price}))}
-  }).filter(Boolean);
-  const o={id:id("order"),courierId:c.courierId,customerId:c.id,customerName:c.name,customerLocation:c.location,locationText:c.location?`${c.location.lat}, ${c.location.lng}`:"",merchants,time:nowText(),shipping:null,completed:false,label:"PESANAN "+String(state.orders.length+1).padStart(2,"0")};
-  state.orders.push(o);c.firstOrderDone=true;
-  const code=state.customerCodes.find(x=>x.id===c.codeId);if(code)code.active=true;
-  save();Object.keys(cart).forEach(k=>delete cart[k]);openCustomerSent(cid,false)
+async function submitSurveyAndOrder(cid){
+  const field=document.getElementById("surveyAnswer");const answer=field?.value.trim()||"";
+  if(!answer){toast("Survei wajib diisi");return}
+  await persistCustomerOrder(cid,answer)
+}
+async function submitOrderDirect(cid){
+  await persistCustomerOrder(cid,null)
 }
 
 function openCustomerSent(cid,push=true){
@@ -1543,4 +1576,4 @@ async function initializeKurirSimple(){
 initializeKurirSimple();
 </script>
 </body>
-</html>
+  </html>
