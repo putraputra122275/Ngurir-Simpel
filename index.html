@@ -1148,7 +1148,12 @@ async function loadPublicCatalogForCourier(courierId, customerId){
         status:String(menu.availability||menu.status||'TERSEDIA').toUpperCase(),
         choiceMode:menu.variant_selection||menu.choiceMode||'single',
         priceMode:menu.variant_price_mode||menu.priceMode||'same',
-        variants:(menu.variants||[]).map(v=>({id:v.id,name:v.variant_name||v.name||'',price:Number(v.price||0)}))
+        // Buang duplikat varian berdasarkan nama + harga; beberapa baris lama
+        // di Supabase bisa memiliki ID berbeda meskipun varian sebenarnya sama.
+        variants:[...new Map((menu.variants||[])
+          .map(v=>({id:v.id,name:String(v.variant_name||v.name||'').trim(),price:Number(v.price||0)}))
+          .filter(v=>v.name)
+          .map(v=>[v.name.toLocaleLowerCase('id-ID')+'|'+v.price,v])).values()]
       }))
     }));
     publicCatalogCache.set(courierId,catalog);
@@ -1234,7 +1239,10 @@ function saveCustomerProfile(cid,field,value){
   c[field]=v;save();toast("Data akun diperbarui")
 }
 function customerOpenMerchant(cid,mid){
-  window.customerOpenMerchant=window.customerOpenMerchant===mid?null:mid;
+  // Ketuk kartu mitra selalu membuka mitra yang diketuk dan menutup mitra lain.
+  // Mengetuk kembali mitra yang sama tidak menutupnya agar pelanggan bisa
+  // terus mengubah jumlah/varian, termasuk setelah menekan SIMPAN.
+  window.customerOpenMerchant=String(mid);
   openCustomerHome(cid,false)
 }
 function renderCustomerMenus(cid,m){
@@ -1328,7 +1336,7 @@ function changeMultiQty(cid,mid,menuId,variantName,delta){
 }
 function saveMerchantCustomerOrder(cid,mid){
   if(!cartMerchantHas(cid,mid)){toast("Belum ada menu yang dipilih");return}
-  window.customerOpenMerchant=null;openCustomerHome(cid,false);toast("Pesanan mitra disimpan")
+  window.customerOpenMerchant=String(mid);openCustomerHome(cid,false);toast("Pesanan mitra disimpan. Kamu masih bisa mengubah menu atau memilih mitra lain.")
 }
 
 /* =========================
