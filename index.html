@@ -1080,7 +1080,6 @@ function openCustomerCode(push=true){
           <b>${esc(c.customerName)}</b>
           <div class="code-box" style="font-size:23px">${esc(c.code)}</div>
           <div class="muted">${c.used?"Sudah digunakan":"Belum digunakan"}</div>
-          <button class="btn small danger" style="margin-top:8px" onclick="deleteCustomerCode('${esc(c.id)}')">HAPUS KODE</button>
         </div>`).join(""):`<div class="empty">Belum ada kode pelanggan.</div>`}
     </div>
   `),push)
@@ -1089,43 +1088,30 @@ async function createCustomerCode(){
   if(!state.courier?.id){toast("Akun Kurir belum tersedia");return}
   if(!isUuid(state.courier.id)){toast("ID Kurir belum valid untuk Supabase. Muat ulang akun Kurir lalu coba lagi.");return}
   try{
-    let code="",attempt=0,exists=true;
-    while(attempt<30&&exists){
+    // Pastikan sesi Auth dan data Kurir tersinkron sebelum meminta RPC pemilik akun.
+    await ensureSupabaseSession();
+    await syncCoreDataToSupabase();
+    let code="",attempt=0,created=null,lastError=null;
+    while(attempt<30&&!created){
       code=String(Math.floor(1000+Math.random()*9000));attempt++;
-      const check=await supabaseClient.from("customer_codes").select("id").eq("code",code).limit(1);
-      if(check.error)throw check.error;
-      exists=!!(check.data&&check.data.length);
+      const {data,error}=await supabaseClient.rpc("create_customer_code_owned",{
+        p_code:code,p_courier_id:state.courier.id
+      });
+      if(error){
+        // Benturan kode unik bisa dicoba ulang; error lain harus ditampilkan.
+        if(/duplicate|unique|already exists/i.test(error.message||"")){lastError=error;continue;}
+        throw error;
+      }
+      const row=Array.isArray(data)?data[0]:data;
+      if(row?.success===true)created=row;
+      else if(row?.code_exists===true){lastError=new Error("Kode sudah ada; mencoba kode lain.");continue;}
+      else throw new Error(row?.message||"RPC tidak mengonfirmasi pembuatan kode.");
     }
-    if(exists)throw new Error("Tidak berhasil membuat kode unik. Coba lagi.");
-    const {data,error}=await supabaseClient.from("customer_codes").insert({courier_id:state.courier.id,code,status:"available",customer_id:null,used_at:null}).select("id,courier_id,code,status,customer_id").single();
-    if(error)throw error;
-    const old=state.customerCodes.find(x=>x.id===data.id);
-    if(!old)state.customerCodes.push({id:data.id,courierId:data.courier_id,customerName:"",code:data.code,used:false,active:false});
+    if(!created)throw lastError||new Error("Tidak berhasil membuat kode unik. Coba lagi.");
+    const old=state.customerCodes.find(x=>x.id===created.id);
+    if(!old)state.customerCodes.push({id:created.id,courierId:created.courier_id,customerName:"",code:created.code,used:false,active:false});
     persistLocal();openCustomerCode(false);toast("Kode pelanggan berhasil dibuat di Supabase")
   }catch(err){console.error(err);toast("Gagal membuat kode pelanggan: "+(err.message||"kesalahan Supabase"))}
-}
-
-async function deleteCustomerCode(codeId){
-  if(!state.courier?.id){toast("Akun Kurir belum tersedia");return}
-  if(!isUuid(state.courier.id)){toast("ID Kurir belum valid untuk Supabase. Muat ulang akun Kurir lalu coba lagi.");return}
-  const code=state.customerCodes.find(c=>String(c.id)===String(codeId)&&String(c.courierId)===String(state.courier.id));
-  if(!code){toast("Kode pelanggan tidak ditemukan pada akun Kurir ini");return}
-  if(!confirm(`Hapus kode pelanggan ${code.code}?`))return;
-  try{
-    const {data,error}=await supabaseClient.rpc("delete_customer_code_owned",{
-      p_code_id:String(code.id),
-      p_courier_id:state.courier.id
-    });
-    if(error)throw error;
-    if(data&&data.success===false)throw new Error(data.message||"Kode pelanggan gagal dihapus");
-    state.customerCodes=state.customerCodes.filter(c=>String(c.id)!==String(code.id));
-    persistLocal();
-    openCustomerCode(false);
-    toast("Kode pelanggan berhasil dihapus");
-  }catch(err){
-    console.error(err);
-    toast("Kode belum dihapus: "+(err.message||"kesalahan Supabase"));
-  }
 }
 
 /* =========================
@@ -1145,16 +1131,16 @@ async function verifyCustomerCode(){
   const code=document.getElementById("customerCodeInput").value.trim();
   if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
   try{
-    const {data,error}=await supabaseClient.from("customer_codes").select("id,courier_id,code,status,customer_id").eq("code",code).maybeSingle();
+    // Verifikasi dilakukan lewat RPC karena aplikasi tidak perlu membaca tabel customer_codes langsung.
+    const {data,error}=await supabaseClient.rpc("verify_customer_code",{p_code:code});
     if(error)throw error;
-    if(!data){toast("Kode tidak valid");return}
-    if(!isUuid(data.courier_id)){toast("Kode ini memiliki ID Kurir yang tidak valid di Supabase");return}
-    if(data.status!=="available"||data.customer_id){toast("Kode sudah digunakan");return}
-    const courierId=data.courier_id;
-    const pending=getPendingMerchant();
+    const row=Array.isArray(data)?data[0]:data;
+    if(!row||row.valid!==true){toast(row?.message||"Kode tidak valid atau sudah digunakan");return}
+    if(!isUuid(row.courier_id)){toast("Kode ini memiliki ID Kurir yang tidak valid di Supabase");return}
+    const courierId=row.courier_id;
     const pendingCourier=getPendingCourier();
     if(pendingCourier&&pendingCourier!==courierId){setPendingCourier(null);toast("Kode pelanggan tidak sesuai dengan link kurir ini");return}
-    const customer={id:id("cust"),courierId,name:"",phone:"",code,codeId:data.id,location:null,registered:false,firstOrderDone:false};
+    const customer={id:id("cust"),courierId,name:"",phone:"",code,codeId:row.id,location:null,registered:false,firstOrderDone:false};
     state.customers=state.customers.filter(x=>x.code!==code);
     state.customers.push(customer);persistLocal();setPendingCourier(null);
     localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
