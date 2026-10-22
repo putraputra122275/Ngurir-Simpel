@@ -1098,6 +1098,7 @@ async function verifyCustomerCode(){
     const {data,error}=await supabaseClient.from("customer_codes").select("id,courier_id,code,status,customer_id").eq("code",code).maybeSingle();
     if(error)throw error;
     if(!data){toast("Kode tidak valid");return}
+    if(!isUuid(data.courier_id)){toast("Kode ini memiliki ID Kurir yang tidak valid di Supabase");return}
     if(data.status!=="available"||data.customer_id){toast("Kode sudah digunakan");return}
     const courierId=data.courier_id;
     const pending=getPendingMerchant();
@@ -1150,13 +1151,20 @@ async function finishCustomerRegistration(cid){
     });
     if(error)throw error;
     const row=Array.isArray(data)?data[0]:data;
-    if(!(row?.customer_id||row?.id)||!row?.courier_id)throw new Error("Supabase tidak mengembalikan identitas pelanggan");
-    c.id=row.customer_id||row.id;c.courierId=row.courier_id;c.name=row.full_name||name;c.phone=row.whatsapp||phone;
-    c.registered=true;c.firstOrderDone=false;c.location={lat:Number(row.latitude),lng:Number(row.longitude),updatedAt:nowText()};
-    // Update identitas yang disimpan di perangkat agar sesi memakai UUID dari Supabase.
+    const customerId=row?.customer_id||row?.id;
+    if(!customerId||!row?.courier_id)throw new Error("Supabase tidak mengembalikan ID pelanggan dan Kurir. Respons: "+JSON.stringify(row??null));
+    // Pastikan pelanggan benar-benar tersimpan dan relasi Kurir cocok sebelum
+    // aplikasi mengizinkan pelanggan melanjutkan ke katalog/pesanan.
+    const check=await supabaseClient.from("customers")
+      .select("id,courier_id,full_name,whatsapp,latitude,longitude")
+      .eq("id",customerId).eq("courier_id",row.courier_id).maybeSingle();
+    if(check.error)throw new Error("Pendaftaran mungkin diproses, tetapi verifikasi data pelanggan gagal: "+check.error.message);
+    if(!check.data)throw new Error("Fungsi pendaftaran tidak menghasilkan data pelanggan yang cocok di tabel customers. Jangan kirim pesanan; coba daftar kembali dengan kode yang masih tersedia.");
+    c.id=check.data.id;c.courierId=check.data.courier_id;c.name=check.data.full_name||name;c.phone=check.data.whatsapp||phone;
+    c.registered=true;c.firstOrderDone=false;c.location={lat:Number(check.data.latitude),lng:Number(check.data.longitude),updatedAt:nowText()};
     localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",c.id);
     persistLocal();
-    toast("Pendaftaran pelanggan berhasil disimpan di Supabase");
+    toast("Pendaftaran pelanggan berhasil disimpan dan diverifikasi di Supabase");
     openCustomerHome(c.id,false);
   }catch(err){
     console.error("Pendaftaran pelanggan Supabase gagal",err);
@@ -1448,6 +1456,10 @@ async function persistCustomerOrder(cid, survey=null){
     }
   }
   try{
+    const customerCheck=await supabaseClient.from("customers").select("id,courier_id")
+      .eq("id",c.id).eq("courier_id",c.courierId).maybeSingle();
+    if(customerCheck.error)throw new Error("Tidak dapat memeriksa data pelanggan di Supabase: "+customerCheck.error.message);
+    if(!customerCheck.data)throw new Error("Data pelanggan belum ada atau courier_id tidak cocok di tabel customers. Buka kembali link pelanggan dan selesaikan pendaftaran menggunakan kode yang masih tersedia.");
     const {data,error}=await supabaseClient.rpc("submit_customer_order",{
       p_courier_id:c.courierId,p_customer_id:c.id,p_items:payload
     });
