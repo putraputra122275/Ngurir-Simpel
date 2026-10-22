@@ -537,6 +537,7 @@ function openMerchants(push=true){
         <button class="btn small ${m.status==='OPEN'?'selected-open':'outline'}" onclick="setMerchantStatus('${m.id}','OPEN')">OPEN</button>
         <button class="btn small ${m.status==='CLOSED'?'selected-closed':'outline'}" onclick="setMerchantStatus('${m.id}','CLOSED')">CLOSED</button>
         <button class="btn outline link-btn" onclick="event.stopPropagation();copyText(merchantLink('${m.id}'))">SALIN LINK</button>
+        <button class="btn small danger" onclick="event.stopPropagation();deleteMerchant('${m.id}')">HAPUS MITRA</button>
       </div>
     </div>`).join("");
   render(screen("MITRA USAHA",`
@@ -547,6 +548,31 @@ function openMerchants(push=true){
 function setMerchantStatus(mid,status){
   const m=merchantById(mid);if(!m)return;
   m.status=status;save();openMerchants(false)
+}
+async function deleteMerchant(mid){
+  const m=merchantById(mid);if(!m)return;
+  if(!confirm(`Hapus Mitra Usaha "${m.name}" beserta menu dan variannya?`))return;
+  try{
+    // Hapus data anak lebih dahulu agar foreign key tidak menggagalkan penghapusan.
+    if(supabaseClient && isUuid(mid)){
+      const menuIds=(m.menus||[]).map(x=>x.id).filter(isUuid);
+      if(menuIds.length){
+        const {error:variantError}=await supabaseClient.from("menu_variants").delete().in("menu_id",menuIds);
+        if(variantError)throw new Error("Gagal menghapus varian menu: "+variantError.message);
+        const {error:menuError}=await supabaseClient.from("menus").delete().eq("merchant_id",mid);
+        if(menuError)throw new Error("Gagal menghapus menu: "+menuError.message);
+      }
+      const {error:merchantError}=await supabaseClient.from("merchants").delete().eq("id",mid).eq("courier_id",state.courier.id);
+      if(merchantError)throw new Error("Gagal menghapus Mitra Usaha di Supabase: "+merchantError.message);
+    }
+    state.merchants=state.merchants.filter(x=>String(x.id)!==String(mid));
+    persistLocal();
+    toast("Mitra Usaha berhasil dihapus");
+    openMerchants(false);
+  }catch(err){
+    console.error(err);
+    toast(err.message||"Mitra Usaha gagal dihapus");
+  }
 }
 function openAddMerchant(push=true){
   currentPage="addMerchant";
@@ -1054,6 +1080,7 @@ function openCustomerCode(push=true){
           <b>${esc(c.customerName)}</b>
           <div class="code-box" style="font-size:23px">${esc(c.code)}</div>
           <div class="muted">${c.used?"Sudah digunakan":"Belum digunakan"}</div>
+          <button class="btn small danger" style="margin-top:8px" onclick="deleteCustomerCode('${esc(c.id)}')">HAPUS KODE</button>
         </div>`).join(""):`<div class="empty">Belum ada kode pelanggan.</div>`}
     </div>
   `),push)
@@ -1088,6 +1115,29 @@ async function createCustomerCode(){
   }
 }
 
+async function deleteCustomerCode(codeId){
+  if(!state.courier?.id){toast("Akun Kurir belum tersedia");return}
+  if(!isUuid(state.courier.id)){toast("ID Kurir belum valid untuk Supabase. Muat ulang akun Kurir lalu coba lagi.");return}
+  const code=state.customerCodes.find(c=>String(c.id)===String(codeId)&&String(c.courierId)===String(state.courier.id));
+  if(!code){toast("Kode pelanggan tidak ditemukan pada akun Kurir ini");return}
+  if(!confirm(`Hapus kode pelanggan ${code.code}?`))return;
+  try{
+    const {data,error}=await supabaseClient.rpc("delete_customer_code_owned",{
+      p_code_id:String(code.id),
+      p_courier_id:state.courier.id
+    });
+    if(error)throw error;
+    if(data&&data.success===false)throw new Error(data.message||"Kode pelanggan gagal dihapus");
+    state.customerCodes=state.customerCodes.filter(c=>String(c.id)!==String(code.id));
+    persistLocal();
+    openCustomerCode(false);
+    toast("Kode pelanggan berhasil dihapus");
+  }catch(err){
+    console.error(err);
+    toast("Kode belum dihapus: "+(err.message||"kesalahan Supabase"));
+  }
+}
+
 /* =========================
    CUSTOMER LOGIN / REGISTRATION
 ========================= */
@@ -1108,6 +1158,7 @@ async function verifyCustomerCode(){
     const {data,error}=await supabaseClient.from("customer_codes").select("id,courier_id,code,status,customer_id").eq("code",code).maybeSingle();
     if(error)throw error;
     if(!data){toast("Kode tidak valid");return}
+    if(!isUuid(data.courier_id)){toast("Kode ini memiliki ID Kurir yang tidak valid di Supabase");return}
     if(data.status!=="available"||data.customer_id){toast("Kode sudah digunakan");return}
     const courierId=data.courier_id;
     const pending=getPendingMerchant();
@@ -1160,13 +1211,17 @@ async function finishCustomerRegistration(cid){
     });
     if(error)throw error;
     const row=Array.isArray(data)?data[0]:data;
-    if(!(row?.customer_id||row?.id)||!row?.courier_id)throw new Error("Supabase tidak mengembalikan identitas pelanggan");
-    c.id=row.customer_id||row.id;c.courierId=row.courier_id;c.name=row.full_name||name;c.phone=row.whatsapp||phone;
-    c.registered=true;c.firstOrderDone=false;c.location={lat:Number(row.latitude),lng:Number(row.longitude),updatedAt:nowText()};
-    // Update identitas yang disimpan di perangkat agar sesi memakai UUID dari Supabase.
+    const customerId=row?.customer_id||row?.id;
+    if(!customerId||!row?.courier_id)throw new Error("Supabase tidak mengembalikan ID pelanggan dan Kurir. Respons: "+JSON.stringify(row??null));
+    // RPC pendaftaran berjalan sebagai satu transaksi: bila sukses dan
+    // mengembalikan ID serta courier_id, gunakan hasil RPC. Jangan membaca
+    // tabel customers langsung dari browser karena RLS dapat menyembunyikan
+    // baris yang sebenarnya berhasil dibuat.
+    c.id=customerId;c.courierId=row.courier_id;c.name=row.full_name||name;c.phone=row.whatsapp||phone;
+    c.registered=true;c.firstOrderDone=false;c.location={lat:Number(row.latitude??c.location.lat),lng:Number(row.longitude??c.location.lng),updatedAt:nowText()};
     localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",c.id);
     persistLocal();
-    toast("Pendaftaran pelanggan berhasil disimpan di Supabase");
+    toast("Pendaftaran pelanggan berhasil disimpan dan diverifikasi di Supabase");
     openCustomerHome(c.id,false);
   }catch(err){
     console.error("Pendaftaran pelanggan Supabase gagal",err);
@@ -1458,6 +1513,8 @@ async function persistCustomerOrder(cid, survey=null){
     }
   }
   try{
+    // Validasi final dilakukan di submit_customer_order (server-side), agar
+    // RLS pada pembacaan tabel customers tidak memblokir pelanggan yang sah.
     const {data,error}=await supabaseClient.rpc("submit_customer_order",{
       p_courier_id:c.courierId,p_customer_id:c.id,p_items:payload
     });
