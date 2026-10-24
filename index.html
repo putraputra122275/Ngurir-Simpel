@@ -1428,21 +1428,58 @@ function openSurvey(cid,push=true){
   `),push)
 }
 async function ensureCustomerCloudIdentity(c){
-  // Pulihkan identitas cloud dari kode pelanggan agar ID lokal lama tidak
-  // dikirim ke submit_customer_order.
-  if(!c || !c.code) throw new Error("Kode pelanggan tidak tersimpan pada perangkat. Daftarkan pelanggan kembali melalui tautan Kurir.");
-  const {data:codeRow,error:codeError}=await supabaseClient
-    .from("customer_codes")
-    .select("code,courier_id,customer_id,status")
-    .eq("code",String(c.code))
-    .maybeSingle();
-  if(codeError) throw new Error("Gagal memeriksa identitas kode pelanggan: "+codeError.message);
-  if(!codeRow) throw new Error("Kode pelanggan tidak ditemukan di Supabase. Periksa apakah aplikasi memakai proyek Supabase yang benar.");
+  // Pulihkan identitas cloud tanpa meminta pelanggan mendaftar ulang.
+  // Utamakan kode yang tersimpan; jika field code hilang, gunakan codeId
+  // (ID baris customer_codes) yang dibuat saat kode diverifikasi.
+  if(!c) throw new Error("Data pelanggan tidak ditemukan pada perangkat. Buka kembali tautan pelanggan Kurir.");
+  let savedCode=String(c.code||"").trim();
+  let codeRow=null;
+
+  if(savedCode){
+    const result=await supabaseClient
+      .from("customer_codes")
+      .select("id,code,courier_id,customer_id,status")
+      .eq("code",savedCode)
+      .maybeSingle();
+    if(result.error) throw new Error("Gagal memeriksa identitas kode pelanggan: "+result.error.message);
+    codeRow=result.data;
+  }else if(c.codeId && isUuid(c.codeId)){
+    // verifyCustomerCode menyimpan ID baris ini sebagai codeId.
+    const result=await supabaseClient
+      .from("customer_codes")
+      .select("id,code,courier_id,customer_id,status")
+      .eq("id",c.codeId)
+      .maybeSingle();
+    if(result.error) throw new Error("Gagal memulihkan kode pelanggan dari Supabase: "+result.error.message);
+    codeRow=result.data;
+    if(codeRow) { savedCode=String(codeRow.code||""); c.code=savedCode; c.courierId=codeRow.courier_id; }
+  }else if(isUuid(c.id)){
+    // Pilihan terakhir: pulihkan lewat relasi customer_id jika pelanggan
+    // sudah pernah berhasil terdaftar di Supabase.
+    const result=await supabaseClient
+      .from("customer_codes")
+      .select("id,code,courier_id,customer_id,status")
+      .eq("customer_id",c.id)
+      .eq("status","used")
+      .maybeSingle();
+    if(result.error) throw new Error("Gagal memulihkan identitas pelanggan dari Supabase: "+result.error.message);
+    codeRow=result.data;
+    if(codeRow) { savedCode=String(codeRow.code||""); c.code=savedCode; c.codeId=codeRow.id; c.courierId=codeRow.courier_id; }
+  }
+
+  if(!codeRow && savedCode){
+    throw new Error("Kode pelanggan tidak ditemukan di Supabase. Periksa apakah aplikasi memakai proyek Supabase yang benar.");
+  }
+  if(!codeRow){
+    throw new Error("Identitas kode pelanggan tidak ditemukan pada perangkat. Buka tautan Kurir, masukkan kode pelanggan yang sama, lalu coba kembali.");
+  }
 
   if(codeRow.status==="used" && codeRow.customer_id){
     if(!isUuid(codeRow.customer_id)||!isUuid(codeRow.courier_id)) throw new Error("Identitas pelanggan/Kurir di Supabase tidak valid.");
     c.id=codeRow.customer_id;
     c.courierId=codeRow.courier_id;
+    c.code=savedCode||String(codeRow.code||"");
+    c.codeId=codeRow.id||c.codeId;
     c.registered=true;
     localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",c.id);
     persistLocal();
@@ -1452,25 +1489,25 @@ async function ensureCustomerCloudIdentity(c){
   if(codeRow.status!=="available" || codeRow.customer_id){
     throw new Error("Kode pelanggan sudah digunakan atau tidak aktif, tetapi belum terhubung dengan pelanggan. Perlu pemeriksaan data kode di Supabase.");
   }
-  // Pemulihan untuk sesi lokal lama: bila kode masih available, daftarkan
-  // pelanggan sekarang menggunakan data yang sudah diisi di perangkat.
+  // Kode masih tersedia berarti pendaftaran sebelumnya belum tersimpan.
+  // Lanjutkan pendaftaran hanya jika data yang telah diisi masih tersedia.
   if(!String(c.name||"").trim() || !/^[0-9]{12}$/.test(String(c.phone||"")) || !c.location || !Number.isFinite(Number(c.location.lat)) || !Number.isFinite(Number(c.location.lng))){
-    throw new Error("Pendaftaran pelanggan belum tersimpan. Buka tautan Kurir, masukkan kode, lalu lengkapi nama, WhatsApp, dan lokasi.");
+    throw new Error("Pendaftaran pelanggan belum tersimpan. Buka tautan Kurir, masukkan kode yang sama, lalu lengkapi nama, WhatsApp, dan lokasi.");
   }
   const {data,error}=await supabaseClient.rpc("register_customer_with_code",{
-    p_code:String(c.code),p_full_name:String(c.name).trim(),p_whatsapp:String(c.phone),
+    p_code:String(codeRow.code||savedCode),p_full_name:String(c.name).trim(),p_whatsapp:String(c.phone),
     p_latitude:Number(c.location.lat),p_longitude:Number(c.location.lng)
   });
   if(error) throw new Error("Pendaftaran pelanggan belum tersimpan: "+error.message);
   const row=Array.isArray(data)?data[0]:data;
   const customerId=row?.customer_id||row?.id;
   if(!isUuid(customerId)||!isUuid(row?.courier_id)) throw new Error("Supabase tidak mengembalikan ID pelanggan dan Kurir yang valid.");
-  c.id=customerId;c.courierId=row.courier_id;c.name=row.full_name||c.name;c.phone=row.whatsapp||c.phone;c.registered=true;
+  c.id=customerId;c.courierId=row.courier_id;c.code=String(codeRow.code||savedCode);c.codeId=codeRow.id||c.codeId;
+  c.name=row.full_name||c.name;c.phone=row.whatsapp||c.phone;c.registered=true;
   if(row.latitude!=null&&row.longitude!=null)c.location={lat:Number(row.latitude),lng:Number(row.longitude),updatedAt:nowText()};
   localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",c.id);
   persistLocal();
 }
-
 async function persistCustomerOrder(cid, survey=null){
   let c=state.customers.find(x=>x.id===cid);
   if(!c){c=customerCurrent();}
