@@ -1092,23 +1092,66 @@ function openCustomerLogin(push=true){
   `),push)
 }
 async function verifyCustomerCode(){
-  const code=document.getElementById("customerCodeInput").value.trim();
+  const code=String(document.getElementById("customerCodeInput")?.value||"").trim();
   if(!/^\d{4}$/.test(code)){toast("Kode harus 4 digit");return}
   try{
-    const {data,error}=await supabaseClient.from("customer_codes").select("id,courier_id,code,status,customer_id").eq("code",code).maybeSingle();
+    // Gunakan RPC identitas agar pemeriksaan tidak bergantung pada SELECT
+    // langsung ke customer_codes yang dapat dibatasi oleh RLS.
+    const {data,error}=await supabaseClient.rpc("get_customer_code_identity",{
+      p_code:code,p_code_id:null,p_customer_id:null
+    });
     if(error)throw error;
-    if(!data){toast("Kode tidak valid");return}
-    if(data.status!=="available"||data.customer_id){toast("Kode sudah digunakan");return}
-    const courierId=data.courier_id;
-    const pending=getPendingMerchant();
+    const row=Array.isArray(data)?data[0]:data;
+    if(!row||row.found===false){toast("Kode tidak valid");return}
+    const courierId=row.courier_id;
     const pendingCourier=getPendingCourier();
-    if(pendingCourier&&pendingCourier!==courierId){setPendingCourier(null);toast("Kode pelanggan tidak sesuai dengan link kurir ini");return}
-    const customer={id:id("cust"),courierId,name:"",phone:"",code,codeId:data.id,location:null,registered:false,firstOrderDone:false};
-    state.customers=state.customers.filter(x=>x.code!==code);
-    state.customers.push(customer);persistLocal();setPendingCourier(null);
+    if(pendingCourier&&pendingCourier!==courierId){
+      setPendingCourier(null);
+      toast("Kode pelanggan tidak sesuai dengan link kurir ini");
+      return;
+    }
+    setPendingCourier(null);
+
+    // Kode yang sudah dipakai tetap dikenali sebagai akun pelanggan terdaftar.
+    let customer=state.customers.find(x=>String(x.code||"").trim()===code);
+    if(row.status==="used"&&row.customer_id){
+      if(!customer){
+        customer={
+          id:row.customer_id,courierId,name:"",phone:"",code,
+          codeId:row.id,location:null,registered:true,firstOrderDone:false
+        };
+        state.customers.push(customer);
+      }else{
+        customer.id=row.customer_id;
+        customer.courierId=row.courier_id;
+        customer.code=String(row.code||code);
+        customer.codeId=row.id;
+        customer.registered=true;
+      }
+      persistLocal();
+      localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
+      if(customer.name&&customer.phone&&customer.location){
+        openCustomerHome(customer.id,true);
+      }else{
+        toast("Kode ditemukan dan sudah terdaftar, tetapi profil lama tidak tersimpan di perangkat ini. Gunakan perangkat yang sebelumnya dipakai mendaftar.");
+      }
+      return;
+    }
+
+    if(row.status!=="available"||row.customer_id){
+      toast("Kode pelanggan tidak aktif");
+      return;
+    }
+    customer={id:id("cust"),courierId,name:"",phone:"",code,codeId:row.id,location:null,registered:false,firstOrderDone:false};
+    state.customers=state.customers.filter(x=>String(x.code||"").trim()!==code);
+    state.customers.push(customer);
+    persistLocal();
     localStorage.setItem("KURIR_SIMPLE_CURRENT_CUSTOMER",customer.id);
-    openCustomerRegister(customer.id,true)
-  }catch(err){console.error(err);toast("Gagal memeriksa kode di Supabase: "+(err.message||"kesalahan"))}
+    openCustomerRegister(customer.id,true);
+  }catch(err){
+    console.error(err);
+    toast("Gagal memeriksa kode di Supabase: "+(err.message||"kesalahan"));
+  }
 }
 function openCustomerRegister(cid,push=true){
   const c=state.customers.find(x=>x.id===cid);if(!c)return;
@@ -1440,9 +1483,17 @@ async function ensureCustomerCloudIdentity(c){
     }
     throw new Error("Gagal memulihkan identitas pelanggan dari Supabase: "+error.message);
   }
-  const codeRow=Array.isArray(data)?data[0]:data;
+  let codeRow=Array.isArray(data)?data[0]:data;
+  // Jika ID lokal lama tidak cocok, ulangi pencarian dengan kode 4 digit saja.
+  if((!codeRow||codeRow.found===false)&&savedCode){
+    const retry=await supabaseClient.rpc("get_customer_code_identity",{
+      p_code:savedCode,p_code_id:null,p_customer_id:null
+    });
+    if(retry.error)throw new Error("Gagal mencari ulang kode pelanggan di Supabase: "+retry.error.message);
+    codeRow=Array.isArray(retry.data)?retry.data[0]:retry.data;
+  }
   if(!codeRow || codeRow.found===false) {
-    throw new Error("Kode pelanggan tidak ditemukan di Supabase. Pastikan tautan memakai proyek Supabase yang benar.");
+    throw new Error("Kode pelanggan tidak ditemukan di Supabase. Pastikan kode 4 digit pada akun pelanggan sama dengan kode yang terdaftar.");
   }
   savedCode=String(codeRow.code||savedCode||"");
   if(codeRow.id) c.codeId=codeRow.id;
