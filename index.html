@@ -1,437 +1,133 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1769aa">
 <title>KURIR SIMPLE</title>
-
 <style>
-:root {
-  --biru: #1769aa;
-  --biru-muda: #eaf4ff;
-  --putih: #ffffff;
-  --abu: #f3f6fa;
-  --teks: #18324b;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: var(--abu);
-  color: var(--teks);
-  min-height: 100vh;
-}
-
-button, input {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.halaman {
-  display: none;
-  max-width: 520px;
-  min-height: 100vh;
-  margin: auto;
-  padding: 20px;
-}
-
-.halaman.aktif {
-  display: block;
-}
-
-.logo {
-  width: 66px;
-  height: 66px;
-  border-radius: 20px;
-  background: var(--biru-muda);
-  color: var(--biru);
-  display: grid;
-  place-items: center;
-  font-size: 30px;
-  margin-bottom: 22px;
-}
-
-.judul {
-  font-size: 27px;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.deskripsi {
-  color: #718096;
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 25px;
-}
-
-.panel {
-  background: var(--putih);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 8px 25px #17324b0d;
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: bold;
-  margin: 17px 0 8px;
-}
-
-input {
-  width: 100%;
-  border: 1px solid #dce4ed;
-  border-radius: 12px;
-  padding: 14px;
-  outline: none;
-  background: #fff;
-}
-
-input:focus {
-  border-color: var(--biru);
-}
-
-.tombol {
-  width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 15px;
-  font-weight: bold;
-  margin-top: 15px;
-}
-
-.primer {
-  background: var(--biru);
-  color: white;
-}
-
-.sekunder {
-  background: var(--biru-muda);
-  color: var(--biru);
-}
-
-.catatan {
-  font-size: 12px;
-  color: #718096;
-  line-height: 1.5;
-  margin-top: 15px;
-}
-
-.header {
-  background: linear-gradient(135deg, #1769aa, #3799e8);
-  color: white;
-  padding: 24px 20px;
-  border-radius: 22px;
-  margin-bottom: 22px;
-}
-
-.header small {
-  opacity: .9;
-}
-
-.header h1 {
-  font-size: 25px;
-  margin: 9px 0;
-  overflow-wrap: anywhere;
-}
-
-.header p {
-  font-size: 13px;
-}
-
-.judul-menu {
-  font-size: 19px;
-  margin: 22px 0 14px;
-}
-
-.grid-menu {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.menu-item {
-  min-height: 115px;
-  padding: 16px 12px;
-  background: white;
-  border: 1px solid #e8edf3;
-  border-radius: 17px;
-  text-align: left;
-  color: var(--teks);
-}
-
-.menu-item:active {
-  transform: scale(.98);
-}
-
-.menu-item .ikon {
-  font-size: 27px;
-  margin-bottom: 15px;
-}
-
-.menu-item strong {
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.penuh {
-  grid-column: 1 / -1;
-  min-height: 75px;
-}
-
-.pesan {
-  display: none;
-  margin-top: 15px;
-  background: var(--biru-muda);
-  color: var(--biru);
-  padding: 13px;
-  border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.pesan.tampil {
-  display: block;
-}
-
-@media (max-width: 350px) {
-  .halaman { padding: 14px; }
-  .panel { padding: 15px; }
-  .grid-menu { gap: 8px; }
-}
+:root{--biru:#1769aa;--biru2:#3799e8;--muda:#eaf4ff;--putih:#fff;--abu:#f3f6fa;--teks:#18324b;--muted:#718096;--garis:#dce4ed;--hijau:#13865b;--merah:#bd3850;--jingga:#a65b0a}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:var(--abu);color:var(--teks);min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.halaman{display:none;max-width:560px;min-height:100vh;margin:auto;padding:20px}.halaman.aktif{display:block}.logo{width:66px;height:66px;border-radius:20px;background:var(--muda);color:var(--biru);display:grid;place-items:center;font-size:30px;margin-bottom:22px}.judul{font-size:27px;font-weight:800;margin-bottom:8px}.deskripsi{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:25px}.panel,.kartu{background:var(--putih);border-radius:18px;padding:17px;box-shadow:0 8px 25px #17324b0d;margin-bottom:12px}label{display:block;font-size:13px;font-weight:bold;margin:15px 0 7px}input,select,textarea{width:100%;border:1px solid var(--garis);border-radius:11px;padding:12px;outline:none;background:white;color:var(--teks)}input:focus,select:focus,textarea:focus{border-color:var(--biru)}textarea{resize:vertical;min-height:80px}.tombol{border:0;border-radius:11px;padding:12px 14px;font-weight:bold;margin-top:9px}.primer{background:var(--biru);color:white}.sekunder{background:var(--muda);color:var(--biru)}.netral{background:#f0f3f7;color:var(--teks);border:1px solid var(--garis)}.bahaya{background:#ffedf0;color:var(--merah)}.sukses{background:#e4f8ee;color:var(--hijau)}.tombol.penuh{width:100%}.catatan{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}.header{background:linear-gradient(135deg,var(--biru),var(--biru2));color:white;padding:22px 18px;border-radius:21px;margin-bottom:20px}.header small{opacity:.9}.header h1{font-size:24px;margin:9px 0;overflow-wrap:anywhere}.header p{font-size:13px}.judul-menu{font-size:19px;margin:22px 0 14px}.grid-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.menu-item{min-height:110px;padding:15px 12px;background:white;border:1px solid #e8edf3;border-radius:16px;text-align:left;color:var(--teks)}.menu-item:active{transform:scale(.98)}.menu-item .ikon{font-size:26px;margin-bottom:13px}.menu-item strong{font-size:12px;line-height:1.4}.menu-item.penuh{grid-column:1/-1;min-height:68px}.pesan{display:none;margin-top:13px;background:var(--muda);color:var(--biru);padding:12px;border-radius:11px;font-size:13px;line-height:1.5}.pesan.tampil{display:block}.baris-judul{display:flex;align-items:center;gap:10px;margin:4px 0 17px}.baris-judul h2{font-size:21px;flex:1}.kembali{border:0;border-radius:10px;background:white;color:var(--biru);padding:10px 13px;font-weight:bold}.aksi{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.aksi button{flex:1;min-width:95px;margin:0}.judul-kecil{font-size:15px;margin-bottom:6px}.muted{color:var(--muted);font-size:12px;line-height:1.5}.status{font-size:10px;font-weight:800;padding:5px 8px;border-radius:30px;white-space:nowrap}.status.open{background:#e2f8ed;color:var(--hijau)}.status.closed{background:#ffedf0;color:var(--merah)}.atas-kartu{display:flex;align-items:flex-start;justify-content:space-between;gap:9px}.harga{font-weight:800;color:var(--biru)}.baris-menu{display:flex;align-items:center;justify-content:space-between;gap:9px;border-bottom:1px solid #edf0f5;padding:10px 0}.baris-menu:last-child{border-bottom:0}.kosong{padding:24px 12px;text-align:center;color:var(--muted);border:1px dashed #cbd7e4;border-radius:14px;background:#ffffff90;line-height:1.6}.angka{font-size:25px;font-weight:800;color:var(--biru);margin:6px 0}.total{display:flex;justify-content:space-between;gap:10px;padding:7px 0;font-size:13px}.total.akhir{border-top:1px solid var(--garis);margin-top:5px;padding-top:12px;font-size:16px;font-weight:800;color:var(--biru)}.cek{display:flex;align-items:center;gap:9px;margin:8px 0;padding:10px;background:#f7faff;border:1px solid var(--garis);border-radius:10px}.cek input{width:18px;height:18px}.pita{background:var(--muda);color:var(--biru);border-radius:10px;padding:10px;font-size:12px;line-height:1.5;margin:10px 0}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#18324b;color:white;padding:12px 16px;border-radius:12px;max-width:90%;z-index:20;font-size:13px;box-shadow:0 5px 20px #0002}.sembunyi{display:none!important}.kecil{padding:8px 9px;font-size:11px;margin:0}.grid-dua{display:grid;grid-template-columns:1fr 1fr;gap:8px}.footer{text-align:center;color:#9aa8b8;font-size:11px;padding:20px 0 5px}
+@media(max-width:350px){.halaman{padding:14px}.panel,.kartu{padding:13px}.grid-menu{gap:8px}.menu-item{padding:11px 9px}.header h1{font-size:21px}}
 </style>
 </head>
-
 <body>
+<!-- PENDAFTARAN -->
+<section id="pendaftaran" class="halaman"><div style="padding-top:25px"><div class="logo">🚚</div><div class="judul">DAFTAR KURIR</div><p class="deskripsi">Lengkapi data diri dan bagikan lokasi untuk mulai menggunakan KURIR SIMPLE.</p><div class="panel"><form id="formKurir"><label for="nama">Nama Kurir</label><input id="nama" type="text" placeholder="Masukkan nama lengkap" autocomplete="name" required><label for="wa">Nomor WhatsApp</label><input id="wa" type="tel" inputmode="numeric" maxlength="12" placeholder="12 digit nomor WhatsApp" required><label>Lokasi Kurir</label><button type="button" class="tombol sekunder penuh" id="tombolLokasi">📍 BAGIKAN LOKASI</button><p id="statusLokasi" class="catatan">Lokasi diperlukan untuk melengkapi data kurir.</p><button type="submit" class="tombol primer penuh">SELESAI</button><p class="catatan">Pastikan nama, nomor WhatsApp, dan lokasi sudah benar.</p></form></div></div></section>
+<!-- DASHBOARD -->
+<section id="utama" class="halaman"><div style="padding-top:8px"><div class="header"><small>KURIR SIMPLE • DASHBOARD</small><h1>Halo, <span id="namaDashboard">Kurir</span> 👋</h1><p>Siap melayani pesanan hari ini?</p></div><div class="grid-dua"><div class="kartu"><div class="muted">MITRA USAHA</div><div class="angka" id="jumlahMitra">0</div></div><div class="kartu"><div class="muted">PESANAN AKTIF</div><div class="angka" id="jumlahPesanan">0</div></div></div><h2 class="judul-menu">Menu Utama</h2><div class="grid-menu">
+<button class="menu-item" data-menu="mitra"><div class="ikon">🏪</div><strong>MITRA USAHA</strong></button>
+<button class="menu-item" data-menu="pesanan"><div class="ikon">🛍️</div><strong>PESANAN BARU</strong></button>
+<button class="menu-item" data-menu="grup"><div class="ikon">👥</div><strong>MASUK KE GRUP</strong></button>
+<button class="menu-item" data-menu="link"><div class="ikon">🔗</div><strong>SALIN LINK PELANGGAN</strong></button>
+<button class="menu-item" data-menu="kode"><div class="ikon">🔑</div><strong>KODE PELANGGAN</strong></button>
+<button class="menu-item" data-menu="riwayat"><div class="ikon">📋</div><strong>RIWAYAT PESANAN</strong></button>
+<button class="menu-item penuh" data-menu="akun"><div class="ikon" style="display:inline-block;margin:0 12px 0 0">👤</div><strong>AKUN KURIR</strong></button>
+</div><div id="pesanMenu" class="pesan"></div><div class="footer">KURIR SIMPLE • Data lokal perangkat ini</div></div></section>
 
-<!-- HALAMAN PENDAFTARAN -->
-<section id="pendaftaran" class="halaman">
-  <div style="padding-top:25px">
-    <div class="logo">🚚</div>
-    <div class="judul">DAFTAR KURIR</div>
-    <p class="deskripsi">
-      Lengkapi data diri dan bagikan lokasi untuk mulai menggunakan KURIR SIMPLE.
-    </p>
+<!-- MITRA -->
+<section id="halMitra" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Mitra Usaha</h2></div><button class="tombol primer penuh" onclick="formMitra()">＋ TAMBAH MITRA USAHA</button><div id="daftarMitra" style="margin-top:13px"></div></section>
+<section id="halFormMitra" class="halaman"><div class="baris-judul"><button class="kembali" onclick="buka('halMitra')">←</button><h2 id="judulFormMitra">Tambah Mitra</h2></div><div class="panel"><label>Nama Mitra Usaha</label><input id="namaMitra" placeholder="Nama toko/kedai"><label>Nomor WhatsApp (12 digit)</label><input id="waMitra" inputmode="numeric" maxlength="12" placeholder="Nomor WhatsApp"><div class="aksi"><button class="tombol primer" onclick="simpanMitra()">SIMPAN MITRA</button></div></div></section>
+<section id="halMenu" class="halaman"><div class="baris-judul"><button class="kembali" onclick="buka('halMitra')">←</button><h2 id="judulMenuMitra">Menu Mitra</h2></div><button class="tombol primer penuh" onclick="formMenu()">＋ TAMBAH MENU</button><div id="daftarMenu" style="margin-top:13px"></div></section>
+<section id="halFormMenu" class="halaman"><div class="baris-judul"><button class="kembali" onclick="buka('halMenu')">←</button><h2 id="judulFormMenu">Tambah Menu</h2></div><div class="panel"><label>Nama Menu</label><input id="namaMenu" placeholder="Contoh: Nasi goreng"><label>Harga Menu (Rp)</label><input id="hargaMenu" type="number" min="0" inputmode="numeric" placeholder="15000"><label>Status</label><select id="statusMenu"><option value="tersedia">TERSEDIA</option><option value="habis">HABIS</option></select><label>Varian (pisahkan dengan koma, opsional)</label><input id="varianMenu" placeholder="Pedas, Tidak pedas, Telur"><label>Tambahan harga varian (urutan sama)</label><input id="hargaVarian" placeholder="0, 0, 3000"><p class="catatan">Harga varian ditambahkan ke harga menu. Misalnya varian Telur tambahan Rp3.000.</p><button class="tombol primer penuh" onclick="simpanMenu()">SIMPAN MENU</button></div></section>
 
-    <div class="panel">
-      <form id="formKurir">
-        <label for="nama">Nama Kurir</label>
-        <input
-          id="nama"
-          type="text"
-          placeholder="Masukkan nama lengkap"
-          autocomplete="name"
-          required
-        >
+<!-- PESANAN / DETAIL -->
+<section id="halPesanan" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Pesanan Baru</h2></div><div id="daftarPesanan"></div></section>
+<section id="halDetail" class="halaman"><div class="baris-judul"><button class="kembali" onclick="buka('halPesanan')">←</button><h2>Detail Pesanan</h2></div><div id="detailPesanan"></div></section>
+<section id="halGrup" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Grup Pesanan</h2></div><div class="panel"><label>Nama Grup</label><input id="namaGrup" placeholder="Nama grup"><label>Nama Kurir</label><input id="kurirGrup" placeholder="Nama kurir"><button class="tombol primer penuh" onclick="simpanGrup()">SIMPAN NAMA GRUP</button></div><div class="pita">Nama grup bisa diubah di sini. Pesanan yang masuk akan tampil pada daftar di bawah.</div><div id="daftarGrup"></div></section>
 
-        <label for="wa">Nomor WhatsApp</label>
-        <input
-          id="wa"
-          type="tel"
-          inputmode="numeric"
-          maxlength="12"
-          placeholder="12 digit nomor WhatsApp"
-          required
-        >
+<!-- LINK / KODE PELANGGAN -->
+<section id="halLink" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Link Pelanggan</h2></div><div class="panel"><p>Bagikan link agar pelanggan membuka halaman pemesanan pada aplikasi yang sudah di-hosting.</p><div class="pita">Link yang dibuat dari file lokal hanya berfungsi di perangkat/browser ini. Untuk menerima pesanan dari HP lain, aplikasi harus di-hosting dan menggunakan database online.</div><label>Link aplikasi saat ini</label><input id="linkPelanggan" readonly><button class="tombol primer penuh" onclick="salinLink()">SALIN LINK PELANGGAN</button><button class="tombol sekunder penuh" onclick="buka('halKode')">BUAT KODE PELANGGAN</button></div></section>
+<section id="halKode" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Kode Pelanggan</h2></div><div class="panel"><label>Nama Pelanggan</label><input id="namaPelangganKode" placeholder="Nama pelanggan"><button class="tombol primer penuh" onclick="buatKode()">BUAT KODE 4 DIGIT</button><div id="hasilKode"></div></div><div id="daftarKode" style="margin-top:12px"></div></section>
 
-        <label>Lokasi Kurir</label>
-        <button type="button" class="tombol sekunder"
-          id="tombolLokasi">
-          📍 BAGIKAN LOKASI
-        </button>
+<!-- RIWAYAT -->
+<section id="halRiwayat" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Riwayat Pesanan</h2></div><div id="daftarRiwayat"></div></section>
+<section id="halAkun" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Akun Kurir</h2></div><div class="panel"><label>Nama Kurir</label><input id="akunNama"><label>Nomor WhatsApp (12 digit)</label><input id="akunWa" inputmode="numeric" maxlength="12"><label>Alamat / tautan lokasi</label><input id="akunLokasi"><button class="tombol primer penuh" onclick="simpanAkun()">SIMPAN PERUBAHAN</button></div><div class="panel"><h3 class="judul-kecil">Cadangan data</h3><p class="catatan">Ekspor data untuk menyimpan salinan data lokal.</p><button class="tombol sekunder penuh" onclick="eksporData()">EKSPOR DATA JSON</button></div></section>
 
-        <p id="statusLokasi" class="catatan">
-          Lokasi diperlukan untuk melengkapi data kurir.
-        </p>
+<!-- CUSTOMER LOCAL DEMO -->
+<section id="halPelanggan" class="halaman"><div class="baris-judul"><button class="kembali" onclick="kembali()">←</button><h2>Halaman Pelanggan</h2></div><div class="pita">Mode pratinjau lokal. Pelanggan pada perangkat berbeda membutuhkan hosting dan database online.</div><div class="panel"><label>Kode Pelanggan (4 digit)</label><input id="kodeMasukPelanggan" maxlength="4" inputmode="numeric"><button class="tombol primer penuh" onclick="verifikasiPelanggan()">LANJUTKAN</button><div id="statusPelanggan"></div></div><div id="areaPesanPelanggan" class="sembunyi"><div class="panel"><label>Nama Pelanggan</label><input id="pelNama"><label>WhatsApp (12 digit)</label><input id="pelWa" maxlength="12" inputmode="numeric"><label>Lokasi / alamat</label><input id="pelLokasi"><button class="tombol sekunder penuh" onclick="ambilLokasiPelanggan()">📍 BAGIKAN LOKASI</button></div><div class="panel"><h3 class="judul-kecil">Pilih menu</h3><div id="menuUntukPelanggan"></div></div><div class="panel"><h3 class="judul-kecil">Ringkasan pesanan</h3><div id="keranjang"></div><label>Ongkir (Rp)</label><input id="ongkirPelanggan" type="number" min="0" value="0"><label>Survei pelanggan (wajib)</label><select id="survei"><option value="">Pilih jawaban</option><option value="puas">Puas</option><option value="cukup">Cukup puas</option><option value="saran">Ada saran</option></select><button class="tombol primer penuh" onclick="kirimPesananPelanggan()">KIRIM PESANAN</button></div></div></section>
 
-        <button type="submit" class="tombol primer">
-          SELESAI
-        </button>
-
-        <p class="catatan">
-          Pastikan nama, nomor WhatsApp, dan lokasi sudah benar sebelum melanjutkan.
-        </p>
-      </form>
-    </div>
-  </div>
-</section>
-
-<!-- MENU UTAMA -->
-<section id="utama" class="halaman">
-  <div style="padding-top:8px">
-    <div class="header">
-      <small>KURIR SIMPLE • DASHBOARD</small>
-      <h1>Halo, <span id="namaDashboard">Kurir</span> 👋</h1>
-      <p>Siap melayani pesanan hari ini?</p>
-    </div>
-
-    <h2 class="judul-menu">Menu Utama</h2>
-
-    <div class="grid-menu">
-      <button class="menu-item" data-menu="MITRA USAHA">
-        <div class="ikon">🏪</div>
-        <strong>MITRA USAHA</strong>
-      </button>
-
-      <button class="menu-item" data-menu="PESANAN BARU">
-        <div class="ikon">🛍️</div>
-        <strong>PESANAN BARU</strong>
-      </button>
-
-      <button class="menu-item" data-menu="MASUK KE GRUP">
-        <div class="ikon">👥</div>
-        <strong>MASUK KE GRUP</strong>
-      </button>
-
-      <button class="menu-item" data-menu="SALIN LINK PELANGGAN">
-        <div class="ikon">🔗</div>
-        <strong>SALIN LINK PELANGGAN</strong>
-      </button>
-
-      <button class="menu-item" data-menu="KODE PELANGGAN">
-        <div class="ikon">🔑</div>
-        <strong>KODE PELANGGAN</strong>
-      </button>
-
-      <button class="menu-item" data-menu="RIWAYAT PESANAN">
-        <div class="ikon">📋</div>
-        <strong>RIWAYAT PESANAN</strong>
-      </button>
-
-      <button class="menu-item penuh" data-menu="AKUN KURIR">
-        <div class="ikon" style="display:inline-block;margin:0 12px 0 0">👤</div>
-        <strong>AKUN KURIR</strong>
-      </button>
-    </div>
-
-    <div id="pesanMenu" class="pesan"></div>
-  </div>
-</section>
-
+<div id="toast" class="toast sembunyi"></div>
 <script>
-const KUNCI_KURIR = "KURIR_SIMPLE_DATA";
+const KUNCI_KURIR="KURIR_SIMPLE_DATA";
+const KUNCI_APP="KURIR_SIMPLE_APP_DATA";
+const dataAwal=()=>({mitra:[],pesanan:[],kode:[],riwayat:[],grup:{nama:"Grup Pesanan",kurir:""}});
+let appData=bacaAppData(), lokasiKurir=null, mitraEdit=null, mitraAktif=null, menuEdit=null, kodeAktif=null, keranjang={};
+let halamanSebelum="utama", halamanAktif="utama";
+function bacaAppData(){try{return Object.assign(dataAwal(),JSON.parse(localStorage.getItem(KUNCI_APP)||"{}"))}catch{return dataAwal()}}
+function simpanData(){try{localStorage.setItem(KUNCI_APP,JSON.stringify(appData))}catch{beriPesan("Penyimpanan browser penuh atau tidak tersedia.")}perbaruiDashboard()}
+function el(id){return document.getElementById(id)}
+function nilai(id){return el(id).value.trim()}
+function aman(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function rupiah(n){return "Rp"+Number(n||0).toLocaleString("id-ID")}
+function idBaru(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function beriPesan(teks){const t=el("toast");t.textContent=teks;t.classList.remove("sembunyi");clearTimeout(window.timerToast);window.timerToast=setTimeout(()=>t.classList.add("sembunyi"),2600)}
+function dataKurir(){try{return JSON.parse(localStorage.getItem(KUNCI_KURIR))}catch{return null}}
+function simpanDataKurir(obj){try{localStorage.setItem(KUNCI_KURIR,JSON.stringify(obj));return true}catch{return false}}
+function buka(id){halamanSebelum=halamanAktif;document.querySelectorAll(".halaman").forEach(x=>x.classList.remove("aktif"));el(id).classList.add("aktif");halamanAktif=id;window.scrollTo({top:0,behavior:"smooth"});if(id==="halMitra")renderMitra();if(id==="halMenu")renderMenu();if(id==="halPesanan")renderPesanan();if(id==="halGrup")renderGrup();if(id==="halKode")renderKode();if(id==="halRiwayat")renderRiwayat();if(id==="halAkun")isiAkun();if(id==="halLink")el("linkPelanggan").value=location.href.split("#")[0]+"#pelanggan";if(id==="halPelanggan"&&location.hash.includes("pelanggan")){}}
+function kembali(){buka("utama")}
+function masukUtama(data){el("namaDashboard").textContent=data.nama||"Kurir";document.querySelectorAll(".halaman").forEach(x=>x.classList.remove("aktif"));el("utama").classList.add("aktif");halamanAktif="utama";perbaruiDashboard()}
+function perbaruiDashboard(){el("jumlahMitra").textContent=appData.mitra.length;el("jumlahPesanan").textContent=appData.pesanan.filter(x=>x.status!=="Selesai").length}
+el("wa").addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").slice(0,12)});
+el("tombolLokasi").addEventListener("click",function(){if(!navigator.geolocation){el("statusLokasi").textContent="Browser tidak mendukung GPS.";return}el("statusLokasi").textContent="Sedang mengambil lokasi...";navigator.geolocation.getCurrentPosition(p=>{lokasiKurir={latitude:p.coords.latitude,longitude:p.coords.longitude};el("statusLokasi").textContent="✓ Lokasi berhasil didapatkan.";},()=>{el("statusLokasi").textContent="Lokasi belum berhasil diambil. Izinkan akses lokasi dan coba lagi."},{enableHighAccuracy:true,timeout:15000})});
+el("formKurir").addEventListener("submit",function(e){e.preventDefault();const nama=nilai("nama"),wa=nilai("wa");if(!nama)return beriPesan("Nama kurir wajib diisi.");if(!/^\d{12}$/.test(wa))return beriPesan("Nomor WhatsApp harus tepat 12 digit.");if(!lokasiKurir)return beriPesan("Tekan BAGIKAN LOKASI terlebih dahulu.");const d={nama,whatsapp:wa,lokasi:lokasiKurir,terdaftar:true};if(!simpanDataKurir(d))return beriPesan("Data gagal disimpan.");masukUtama(d);beriPesan("Pendaftaran berhasil disimpan.")});
+document.querySelectorAll("[data-menu]").forEach(b=>b.addEventListener("click",()=>{const m=b.dataset.menu;switch(m){case"mitra":buka("halMitra");break;case"pesanan":buka("halPesanan");break;case"grup":buka("halGrup");break;case"link":buka("halLink");break;case"kode":buka("halKode");break;case"riwayat":buka("halRiwayat");break;case"akun":buka("halAkun");break}}));
 
-let lokasiKurir = null;
+// MITRA USAHA
+function formMitra(id=null){mitraEdit=id;const m=appData.mitra.find(x=>x.id===id);el("judulFormMitra").textContent=m?"Edit Mitra":"Tambah Mitra";el("namaMitra").value=m?.nama||"";el("waMitra").value=m?.wa||"";buka("halFormMitra")}
+el("waMitra").addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").slice(0,12)});
+function simpanMitra(){const nama=nilai("namaMitra"),wa=nilai("waMitra");if(!nama)return beriPesan("Nama mitra wajib diisi.");if(!/^\d{12}$/.test(wa))return beriPesan("Nomor WhatsApp mitra harus 12 digit.");if(mitraEdit){const m=appData.mitra.find(x=>x.id===mitraEdit);if(m){m.nama=nama;m.wa=wa}}else appData.mitra.push({id:idBaru(),nama,wa,buka:false,menu:[]});simpanData();buka("halMitra");beriPesan("Mitra berhasil disimpan.")}
+function renderMitra(){const box=el("daftarMitra");if(!appData.mitra.length){box.innerHTML='<div class="kosong">🏪<br><b>Belum ada mitra usaha</b><br>Tekan TAMBAH MITRA USAHA untuk mulai.</div>';return}box.innerHTML=appData.mitra.map(m=>`<div class="kartu"><div class="atas-kartu"><div><b>${aman(m.nama)}</b><div class="muted">${aman(m.wa)} · ${m.menu.length} menu</div></div><span class="status ${m.buka?"open":"closed"}">${m.buka?"OPEN":"CLOSED"}</span></div><div class="aksi"><button class="tombol ${m.buka?"sukses":"netral"} kecil" onclick="ubahStatusMitra('${m.id}',true)">OPEN</button><button class="tombol ${!m.buka?"bahaya":"netral"} kecil" onclick="ubahStatusMitra('${m.id}',false)">CLOSED</button><button class="tombol sekunder kecil" onclick="salinTeks(location.href.split('#')[0]+'#pelanggan')">SALIN LINK</button></div><div class="aksi"><button class="tombol primer kecil" onclick="mitraAktif='${m.id}';buka('halMenu')">KELOLA MENU</button><button class="tombol netral kecil" onclick="formMitra('${m.id}')">EDIT</button><button class="tombol bahaya kecil" onclick="hapusMitra('${m.id}')">HAPUS</button></div></div>`).join("")}
+function ubahStatusMitra(id,bukaStatus){const m=appData.mitra.find(x=>x.id===id);if(!m)return;m.buka=bukaStatus;simpanData();renderMitra();beriPesan(m.nama+" "+(bukaStatus?"dibuka":"ditutup"))}
+function hapusMitra(id){if(!confirm("Hapus mitra ini beserta daftar menunya?"))return;appData.mitra=appData.mitra.filter(x=>x.id!==id);simpanData();renderMitra();beriPesan("Mitra dihapus.")}
 
-const halamanDaftar = document.getElementById("pendaftaran");
-const halamanUtama = document.getElementById("utama");
-const statusLokasi = document.getElementById("statusLokasi");
+// MENU & VARIAN
+function formMenu(id=null){menuEdit=id;const m=appData.mitra.find(x=>x.id===mitraAktif),z=m?.menu.find(x=>x.id===id);el("judulFormMenu").textContent=z?"Edit Menu":"Tambah Menu";el("namaMenu").value=z?.nama||"";el("hargaMenu").value=z?.harga??"";el("statusMenu").value=z?.status||"tersedia";el("varianMenu").value=(z?.varian||[]).map(v=>v.nama).join(", ");el("hargaVarian").value=(z?.varian||[]).map(v=>v.harga).join(", ");buka("halFormMenu")}
+function simpanMenu(){const m=appData.mitra.find(x=>x.id===mitraAktif),nama=nilai("namaMenu"),harga=Number(nilai("hargaMenu"));if(!m)return beriPesan("Pilih mitra dahulu.");if(!nama)return beriPesan("Nama menu wajib diisi.");if(!Number.isFinite(harga)||harga<0)return beriPesan("Harga menu tidak valid.");const vn=nilai("varianMenu").split(",").map(x=>x.trim()).filter(Boolean),vh=nilai("hargaVarian").split(",").map(x=>Math.max(0,Number(x.trim())||0));const z={id:menuEdit||idBaru(),nama,harga,status:el("statusMenu").value,varian:vn.map((nama,i)=>({nama,harga:vh[i]||0}))};if(menuEdit){const i=m.menu.findIndex(x=>x.id===menuEdit);if(i>=0)m.menu[i]=z;else m.menu.push(z)}else m.menu.push(z);simpanData();buka("halMenu");beriPesan("Menu berhasil disimpan.")}
+function renderMenu(){const m=appData.mitra.find(x=>x.id===mitraAktif);el("judulMenuMitra").textContent=m?"Menu: "+m.nama:"Menu Mitra";const box=el("daftarMenu");if(!m){box.innerHTML='<div class="kosong">Pilih mitra usaha dahulu.</div>';return}if(!m.menu.length){box.innerHTML='<div class="kosong">🍽️<br>Belum ada menu untuk mitra ini.</div>';return}box.innerHTML=m.menu.map(z=>`<div class="kartu"><div class="atas-kartu"><div><b>${aman(z.nama)}</b><div class="muted">${z.status==="tersedia"?"TERSEDIA":"HABIS"}</div></div><b class="harga">${rupiah(z.harga)}</b></div>${z.varian.map(v=>`<div class="baris-menu"><span>${aman(v.nama)}</span><span class="muted">+${rupiah(v.harga)}</span></div>`).join("")}<div class="aksi"><button class="tombol netral kecil" onclick="formMenu('${z.id}')">EDIT MENU</button><button class="tombol sekunder kecil" onclick="ubahStatusMenu('${z.id}')">${z.status==="tersedia"?"TANDAI HABIS":"TANDAI TERSEDIA"}</button><button class="tombol bahaya kecil" onclick="hapusMenu('${z.id}')">HAPUS</button></div></div>`).join("")}
+function ubahStatusMenu(id){const m=appData.mitra.find(x=>x.id===mitraAktif),z=m?.menu.find(x=>x.id===id);if(z){z.status=z.status==="tersedia"?"habis":"tersedia";simpanData();renderMenu()}}
+function hapusMenu(id){if(!confirm("Hapus menu ini?"))return;const m=appData.mitra.find(x=>x.id===mitraAktif);m.menu=m.menu.filter(x=>x.id!==id);simpanData();renderMenu()}
 
-function tampilkanHalaman(nama) {
-  halamanDaftar.classList.toggle("aktif", nama === "pendaftaran");
-  halamanUtama.classList.toggle("aktif", nama === "utama");
-}
+// PESANAN, DETAIL, RIWAYAT
+function renderPesanan(){const box=el("daftarPesanan");const arr=appData.pesanan.filter(x=>x.status!=="Selesai");if(!arr.length){box.innerHTML='<div class="kosong">🛍️<br><b>Belum ada pesanan baru</b><br>Pesanan pelanggan akan muncul setelah dikirim melalui halaman pelanggan pada perangkat ini.</div>';return}box.innerHTML=arr.slice().reverse().map(o=>`<div class="kartu"><div class="atas-kartu"><div><b>${aman(o.namaPelanggan)}</b><div class="muted">${aman(o.waktu)} · ${aman(o.wa||"")}</div></div><span class="status closed">DIPROSES</span></div><div class="total"><span>Total belanja</span><b>${rupiah(o.subtotal)}</b></div><div class="total"><span>Ongkir</span><b>${rupiah(o.ongkir)}</b></div><div class="total akhir"><span>Total pembayaran</span><b>${rupiah(o.subtotal+o.ongkir)}</b></div><div class="aksi"><button class="tombol sekunder kecil" onclick="lihatDetail('${o.id}')">LIHAT PESANAN</button><button class="tombol netral kecil" onclick="bukaPeta('${aman(o.lokasi||"")}')">LIHAT LOKASI</button><button class="tombol sukses kecil" onclick="selesaikanPesanan('${o.id}')">SELESAIKAN</button></div></div>`).join("")}
+function lihatDetail(id){const o=appData.pesanan.find(x=>x.id===id);if(!o)return;el("detailPesanan").innerHTML=`<div class="kartu"><h3>${aman(o.namaPelanggan)}</h3><p class="muted">${aman(o.waktu)} · ${aman(o.wa||"")}</p><p style="margin:12px 0">${aman(o.lokasi||"Lokasi belum tersedia")}</p><h3 style="margin:12px 0">Daftar belanja</h3>${o.item.map(i=>`<div class="baris-menu"><span>${aman(i.mitra)} — ${aman(i.nama)}${i.varian?" ("+aman(i.varian)+")":""} × ${i.jumlah}</span><b>${rupiah(i.total)}</b></div>`).join("")}<div class="total"><span>Total belanja</span><b>${rupiah(o.subtotal)}</b></div><div class="total"><span>Ongkir</span><b>${rupiah(o.ongkir)}</b></div><div class="total akhir"><span>Total</span><b>${rupiah(o.subtotal+o.ongkir)}</b></div><button class="tombol primer penuh" onclick="selesaikanPesanan('${o.id}')">TANDAI PESANAN SELESAI</button></div>`;buka("halDetail")}
+function selesaikanPesanan(id){const o=appData.pesanan.find(x=>x.id===id);if(!o)return;if(o.status==="Selesai"){beriPesan("Pesanan sudah selesai.");return}o.status="Selesai";appData.riwayat.push({id:idBaru(),pesananId:id,nama:o.namaPelanggan,ongkir:o.ongkir,waktu:new Date().toLocaleString("id-ID")});simpanData();renderPesanan();renderRiwayat();beriPesan("Pesanan ditandai selesai.");if(halamanAktif==="halDetail")buka("halPesanan")}
+function renderRiwayat(){const box=el("daftarRiwayat");if(!appData.riwayat.length){box.innerHTML='<div class="kosong">📋<br>Belum ada riwayat pesanan selesai.</div>';return}box.innerHTML=appData.riwayat.slice().reverse().map(r=>`<div class="kartu"><div class="atas-kartu"><div><b>${aman(r.nama)}</b><div class="muted">${aman(r.waktu)}</div></div><span class="status open">SELESAI</span></div><div class="total"><span>Ongkir tercatat</span><b>${rupiah(r.ongkir)}</b></div><button class="tombol sekunder penuh" onclick="lihatDetail('${r.pesananId}')">LIHAT DETAIL PESANAN</button></div>`).join("")}
 
-function bacaDataKurir() {
-  try {
-    return JSON.parse(localStorage.getItem(KUNCI_KURIR));
-  } catch {
-    return null;
-  }
-}
+// GRUP
+function simpanGrup(){appData.grup={nama:nilai("namaGrup")||"Grup Pesanan",kurir:nilai("kurirGrup")||(dataKurir()?.nama||"")};simpanData();beriPesan("Nama grup disimpan.")}
+function renderGrup(){el("namaGrup").value=appData.grup.nama||"Grup Pesanan";el("kurirGrup").value=appData.grup.kurir||dataKurir()?.nama||"";const box=el("daftarGrup");if(!appData.pesanan.length){box.innerHTML='<div class="kosong">👥<br><b>BELUM ADA PESANAN</b><br>Pesanan pelanggan akan muncul di sini.</div>';return}box.innerHTML=appData.pesanan.slice().reverse().map(o=>`<div class="kartu"><div class="atas-kartu"><div><b>PESANAN · ${aman(o.namaPelanggan)}</b><div class="muted">${aman(o.waktu)}</div></div><span class="status ${o.status==="Selesai"?"open":"closed"}">${aman(o.status)}</span></div><div class="aksi"><button class="tombol sekunder kecil" onclick="lihatDetail('${o.id}')">LIHAT PESANAN</button><button class="tombol netral kecil" onclick="bukaPeta('${aman(o.lokasi||"")}')">LIHAT LOKASI PEMESAN</button><button class="tombol sukses kecil" onclick="selesaikanPesanan('${o.id}')">TANDAI SELESAI</button></div></div>`).join("")}
 
-function masukMenuUtama(data) {
-  document.getElementById("namaDashboard").textContent = data.nama;
-  tampilkanHalaman("utama");
-}
+// KODE PELANGGAN
+function buatKode(){const nama=nilai("namaPelangganKode");if(!nama)return beriPesan("Nama pelanggan wajib diisi.");let kode;do{kode=String(Math.floor(1000+Math.random()*9000))}while(appData.kode.some(x=>x.kode===kode));appData.kode.push({id:idBaru(),nama,kode,digunakan:false,waktu:new Date().toLocaleString("id-ID")});simpanData();el("hasilKode").innerHTML=`<div class="pita">Kode pelanggan berhasil dibuat:</div><div class="angka" style="letter-spacing:5px">${kode}</div><button class="tombol sekunder penuh" onclick="salinTeks('${kode}')">SALIN KODE</button>`;renderKode()}
+function renderKode(){const box=el("daftarKode");if(!appData.kode.length){box.innerHTML='<div class="kosong">Belum ada kode pelanggan.</div>';return}box.innerHTML=appData.kode.slice().reverse().map(k=>`<div class="kartu"><div class="atas-kartu"><div><b>${aman(k.nama)}</b><div class="muted">${aman(k.waktu)}</div></div><span class="status ${k.digunakan?"open":"closed"}">${k.digunakan?"SUDAH DIGUNAKAN":"BELUM DIGUNAKAN"}</span></div><div class="angka" style="letter-spacing:5px">${aman(k.kode)}</div><button class="tombol sekunder penuh" onclick="salinTeks('${k.kode}')">SALIN KODE</button></div>`).join("")}
 
-document.getElementById("wa").addEventListener("input", function() {
-  this.value = this.value.replace(/\D/g, "").slice(0, 12);
-});
+// LINK PELANGGAN
+function salinLink(){const link=location.href.split("#")[0]+"#pelanggan";salinTeks(link);beriPesan("Link disalin. Link lokal hanya bisa dipakai pada aplikasi yang diakses dari alamat yang sama.");}
+function salinTeks(teks){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(teks).then(()=>beriPesan("Berhasil disalin.")).catch(()=>salinCadangan(teks))}else salinCadangan(teks)}
+function salinCadangan(teks){const x=document.createElement("textarea");x.value=teks;document.body.appendChild(x);x.select();try{document.execCommand("copy");beriPesan("Berhasil disalin.")}catch{beriPesan("Salin teks ini: "+teks)}x.remove()}
+function bukaPeta(lokasi){if(!lokasi)return beriPesan("Lokasi pelanggan belum tersedia.");if(lokasi.startsWith("http"))window.open(lokasi,"_blank");else if(lokasi.latitude)window.open(`https://maps.google.com/?q=${lokasi.latitude},${lokasi.longitude}`,"_blank");else window.open("https://maps.google.com/?q="+encodeURIComponent(lokasi),"_blank")}
 
-document.getElementById("tombolLokasi").addEventListener("click", function() {
-  if (!navigator.geolocation) {
-    statusLokasi.textContent = "Browser tidak mendukung GPS.";
-    return;
-  }
+// AKUN KURIR
+function isiAkun(){const d=dataKurir()||{};el("akunNama").value=d.nama||"";el("akunWa").value=d.whatsapp||"";el("akunLokasi").value=d.lokasi?.latitude?`https://maps.google.com/?q=${d.lokasi.latitude},${d.lokasi.longitude}`:(d.lokasi||"")}
+el("akunWa").addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").slice(0,12)});
+function simpanAkun(){const nama=nilai("akunNama"),wa=nilai("akunWa"),lokasi=nilai("akunLokasi");if(!nama)return beriPesan("Nama kurir wajib diisi.");if(!/^\d{12}$/.test(wa))return beriPesan("WhatsApp harus tepat 12 digit.");const lama=dataKurir()||{};let loc=lama.lokasi;if(lokasi.startsWith("http"))loc=lokasi;const d={nama,whatsapp:wa,lokasi:loc,terdaftar:true};if(!simpanDataKurir(d))return beriPesan("Data gagal disimpan.");el("namaDashboard").textContent=nama;beriPesan("Akun kurir diperbarui.");buka("utama")}
+function eksporData(){const semua={kurir:dataKurir(),aplikasi:appData};const blob=new Blob([JSON.stringify(semua,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="KURIR_SIMPLE_cadangan.json";a.click();URL.revokeObjectURL(url);beriPesan("Ekspor data dimulai.")}
 
-  statusLokasi.textContent = "Sedang mengambil lokasi...";
+// HALAMAN PELANGGAN DEMO LOKAL
+function verifikasiPelanggan(){const kode=nilai("kodeMasukPelanggan");if(!/^\d{4}$/.test(kode))return beriPesan("Masukkan kode 4 digit.");kodeAktif=appData.kode.find(x=>x.kode===kode);if(!kodeAktif)return beriPesan("Kode tidak ditemukan di perangkat ini.");if(kodeAktif.digunakan)return beriPesan("Kode ini sudah digunakan untuk pendaftaran/pesanan pertama.");el("statusPelanggan").innerHTML=`<div class="pita">Kode cocok untuk ${aman(kodeAktif.nama)}.</div>`;el("areaPesanPelanggan").classList.remove("sembunyi");el("pelNama").value=kodeAktif.nama;renderMenuPelanggan()}
+function renderMenuPelanggan(){const box=el("menuUntukPelanggan"),mitra=appData.mitra.filter(m=>m.buka);if(!mitra.length){box.innerHTML='<div class="kosong">Belum ada mitra yang OPEN.</div>';return}box.innerHTML=mitra.map(m=>`<div style="margin-bottom:15px"><b>${aman(m.nama)}</b>${m.menu.filter(z=>z.status==="tersedia").map(z=>`<div class="baris-menu"><div style="flex:1"><b>${aman(z.nama)}</b><div class="muted">${rupiah(z.harga)}</div>${z.varian.length?`<select id="var-${z.id}" style="margin-top:6px"><option value="">Tanpa varian</option>${z.varian.map(v=>`<option value="${aman(v.nama)}">${aman(v.nama)} (+${rupiah(v.harga)})</option>`).join("")}</select>`:""}</div><div style="display:flex;align-items:center;gap:5px"><button class="tombol netral kecil" onclick="ubahJumlah('${m.id}','${z.id}',-1)">−</button><b id="j-${z.id}">${keranjang[z.id]?.jumlah||0}</b><button class="tombol primer kecil" onclick="ubahJumlah('${m.id}','${z.id}',1)">＋</button><button class="tombol sekunder kecil" onclick="pilihVarian('${m.id}','${z.id}')">PILIH</button></div></div>`).join("")}</div>`).join("");renderKeranjang()}
+function ubahJumlah(mid,zid,delta){keranjang[zid]=keranjang[zid]||{mid:mid,jumlah:0,varian:""};keranjang[zid].jumlah=Math.max(0,keranjang[zid].jumlah+delta);el("j-"+zid).textContent=keranjang[zid].jumlah;renderKeranjang()}
+function pilihVarian(mid,zid){const c=keranjang[zid]||{mid:mid,jumlah:1,varian:""};c.mid=mid;c.jumlah=Math.max(1,c.jumlah);c.varian=el("var-"+zid)?.value||"";keranjang[zid]=c;renderMenuPelanggan();beriPesan("Menu dipilih.")}
+function daftarItemKeranjang(){const out=[];Object.entries(keranjang).forEach(([zid,c])=>{if(!c.jumlah)return;const m=appData.mitra.find(x=>x.id===c.mid),z=m?.menu.find(x=>x.id===zid);if(!m||!z)return;const v=z.varian.find(x=>x.nama===c.varian),harga=z.harga+(v?.harga||0);out.push({mitra:m.nama,nama:z.nama,varian:c.varian,jumlah:c.jumlah,total:harga*c.jumlah})});return out}
+function renderKeranjang(){const items=daftarItemKeranjang();el("keranjang").innerHTML=(items.length?items.map(i=>`<div class="total"><span>${aman(i.mitra)} — ${aman(i.nama)}${i.varian?" ("+aman(i.varian)+")":""} × ${i.jumlah}</span><b>${rupiah(i.total)}</b></div>`).join(""):'<p class="muted">Belum ada menu dipilih.</p>')+`<div class="total akhir"><span>Total belanja</span><b>${rupiah(items.reduce((s,i)=>s+i.total,0))}</b></div>`}
+function ambilLokasiPelanggan(){if(!navigator.geolocation)return beriPesan("Browser tidak mendukung lokasi.");navigator.geolocation.getCurrentPosition(p=>{el("pelLokasi").value=`https://maps.google.com/?q=${p.coords.latitude},${p.coords.longitude}`;beriPesan("Lokasi pelanggan ditambahkan.")},()=>beriPesan("Lokasi gagal diambil. Periksa izin browser."),{enableHighAccuracy:true,timeout:15000})}
+el("pelWa").addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").slice(0,12)});
+function kirimPesananPelanggan(){if(!kodeAktif)return beriPesan("Masukkan kode pelanggan dahulu.");const nama=nilai("pelNama"),wa=nilai("pelWa"),lokasi=nilai("pelLokasi"),ongkir=Number(nilai("ongkirPelanggan")||0),survei=nilai("survei"),item=daftarItemKeranjang();if(!nama)return beriPesan("Nama pelanggan wajib diisi.");if(!/^\d{12}$/.test(wa))return beriPesan("WhatsApp harus 12 digit.");if(!lokasi)return beriPesan("Bagikan lokasi terlebih dahulu.");if(!item.length)return beriPesan("Pilih minimal satu menu.");if(!survei)return beriPesan("Isi survei pelanggan terlebih dahulu.");const subtotal=item.reduce((s,i)=>s+i.total,0);appData.pesanan.push({id:idBaru(),namaPelanggan:nama,wa,lokasi,item,subtotal,ongkir:Math.max(0,ongkir),status:"Diproses",survei,waktu:new Date().toLocaleString("id-ID")});kodeAktif.digunakan=true;simpanData();keranjang={};el("areaPesanPelanggan").classList.add("sembunyi");el("statusPelanggan").innerHTML='<div class="pita">Pesanan berhasil disimpan pada perangkat ini.</div>';beriPesan("Pesanan berhasil dibuat.");buka("utama")}
 
-  navigator.geolocation.getCurrentPosition(
-    function(posisi) {
-      lokasiKurir = {
-        latitude: posisi.coords.latitude,
-        longitude: posisi.coords.longitude
-      };
-
-      statusLokasi.textContent =
-        "✓ Lokasi berhasil didapatkan.";
-    },
-    function() {
-      statusLokasi.textContent =
-        "Lokasi belum berhasil diambil. Izinkan akses lokasi dan coba lagi.";
-    },
-    { enableHighAccuracy: true, timeout: 15000 }
-  );
-});
-
-document.getElementById("formKurir").addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  const nama = document.getElementById("nama").value.trim();
-  const wa = document.getElementById("wa").value.trim();
-
-  if (!nama) {
-    alert("Nama kurir wajib diisi.");
-    return;
-  }
-
-  if (!/^\d{12}$/.test(wa)) {
-    alert("Nomor WhatsApp harus tepat 12 digit.");
-    return;
-  }
-
-  if (!lokasiKurir) {
-    alert("Silakan tekan BAGIKAN LOKASI terlebih dahulu.");
-    return;
-  }
-
-  const data = {
-    nama: nama,
-    whatsapp: wa,
-    lokasi: lokasiKurir,
-    terdaftar: true
-  };
-
-  try {
-    localStorage.setItem(KUNCI_KURIR, JSON.stringify(data));
-  } catch {
-    alert("Data gagal disimpan. Periksa penyimpanan browser.");
-    return;
-  }
-
-  masukMenuUtama(data);
-});
-
-document.querySelectorAll("[data-menu]").forEach(function(tombol) {
-  tombol.addEventListener("click", function() {
-    const namaMenu = this.dataset.menu;
-    const pesan = document.getElementById("pesanMenu");
-
-    pesan.textContent = namaMenu +
-      " dipilih. Halaman fitur ini perlu dihubungkan pada tahap berikutnya.";
-    pesan.classList.add("tampil");
-  });
-});
-
-// Pendaftaran hanya muncul jika data kurir belum tersimpan.
-const dataTersimpan = bacaDataKurir();
-
-if (dataTersimpan && dataTersimpan.terdaftar && dataTersimpan.nama) {
-  masukMenuUtama(dataTersimpan);
-} else {
-  tampilkanHalaman("pendaftaran");
-}
+// BOOT
+function mulai(){const d=dataKurir();if(d&&d.terdaftar&&d.nama){masukUtama(d)}else{document.querySelectorAll(".halaman").forEach(x=>x.classList.remove("aktif"));el("pendaftaran").classList.add("aktif");halamanAktif="pendaftaran"}perbaruiDashboard();if(location.hash==="#pelanggan"){document.querySelectorAll(".halaman").forEach(x=>x.classList.remove("aktif"));el("halPelanggan").classList.add("aktif");halamanAktif="halPelanggan"}}
+mulai();
 </script>
-
 </body>
 </html>
