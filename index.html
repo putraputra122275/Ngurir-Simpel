@@ -1171,7 +1171,21 @@ function customerCurrent(){
 /* =========================
    CUSTOMER HOME / MENUS
 ========================= */
-const carts={};
+// Keranjang pelanggan disimpan di localStorage agar pesanan per mitra tidak hilang
+// ketika pelanggan membuka mitra lain, berpindah halaman, atau membuka ulang aplikasi.
+const CART_STORAGE_KEY="KURIR_SIMPLE_CUSTOMER_CARTS_V1";
+function loadSavedCarts(){
+  try{
+    const raw=localStorage.getItem(CART_STORAGE_KEY);
+    const parsed=raw?JSON.parse(raw):{};
+    return parsed&&typeof parsed==="object"&&!Array.isArray(parsed)?parsed:{};
+  }catch(err){console.error("KURIR SIMPLE: keranjang tersimpan tidak dapat dibaca",err);return {}}
+}
+const carts=loadSavedCarts();
+function persistCarts(){
+  try{localStorage.setItem(CART_STORAGE_KEY,JSON.stringify(carts));return true}
+  catch(err){console.error("KURIR SIMPLE: keranjang gagal disimpan",err);toast("Keranjang belum tersimpan di perangkat");return false}
+}
 // Katalog pelanggan dimuat dari Supabase melalui RPC publik yang hanya
 // mengembalikan informasi katalog (nama/status mitra dan menu), bukan nomor WA.
 const publicCatalogCache = new Map();
@@ -1301,14 +1315,14 @@ function renderCustomerMenus(cid,m){
 function jsArg(value){return String(value??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n")}
 function renderCustomerMenu(cid,m,menu){
   const cart=cartForMerchant(cid,m.id);
-  if(menu.status==="HABIS") return `<div class="customer-menu"><div class="menu-main-row"><div class="grow"><div class="menu-name">${esc(menu.name)}</div>${menu.priceMode==="same"?`<div class="price">${money(menu.price)}</div>`:""}</div><span class="status closed">HABIS</span></div></div>`;
+  if(menu.status==="HABIS") return `<div class="customer-menu"><div class="menu-main-row"><div class="grow"><div class="menu-name">${esc(menu.name)}</div><div class="price">${menu.priceMode==="different"?"Harga sesuai varian":money(menu.price)}</div></div><span class="status closed">HABIS</span></div></div>`;
   if(["multiple","multi","bisa pilih lebih dari satu","bisa_pilih_lebih_dari_satu"].includes(String(menu.choiceMode||"").toLowerCase())){
     const rows=(menu.variants||[]).map((v,i)=>{
       const item=cart.find(x=>x.menuId===menu.id&&x.variantName===v.name);
       const q=item?.qty||0;
       const price=menu.priceMode==="different"?Number(v.price||0):Number(menu.price||0);
       return `<div class="variant-option">
-        <div class="grow"><b>${esc(v.name)}</b>${menu.priceMode==="different"&&price?`<div class="muted">${money(price)}</div>`:""}</div>
+        <div class="grow"><b>${esc(v.name)}</b>${price?`<div class="muted">${money(price)}</div>`:""}</div>
         <div class="variant-qty qty">
           <button onclick="changeMultiQty('${cid}','${m.id}','${menu.id}','${jsArg(v.name)}',-1)">−</button>
           <strong>${q}</strong>
@@ -1352,7 +1366,7 @@ function selectSingleVariant(cid,mid,menuId,variantName){
   const price=menu.priceMode==="different"?Number(menu.variants.find(v=>v.name===variantName)?.price||0):Number(menu.price||0);
   if(old){old.variantName=variantName;old.price=price}
   else cart.push({menuId,menuName:menu.name,variantName,qty:1,price});
-  openCustomerHome(cid,false)
+  persistCarts();openCustomerHome(cid,false)
 }
 function changeSingleQty(cid,mid,menuId,delta){
   const cart=cartForMerchant(cid,mid);let item=cart.find(x=>x.menuId===menuId);
@@ -1366,7 +1380,7 @@ function changeSingleQty(cid,mid,menuId,delta){
   if(item){
     item.qty+=delta;if(item.qty<=0)cart.splice(cart.indexOf(item),1)
   }
-  openCustomerHome(cid,false)
+  persistCarts();openCustomerHome(cid,false)
 }
 function changeMultiQty(cid,mid,menuId,variantName,delta){
   const cart=cartForMerchant(cid,mid);let item=cart.find(x=>x.menuId===menuId&&x.variantName===variantName);
@@ -1378,11 +1392,16 @@ function changeMultiQty(cid,mid,menuId,variantName,delta){
   if(item){
     item.qty+=delta;if(item.qty<=0)cart.splice(cart.indexOf(item),1)
   }
-  openCustomerHome(cid,false)
+  persistCarts();openCustomerHome(cid,false)
 }
 function saveMerchantCustomerOrder(cid,mid){
   if(!cartMerchantHas(cid,mid)){toast("Belum ada menu yang dipilih");return}
-  window.customerOpenMerchant=String(mid);openCustomerHome(cid,false);toast("Pesanan mitra disimpan. Kamu masih bisa mengubah menu atau memilih mitra lain.")
+  // Simpan keranjang mitra ini tanpa menghapus pesanan dari mitra lain.
+  // Setelah SIMPAN, kembali ke daftar mitra agar pelanggan dapat memilih kedai lain.
+  if(!persistCarts())return;
+  window.customerOpenMerchant=null;
+  openCustomerHome(cid,false);
+  toast("Pesanan mitra disimpan. Pilih mitra lain; pesanan sebelumnya tetap tersimpan.")
 }
 
 /* =========================
@@ -1505,6 +1524,7 @@ async function persistCustomerOrder(cid, survey=null){
     const o={id:data.order_id,courierId:c.courierId,customerId:c.id,customerName:c.name,customerLocation:c.location,locationText:c.location?`${c.location.lat}, ${c.location.lng}`:"",merchants,time:nowText(),shipping:survey?0:null,completed:false,label:"PESANAN "+String(data.order_number).padStart(2,"0"),orderNumber:data.order_number,remote:true,survey:survey?{completed:true,answer:survey}:undefined};
     state.orders=state.orders.filter(x=>x.id!==o.id);state.orders.push(o);c.firstOrderDone=true;persistLocal();
     Object.keys(cart).forEach(k=>delete cart[k]);
+    persistCarts();
     toast("Pesanan berhasil disimpan ke Supabase");openCustomerSent(cid,false)
   }catch(err){console.error("Penyimpanan pesanan Supabase gagal",err);toast("Pesanan BELUM terkirim: "+(err?.message||"kesalahan Supabase"))}
 }
