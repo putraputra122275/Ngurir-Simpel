@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -307,16 +306,19 @@ let blockedFriends=readStore('cs_blocked',[]);
 let comments=readStore('cs_comments',[]);
 let posts=readStore('cs_posts',[]);
 let profile=readStore('cs_profile',{name:'Pengguna',bio:'',wa:''});
-const OWNER_ACCOUNT_CODE='RSD-150710';
-const LEGACY_OWNER_ACCOUNT_CODES=['RUSDI-150710','RUSDI - 150710'];
+const OWNER_ACCOUNT_CODE='RSI-150710';
+const LEGACY_OWNER_ACCOUNT_CODES=['RSD-150710','RUSDI-150710','RUSDI - 150710'];
 const wasRegistered=localStorage.getItem('cs_registered')==='true';
 const isSharedAppLink=new URLSearchParams(window.location.search).get('shared')==='1';
 const normalizedOwnerName=String(profile.name||'').trim().toLocaleLowerCase('id-ID');
-let isOwnerAccount=LEGACY_OWNER_ACCOUNT_CODES.includes(String(profile.id||'').trim().toUpperCase()) || (!isSharedAppLink && (normalizedOwnerName==='rusdi'||normalizedOwnerName.startsWith('rusdi ')));
+let isOwnerAccount=[OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(String(profile.id||'').trim().toUpperCase()) || normalizedOwnerName==='rusdi' || normalizedOwnerName.startsWith('rusdi ');
 if(isOwnerAccount){profile.id=OWNER_ACCOUNT_CODE;saveStore('cs_profile',profile);}
 function updateOwnerMenu(){
  const aboutButton=$('aboutAppButton');
- if(aboutButton) aboutButton.style.display=isOwnerAccount?'':'none';
+ if(aboutButton){
+  aboutButton.style.display=isOwnerAccount?'':'none';
+  aboutButton.disabled=!isOwnerAccount;
+ }
 }
 function makeAccountId(){
  const used=readStore('cs_used_account_codes',[]);
