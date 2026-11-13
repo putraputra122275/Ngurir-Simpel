@@ -1,107 +1,401 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#edf5ff">
 <title>Chat Saya</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#24334a}
-.page{display:none;min-height:100vh;padding:18px}
+:root{
+  --bg:#edf5ff;
+  --blue:#347cf5;
+  --blue-dark:#286ce8;
+  --ink:#304766;
+  --muted:#8393aa;
+  --line:#e7edf7;
+  --white:#fff;
+}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+body{
+  background:var(--bg);
+  font-size:13px;
+  -webkit-tap-highlight-color:transparent;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer;border:0}
+button:disabled{opacity:.55;cursor:default}
+.page{
+  display:none;
+  position:relative;
+  isolation:isolate;
+  min-height:100dvh;
+  padding:0 12px 24px;
+  overflow:hidden;
+  background:linear-gradient(155deg,#f1f7ff 0%,#edf5ff 58%,#e6f0ff 100%);
+}
 .page.active{display:block}
-h2{text-align:center;margin:12px 0 22px}
-input,textarea,button{font:inherit}
-input,textarea{width:100%;padding:13px;border:1px solid #d8e0ec;border-radius:10px;background:white;margin:7px 0;outline:none}
-input[readonly]{background:#eaf0f8;color:#52627a}
-button{border:0;border-radius:10px;padding:12px;background:#3478f6;color:white;cursor:pointer}
-button:disabled{opacity:.6}
-.primary{width:100%;margin-top:10px}
-.back{background:#e4ecf8;color:#24334a;margin-bottom:15px}
-.card{background:white;border-radius:13px;padding:14px;margin:9px 0;box-shadow:0 2px 8px #2030500a}
-.small{font-size:13px;color:#748198}
-.error{color:#d33;font-size:13px;margin-top:10px;overflow-wrap:anywhere}
-#friendList{padding-bottom:110px}
-.friend{display:flex;align-items:center;gap:12px;cursor:pointer}
-.avatar{width:43px;height:43px;border-radius:50%;background:#e5efff;color:#3478f6;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0}
-.floating{position:fixed;bottom:20px;right:18px;display:none;flex-direction:column;align-items:flex-end;gap:9px}
+.page::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:-8%;
+  bottom:-2px;
+  width:116%;
+  height:115px;
+  background:#dceaff;
+  border-radius:48% 52% 0 0/35% 43% 0 0;
+  clip-path:polygon(0 35%,10% 28%,21% 50%,32% 70%,43% 58%,53% 36%,65% 23%,77% 50%,88% 62%,100% 37%,100% 100%,0 100%);
+}
+.page::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:-5%;
+  bottom:-28px;
+  width:110%;
+  height:100px;
+  background:#e5efff;
+  border-radius:50% 50% 0 0;
+}
+.statusbar{
+  height:35px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 10px;
+  color:#172337;
+  font-size:10px;
+  font-weight:bold;
+}
+.status-icons{display:flex;align-items:center;gap:4px}
+.signal{display:inline-flex;align-items:flex-end;gap:1px;height:9px}
+.signal i{display:block;width:2px;background:#172337;border-radius:1px}
+.signal i:nth-child(1){height:3px}
+.signal i:nth-child(2){height:5px}
+.signal i:nth-child(3){height:7px}
+.signal i:nth-child(4){height:9px}
+.wifi{font-size:10px}
+.battery{width:13px;height:7px;border:1px solid #172337;border-radius:2px;position:relative}
+.battery:before{content:"";position:absolute;inset:1px 2px;background:#172337}
+.battery:after{content:"";position:absolute;right:-3px;top:1px;width:2px;height:3px;background:#172337;border-radius:0 1px 1px 0}
+h2{
+  font-size:17px;
+  font-weight:700;
+  text-align:center;
+  margin:27px 0 20px;
+  color:#304e79;
+}
+input,textarea{
+  width:100%;
+  min-width:0;
+  border:1px solid #edf0f6;
+  border-radius:12px;
+  background:#f8faff;
+  color:#334966;
+  outline:none;
+  padding:12px 13px;
+  margin:0;
+  box-shadow:inset 0 1px 2px #263d5b05;
+}
+input::placeholder,textarea::placeholder{color:#9aa7ba}
+input:focus,textarea:focus{
+  border-color:#a9c9ff;
+  background:#fff;
+}
+input[readonly]{background:#f1f4f9;color:#75849a}
+.card{
+  background:rgba(255,255,255,.88);
+  border:1px solid #edf1f8;
+  border-radius:13px;
+  padding:11px;
+  margin:9px 0;
+  box-shadow:0 2px 8px #35517b06;
+}
+.primary{
+  display:block;
+  width:100%;
+  min-height:36px;
+  padding:10px 12px;
+  margin-top:9px;
+  border-radius:9px;
+  color:#fff;
+  background:linear-gradient(100deg,#3785fa,#3475ef);
+  box-shadow:0 2px 3px #286ce818;
+}
+.primary:active,.send:active{filter:brightness(.96)}
+.back{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#42638e;
+  background:transparent;
+  padding:5px 0;
+  margin:5px 0 0;
+  font-size:14px;
+}
+.back .arrow{font-size:25px;line-height:1}
+.small{font-size:10px;color:#8593a8;line-height:1.5}
+.error{font-size:12px;color:#d75e70;margin-top:8px;overflow-wrap:anywhere}
+.hint{font-size:11px;color:#cf7482;margin:10px 1px 2px}
+.field{position:relative;margin:7px 0}
+.field input{padding-left:35px}
+.field-icon{
+  position:absolute;left:12px;top:50%;
+  transform:translateY(-50%);
+  font-size:15px;color:#6b85ad;
+  pointer-events:none;
+}
+#registerPage .card{padding:11px}
+#registerPage .field{margin:8px 0}
+#registerPage h2{margin-top:27px;margin-bottom:18px}
+#homePage h2{margin:20px 0 13px}
+.searchbox{position:relative;margin-bottom:9px}
+.searchbox .field-icon{left:13px}
+.searchbox input{padding-left:34px;border-radius:13px;background:#f8faff}
+#friendList{padding-bottom:115px}
+.friend{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  padding:10px;
+  min-height:59px;
+  margin:5px 0;
+}
+.avatar{
+  width:39px;height:39px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  background:#dceaff;
+  color:#3376d8;
+  font-size:14px;font-weight:500;
+}
+.friend-info{flex:1;min-width:0}
+.friend-name{display:block;font-size:12px;font-weight:600;color:#304766;margin-bottom:3px}
+.friend-arrow{color:#91a5c2;font-size:23px}
+.floating{
+  position:fixed;z-index:5;
+  right:18px;bottom:22px;
+  display:none;flex-direction:column;align-items:flex-end;gap:8px;
+}
 .floating.show{display:flex}
-.menu-items{display:none;flex-direction:column;gap:8px;align-items:flex-end}
+.menu-items{display:none;flex-direction:column;gap:7px;align-items:flex-end}
 .menu-items.show{display:flex}
-.menu-items button{box-shadow:0 3px 10px #0002}
-.dots{width:52px;height:52px;border-radius:50%;font-size:24px;box-shadow:0 3px 12px #0002}
-#messages{padding-bottom:100px}
-.bubble{padding:10px 12px;border-radius:13px;margin:8px 0;max-width:82%;overflow-wrap:anywhere}
-.mine{background:#3478f6;color:white;margin-left:auto}
-.theirs{background:white;color:#24334a;margin-right:auto}
-.time{font-size:10px;opacity:.7;margin-top:5px}
-.composer{position:fixed;bottom:0;left:0;right:0;background:white;padding:10px;display:flex;gap:8px;align-items:center;border-top:1px solid #e1e7f0}
-.composer textarea{margin:0;resize:none;max-height:100px}
-.send{width:46px;height:46px;border-radius:50%;flex-shrink:0;font-size:20px}
+.menu-items button{
+  display:flex;align-items:center;gap:7px;
+  min-width:105px;justify-content:flex-start;
+  border-radius:25px;padding:10px 14px;
+  color:#536c91;background:white;
+  box-shadow:0 2px 8px #233b5a10;
+  font-size:11px;
+}
+.dots{
+  width:43px;height:43px;border-radius:50%;
+  background:#2877ed;color:#fff;
+  font-size:22px;line-height:1;
+  box-shadow:0 3px 10px #286ce829;
+}
+#editPage h2,#findPage h2{margin:20px 0 22px}
+#editPage .card,#findPage .card{padding:11px}
+#editPage .field{margin:7px 0}
+#editPage input{font-size:12px;padding-top:12px;padding-bottom:12px}
+#editPage .primary{margin-top:14px}
+#findPage .card{background:transparent;border:0;box-shadow:none;padding:0}
+#findPage .field{margin:0 0 12px}
+#findResult{margin-top:22px}
+#findResult .card{background:rgba(255,255,255,.9);padding:13px}
+#findResult .primary{width:auto;min-width:100px;margin:10px auto 0}
+#chatPage{padding-left:0;padding-right:0;padding-bottom:78px}
+.chat-header{
+  display:flex;align-items:center;gap:10px;
+  min-height:62px;padding:4px 14px 10px;
+  border-bottom:1px solid #e4ecf7;
+}
+.chat-header .back{margin:0 1px 0 0;padding:0;width:20px;flex-shrink:0}
+.chat-header .avatar{width:36px;height:36px}
+.chat-heading{flex:1;min-width:0}
+.chat-heading strong{display:block;font-size:13px;margin-bottom:2px;color:#304766}
+.chat-heading .small{font-size:10px;line-height:1.4}
+.chat-options{
+  padding:6px;color:#6480a6;background:transparent;
+  font-size:21px;line-height:1;
+}
+#messages{
+  padding:5px 11px 15px;
+  overflow-y:auto;
+  height:calc(100dvh - 207px);
+  min-height:240px;
+  scrollbar-width:thin;
+  scrollbar-color:#d7e5fa transparent;
+}
+.date-separator{text-align:center;margin:11px 0 9px}
+.date-separator span{
+  display:inline-block;
+  background:#e1ebfb;
+  color:#5c7393;
+  font-size:10px;
+  padding:5px 11px;
+  border-radius:12px;
+}
+.bubble{
+  position:relative;
+  padding:9px 10px 7px;
+  border-radius:12px;
+  margin:7px 0;
+  max-width:84%;
+  width:fit-content;
+  min-width:62px;
+  overflow-wrap:anywhere;
+  font-size:12px;
+  line-height:1.35;
+  box-shadow:0 1px 2px #294b7b05;
+}
+.mine{
+  background:linear-gradient(110deg,#3e8afa,#3478f5);
+  color:white;margin-left:auto;
+  border-bottom-right-radius:5px;
+}
+.theirs{
+  background:#fff;color:#283b56;margin-right:auto;
+  border-bottom-left-radius:5px;
+}
+.time{
+  display:block;text-align:right;
+  font-size:8px;opacity:.8;
+  margin-top:4px;line-height:1;
+}
+.composer{
+  position:fixed;z-index:4;
+  bottom:0;left:0;right:0;
+  display:flex;align-items:center;gap:8px;
+  min-height:58px;padding:8px 11px;
+  background:rgba(247,250,255,.97);
+  border-top:1px solid #e3ebf7;
+}
+.attach{
+  flex-shrink:0;width:26px;height:35px;
+  color:#7288a8;background:transparent;
+  font-size:23px;padding:0;
+}
+.composer textarea{
+  flex:1;height:36px;min-height:36px;max-height:90px;
+  resize:none;padding:10px 12px;
+  border-radius:22px;background:#fff;
+  border:1px solid #e8edf5;font-size:12px;
+}
+.send{
+  display:flex;align-items:center;justify-content:center;
+  width:32px;height:32px;flex-shrink:0;
+  border-radius:50%;background:#2f7df5;color:white;
+  font-size:18px;padding:0;
+}
+#messageLoadError{margin:8px 0}
+.empty-state{
+  text-align:center;padding:20px 12px;
+  font-size:12px;color:#8797ad;
+}
+@media(min-width:600px){
+  .page{max-width:430px;margin:0 auto}
+  .composer{left:50%;right:auto;transform:translateX(-50%);width:min(430px,100%)}
+  .floating{right:calc((100vw - min(430px,100vw))/2 + 18px)}
+}
 </style>
 </head>
 <body>
 
 <section id="registerPage" class="page active">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
+  </div>
   <h2>Buat Akun</h2>
   <div class="card">
-    <input id="regName" placeholder="Nama lengkap" autocomplete="name">
-    <input id="regAddress" placeholder="Alamat">
-    <input id="regPhone" placeholder="Nomor WhatsApp" inputmode="tel">
+    <div class="field"><span class="field-icon">♙</span><input id="regName" placeholder="Nama lengkap" autocomplete="name"></div>
+    <div class="field"><span class="field-icon">♙</span><input id="regAddress" placeholder="Alamat"></div>
+    <div class="field"><span class="field-icon">◉</span><input id="regPhone" placeholder="Nomor WhatsApp" inputmode="tel"></div>
     <button class="primary" id="registerButton" onclick="register()">Daftar Sekarang</button>
+    <div class="hint">Lengkapi semua data dengan benar.</div>
     <div id="registerError" class="error"></div>
   </div>
 </section>
 
 <section id="homePage" class="page">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
+  </div>
   <h2>Teman Chat</h2>
-  <input id="searchFriends" placeholder="Cari nama atau ID teman..." oninput="renderFriends()">
+  <div class="searchbox">
+    <span class="field-icon">⌕</span>
+    <input id="searchFriends" placeholder="Cari nama atau ID teman..." oninput="renderFriends()">
+  </div>
   <div id="friendList"></div>
 </section>
 
 <section id="editPage" class="page">
-  <button class="back" onclick="showPage('homePage')">← Kembali</button>
-  <h2>Edit Akun</h2>
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
+  </div>
+  <button class="back" onclick="showPage('homePage')"><span class="arrow">‹</span> Edit Akun</button>
+  <h2 style="display:none">Edit Akun</h2>
   <div class="card">
-    <input id="editId" placeholder="ID Akun" readonly>
-    <input id="editName" placeholder="Nama lengkap">
-    <input id="editAddress" placeholder="Alamat">
-    <input id="editPhone" placeholder="Nomor WhatsApp" inputmode="tel">
+    <div class="field"><span class="field-icon">▣</span><input id="editId" placeholder="ID Akun" readonly></div>
+    <div class="field"><span class="field-icon">♙</span><input id="editName" placeholder="Nama lengkap"></div>
+    <div class="field"><span class="field-icon">⌖</span><input id="editAddress" placeholder="Alamat"></div>
+    <div class="field"><span class="field-icon">◉</span><input id="editPhone" placeholder="Nomor WhatsApp" inputmode="tel"></div>
     <button class="primary" id="saveButton" onclick="saveAccount()">Simpan Perubahan</button>
     <div id="editError" class="error"></div>
   </div>
 </section>
 
 <section id="findPage" class="page">
-  <button class="back" onclick="showPage('homePage')">← Kembali</button>
-  <h2>Cari Teman</h2>
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
+  </div>
+  <button class="back" onclick="showPage('homePage')"><span class="arrow">‹</span> Cari Teman</button>
+  <h2 style="display:none">Cari Teman</h2>
   <div class="card">
-    <input id="findId" placeholder="Masukkan ID teman (5 digit)" inputmode="numeric" maxlength="5">
+    <div class="field"><span class="field-icon">▦</span><input id="findId" placeholder="Masukkan ID teman (5 digit)" inputmode="numeric" maxlength="5"></div>
     <button class="primary" id="findButton" onclick="findFriend()">Cari Teman</button>
     <div id="findResult"></div>
   </div>
 </section>
 
 <section id="chatPage" class="page">
-  <button class="back" onclick="showPage('homePage')">← Kembali</button>
-  <div class="card">
-    <strong id="chatName">Nama teman</strong>
-    <div id="chatId" class="small"></div>
-    <div id="chatPhone" class="small"></div>
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
   </div>
+  <header class="chat-header">
+    <button class="back" onclick="showPage('homePage')" aria-label="Kembali"><span class="arrow">‹</span></button>
+    <div class="avatar" id="chatAvatar">?</div>
+    <div class="chat-heading">
+      <strong id="chatName">Nama teman</strong>
+      <div id="chatId" class="small"></div>
+      <div id="chatPhone" class="small"></div>
+    </div>
+    <button class="chat-options" aria-label="Opsi">⋮</button>
+  </header>
   <div id="messages"></div>
   <div class="composer">
+    <button class="attach" aria-label="Lampiran" onclick="alert('Fitur lampiran belum diaktifkan.')">♧</button>
     <textarea id="messageInput" rows="1" placeholder="Tulis pesan..."></textarea>
-    <button class="send" id="sendButton" onclick="sendMessage()">➤</button>
+    <button class="send" id="sendButton" onclick="sendMessage()" aria-label="Kirim">➤</button>
   </div>
 </section>
 
 <div id="floating" class="floating">
   <div id="menuItems" class="menu-items">
-    <button onclick="openEdit()">Edit Akun</button>
-    <button onclick="openFind()">Cari Teman</button>
+    <button onclick="openEdit()">♙ <span>Edit Akun</span></button>
+    <button onclick="openFind()">⌕ <span>Cari Teman</span></button>
   </div>
-  <button class="dots" onclick="toggleMenu()">⋮</button>
+  <button class="dots" onclick="toggleMenu()" aria-label="Menu">⋮</button>
 </div>
 
 <script>
@@ -269,7 +563,6 @@ async function register(){
   }
 }
 
-/* Memuat daftar teman melalui fungsi database yang sudah digunakan aplikasi. */
 async function loadFriends(){
   if(!account)return;
 
@@ -297,8 +590,7 @@ async function loadFriends(){
 }
 
 function renderFriends(){
-  const search=document.getElementById('searchFriends');
-  const query=(search.value||'').trim().toLowerCase();
+  const query=(document.getElementById('searchFriends').value||'').trim().toLowerCase();
   const list=document.getElementById('friendList');
   list.replaceChildren();
 
@@ -309,7 +601,7 @@ function renderFriends(){
 
   if(!matches.length){
     const empty=document.createElement('div');
-    empty.className='card small';
+    empty.className='card empty-state';
     empty.textContent='Belum ada teman. Gunakan Cari Teman untuk menemukan pengguna.';
     list.append(empty);
     return;
@@ -321,20 +613,25 @@ function renderFriends(){
 
     const avatar=document.createElement('div');
     avatar.className='avatar';
-    avatar.textContent=(friend.display_name||'?').charAt(0).toUpperCase();
+    avatar.textContent=(friend.display_name||'?').slice(0,2).toUpperCase();
 
     const info=document.createElement('div');
-    info.style.flex='1';
+    info.className='friend-info';
 
     const name=document.createElement('strong');
+    name.className='friend-name';
     name.textContent=friend.display_name||'Pengguna';
 
     const id=document.createElement('div');
     id.className='small';
     id.textContent='ID: '+friend.public_id;
 
+    const arrow=document.createElement('span');
+    arrow.className='friend-arrow';
+    arrow.textContent='›';
+
     info.append(name,id);
-    card.append(avatar,info);
+    card.append(avatar,info,arrow);
     card.onclick=()=>openChat(friend);
     list.append(card);
   });
@@ -393,7 +690,6 @@ async function saveAccount(){
 function openFind(){
   document.getElementById('findId').value='';
   document.getElementById('findResult').replaceChildren();
-  setError('findResult','');
   showPage('findPage');
 }
 
@@ -433,20 +729,27 @@ async function findFriend(){
       return;
     }
 
-    if(profile.id===account.id){
-      result.textContent='Itu ID akun kamu sendiri.';
-      return;
-    }
-
     const card=document.createElement('div');
-    card.className='card';
+    card.className='card friend';
+
+    const avatar=document.createElement('div');
+    avatar.className='avatar';
+    avatar.textContent=(profile.display_name||'?').slice(0,2).toUpperCase();
+
+    const info=document.createElement('div');
+    info.className='friend-info';
 
     const name=document.createElement('strong');
+    name.className='friend-name';
     name.textContent=profile.display_name||'Pengguna';
 
     const publicId=document.createElement('div');
     publicId.className='small';
     publicId.textContent='ID: '+profile.public_id;
+
+    info.append(name,publicId);
+    card.append(avatar,info);
+    result.append(card);
 
     const start=document.createElement('button');
     start.className='primary';
@@ -454,8 +757,6 @@ async function findFriend(){
 
     start.onclick=async()=>{
       start.disabled=true;
-      const oldText=start.textContent;
-      start.textContent='Membuka chat...';
 
       try{
         const {error:contactError}=await db.from('contacts').upsert({
@@ -466,26 +767,18 @@ async function findFriend(){
         if(contactError)throw contactError;
 
         await loadFriends();
-
-        /* Buka percakapan langsung dengan UUID profil yang ditemukan. */
         openChat(profile);
       }catch(error){
         console.error('add contact:',error);
         start.disabled=false;
-        start.textContent=oldText;
-
-        let message=card.querySelector('.error');
-        if(!message){
-          message=document.createElement('div');
-          message.className='error';
-          card.append(message);
-        }
+        const message=document.createElement('div');
+        message.className='error';
         message.textContent='Gagal menambahkan teman: '+error.message;
+        result.append(message);
       }
     };
 
-    card.append(name,publicId,start);
-    result.append(card);
+    result.append(start);
   }catch(error){
     console.error('findFriend:',error);
     result.replaceChildren();
@@ -505,18 +798,37 @@ function openChat(friend){
   document.getElementById('chatName').textContent=friend.display_name||'Pengguna';
   document.getElementById('chatId').textContent='ID akun: '+(friend.public_id||'');
   document.getElementById('chatPhone').textContent=friend.whatsapp||'';
-  document.getElementById('messages').replaceChildren();
-  document.getElementById('messages').dataset.count='';
-  document.getElementById('messages').dataset.last='';
+  document.getElementById('chatAvatar').textContent=(friend.display_name||'?').slice(0,2).toUpperCase();
+
+  const box=document.getElementById('messages');
+  box.replaceChildren();
+  delete box.dataset.signature;
+  box.dataset.count='';
+  box.dataset.last='';
+
   document.getElementById('messageInput').value='';
   showPage('chatPage');
 }
 
-/*
- * Ambil pesan dari dua arah dengan dua query terpisah.
- * Ini menghindari kesalahan parsing filter .or() dan memastikan
- * pesan masuk maupun keluar digabung berdasarkan UUID.
- */
+function getDateKey(date){
+  const d=new Date(date);
+  return d.getFullYear()+'-'+
+    String(d.getMonth()+1).padStart(2,'0')+'-'+
+    String(d.getDate()).padStart(2,'0');
+}
+
+function formatDateSeparator(date){
+  return new Date(date).toLocaleDateString('id-ID',{
+    weekday:'long',day:'numeric',month:'long',year:'numeric'
+  });
+}
+
+function formatMessageTime(date){
+  return new Date(date).toLocaleTimeString('id-ID',{
+    hour:'2-digit',minute:'2-digit',hour12:false
+  });
+}
+
 async function loadMessages(){
   if(!account||!activeFriend||loadingMessages)return;
   if(!document.getElementById('chatPage').classList.contains('active'))return;
@@ -524,22 +836,20 @@ async function loadMessages(){
   loadingMessages=true;
 
   try{
-    const outgoingPromise=db.from('messages')
-      .select('id,sender_id,recipient_id,content,created_at')
-      .eq('sender_id',account.id)
-      .eq('recipient_id',activeFriend.id)
-      .order('created_at',{ascending:true})
-      .limit(300);
-
-    const incomingPromise=db.from('messages')
-      .select('id,sender_id,recipient_id,content,created_at')
-      .eq('sender_id',activeFriend.id)
-      .eq('recipient_id',account.id)
-      .order('created_at',{ascending:true})
-      .limit(300);
-
     const [outgoing,incoming]=await Promise.all([
-      outgoingPromise,incomingPromise
+      db.from('messages')
+        .select('id,sender_id,recipient_id,content,created_at')
+        .eq('sender_id',account.id)
+        .eq('recipient_id',activeFriend.id)
+        .order('created_at',{ascending:true})
+        .limit(300),
+
+      db.from('messages')
+        .select('id,sender_id,recipient_id,content,created_at')
+        .eq('sender_id',activeFriend.id)
+        .eq('recipient_id',account.id)
+        .order('created_at',{ascending:true})
+        .limit(300)
     ]);
 
     if(outgoing.error)throw outgoing.error;
@@ -551,8 +861,9 @@ async function loadMessages(){
     ].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
 
     const box=document.getElementById('messages');
-    const lastId=messages.length?messages[messages.length-1].id:'';
-    const signature=messages.map(m=>m.id+':'+m.content).join('|');
+    const signature=messages.map(m=>
+      m.id+':'+m.content+':'+m.created_at
+    ).join('|');
 
     if(box.dataset.signature===signature)return;
 
@@ -560,22 +871,37 @@ async function loadMessages(){
 
     if(!messages.length){
       const empty=document.createElement('div');
-      empty.className='small';
-      empty.style.textAlign='center';
-      empty.style.padding='18px 0';
+      empty.className='empty-state';
       empty.textContent='Belum ada pesan. Mulai percakapan sekarang.';
       box.append(empty);
     }else{
+      let previousDate='';
+
       messages.forEach(msg=>{
+        const currentDate=getDateKey(msg.created_at);
+
+        if(currentDate!==previousDate){
+          const separator=document.createElement('div');
+          separator.className='date-separator';
+
+          const label=document.createElement('span');
+          label.textContent=formatDateSeparator(msg.created_at);
+
+          separator.append(label);
+          box.append(separator);
+          previousDate=currentDate;
+        }
+
         const bubble=document.createElement('div');
-        bubble.className='bubble '+(msg.sender_id===account.id?'mine':'theirs');
+        bubble.className='bubble '+
+          (msg.sender_id===account.id?'mine':'theirs');
 
         const content=document.createElement('div');
         content.textContent=msg.content;
 
         const time=document.createElement('div');
         time.className='time';
-        time.textContent=new Date(msg.created_at).toLocaleString('id-ID');
+        time.textContent=formatMessageTime(msg.created_at);
 
         bubble.append(content,time);
         box.append(bubble);
@@ -583,19 +909,20 @@ async function loadMessages(){
     }
 
     box.dataset.count=String(messages.length);
-    box.dataset.last=lastId;
+    box.dataset.last=messages.length?messages[messages.length-1].id:'';
     box.dataset.signature=signature;
     box.scrollTop=box.scrollHeight;
+
   }catch(error){
     console.error('loadMessages:',error);
-    const box=document.getElementById('messages');
+
     let notice=document.getElementById('messageLoadError');
 
     if(!notice){
       notice=document.createElement('div');
       notice.id='messageLoadError';
       notice.className='card error';
-      box.prepend(notice);
+      document.getElementById('messages').prepend(notice);
     }
 
     notice.textContent='Gagal memuat pesan: '+error.message;
@@ -657,10 +984,12 @@ db.auth.onAuthStateChange((event,session)=>{
   if(event==='SIGNED_OUT'){
     account=null;
     activeFriend=null;
+
     if(messageTimer){
       clearInterval(messageTimer);
       messageTimer=null;
     }
+
     showPage('registerPage');
   }
 });
@@ -669,3 +998,4 @@ startApp();
 </script>
 </body>
 </html>
+
