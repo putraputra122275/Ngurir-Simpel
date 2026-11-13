@@ -307,19 +307,25 @@ let blockedFriends=readStore('cs_blocked',[]);
 let comments=readStore('cs_comments',[]);
 let posts=readStore('cs_posts',[]);
 let profile=readStore('cs_profile',{name:'Pengguna',bio:'',wa:''});
-const OWNER_ACCOUNT_CODE='RUSDI-150710';
+const OWNER_ACCOUNT_CODE='RSD-150710';
+const LEGACY_OWNER_ACCOUNT_CODES=['RUSDI-150710','RUSDI - 150710'];
 const wasRegistered=localStorage.getItem('cs_registered')==='true';
+const isSharedAppLink=new URLSearchParams(window.location.search).get('shared')==='1';
 const normalizedOwnerName=String(profile.name||'').trim().toLocaleLowerCase('id-ID');
-const isOwnerAccount=String(profile.id||'').toUpperCase()===OWNER_ACCOUNT_CODE || normalizedOwnerName==='rusdi' || normalizedOwnerName.startsWith('rusdi ');
-function makeAccountId(name){
- const prefix=String(name||'Pengguna').trim().replace(/\s+/g,' ');
+let isOwnerAccount=LEGACY_OWNER_ACCOUNT_CODES.includes(String(profile.id||'').trim().toUpperCase()) || (!isSharedAppLink && (normalizedOwnerName==='rusdi'||normalizedOwnerName.startsWith('rusdi ')));
+if(isOwnerAccount){profile.id=OWNER_ACCOUNT_CODE;saveStore('cs_profile',profile);}
+function updateOwnerMenu(){
+ const aboutButton=$('aboutAppButton');
+ if(aboutButton) aboutButton.style.display=isOwnerAccount?'':'none';
+}
+function makeAccountId(){
  const used=readStore('cs_used_account_codes',[]);
  const localIds=[profile.id,...friends.map(f=>f.id),...userDirectory.map(u=>u.id)].filter(Boolean);
- const normalizedUsed=new Set([...used,...localIds].map(x=>String(x).toLocaleLowerCase('id-ID')));
+ const normalizedUsed=new Set([...used,...localIds].map(x=>String(x).toUpperCase()));
  for(let attempt=0;attempt<1000000;attempt++){
   const digits=String(Math.floor(Math.random()*1000000)).padStart(6,'0');
-  const id=prefix+'-'+digits;
-  if(id.toUpperCase()!==OWNER_ACCOUNT_CODE && !normalizedUsed.has(id.toLocaleLowerCase('id-ID'))){
+  const id='RSD-'+digits;
+  if(![OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(id.toUpperCase()) && !normalizedUsed.has(id.toUpperCase())){
    used.push(id);saveStore('cs_used_account_codes',used);return id;
   }
  }
@@ -331,7 +337,8 @@ if(isOwnerAccount){
  profile.id=CURRENT_USER_ID;
  saveStore('cs_profile',profile);
 }else if(wasRegistered){
- if(!CURRENT_USER_ID||!/^.+-\d{6}$/.test(CURRENT_USER_ID)||String(CURRENT_USER_ID).toUpperCase()===OWNER_ACCOUNT_CODE) CURRENT_USER_ID=makeAccountId(profile.name||'Pengguna');
+ if(!/^RSD-\d{6}$/.test(String(CURRENT_USER_ID).toUpperCase()) || [OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(String(CURRENT_USER_ID).trim().toUpperCase())) CURRENT_USER_ID=makeAccountId();
+ else CURRENT_USER_ID=String(CURRENT_USER_ID).toUpperCase();
  profile.id=CURRENT_USER_ID;saveStore('cs_profile',profile);
 }
 pendingGroupMembers=[CURRENT_USER_ID];
@@ -345,9 +352,11 @@ function completeRegistration(){
  const wa=$('registerWa').value.trim();
  if(!name || !wa){alert('Nama dan nomor WhatsApp wajib diisi.');return;}
  const normalizedName=name.trim().toLocaleLowerCase('id-ID');
- CURRENT_USER_ID=(normalizedName==='rusdi'||normalizedName.startsWith('rusdi '))?OWNER_ACCOUNT_CODE:makeAccountId(name);
+ isOwnerAccount=!isSharedAppLink && (normalizedName==='rusdi'||normalizedName.startsWith('rusdi '));
+ CURRENT_USER_ID=isOwnerAccount?OWNER_ACCOUNT_CODE:makeAccountId();
  profile.name=name; profile.wa=wa; profile.bio=profile.bio||''; profile.id=CURRENT_USER_ID;
  saveStore('cs_profile',profile); localStorage.setItem('cs_registered','true');
+ updateOwnerMenu();
  $('normalHeader').classList.remove('hidden'); $('bottomNav').classList.remove('hidden');
  openPage('home','BERANDA'); renderAccount();
 }
@@ -389,6 +398,7 @@ function goBack(){
  // Tidak berpindah ke halaman lain jika memang tidak ada halaman sebelumnya.
 }
 function openPage(id,title,skipHistory=false){
+ if(id==='aboutApp'&&!isOwnerAccount){alert('Fitur Tentang Aplikasi hanya tersedia untuk pemilik aplikasi.');return;}
  if(!skipHistory && id!==currentPageId && $(currentPageId)){pageHistory.push({id:currentPageId,title:pageTitles[currentPageId]||$('pageTitle').textContent});}
  currentPageId=id;
  $('chatScreen').classList.add('hidden');
@@ -505,7 +515,7 @@ function searchPosts(q){
  });
 }
 function renderAccount(){
- if(isOwnerAccount || String(profile.id||'').toUpperCase()===OWNER_ACCOUNT_CODE){CURRENT_USER_ID=OWNER_ACCOUNT_CODE;profile.id=OWNER_ACCOUNT_CODE;saveStore('cs_profile',profile);}
+ if(isOwnerAccount || [OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(String(profile.id||'').trim().toUpperCase())){isOwnerAccount=true;CURRENT_USER_ID=OWNER_ACCOUNT_CODE;profile.id=OWNER_ACCOUNT_CODE;saveStore('cs_profile',profile);updateOwnerMenu();}
  $('profileName').textContent=profile.name||'Pengguna';
  $('profileId').textContent='ID akun: '+CURRENT_USER_ID;
  if($('aboutAccountName')) $('aboutAccountName').textContent=profile.name||'Pengguna';
@@ -769,7 +779,8 @@ function openGroupChat(id){
  $('normalHeader').classList.add('hidden');$('normalMain').classList.add('hidden');$('bottomNav').classList.remove('hidden');$('bottomNav').style.display='flex';$('chatScreen').classList.remove('hidden');$('messageInput').value='';$('messageInput').style.height='auto';renderMessages();
 }
 async function copyAppLink(){
- const link=window.location.href.split('#')[0];
+ const baseLink=window.location.href.split('#')[0].split('?')[0];
+ const link=baseLink+'?shared=1';
  try{await navigator.clipboard.writeText(link);$('appLinkStatus').textContent='Link aplikasi berhasil disalin.';}
  catch(e){const t=document.createElement('textarea');t.value=link;document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();$('appLinkStatus').textContent=ok?'Link aplikasi berhasil disalin.':'Salin link dari alamat halaman ini: '+link;}
 }
@@ -879,6 +890,7 @@ if(localStorage.getItem('cs_registered')!=='true'){
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='home'));
 }
 renderAccount();
+updateOwnerMenu();
 renderAboutApp();
 searchFriends('');
 renderChatList();
