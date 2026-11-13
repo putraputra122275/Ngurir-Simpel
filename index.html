@@ -5,94 +5,106 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chat Saya</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#24334a}
-.page{display:none;padding:15px 14px 88px}
+.page{display:none;min-height:100vh;padding:18px}
 .page.active{display:block}
-button,input,textarea{font:inherit}
-button{cursor:pointer}
-input,textarea{width:100%;padding:12px;border:1px solid #dce4ef;border-radius:12px;background:white;outline-color:#4388ed;margin:6px 0 12px}
-.primary{background:#287bea;color:white;border:0;border-radius:11px;padding:13px;width:100%;font-weight:bold}
-h3{font-size:19px;margin:8px 0 16px}
-.back{border:0;background:#e8f0fc;color:#287bea;border-radius:10px;padding:9px 13px;font-size:14px;font-weight:bold;margin-bottom:12px}
-.friend{background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 2px 8px #e5eaf2;cursor:pointer}
-.friend strong,.friend small{display:block;margin-bottom:5px}
-small{font-size:12px;color:#7b8798}
-.chat-heading{padding:3px 2px 15px;margin-bottom:12px;border-bottom:1px solid #e2e8f0}
-.chat-heading .label{font-size:14px;font-weight:bold;letter-spacing:.5px;margin-bottom:10px;color:#526781}
-.chat-heading h3{font-size:17px;margin:0 0 7px;color:#24334a}
-.chat-heading small{display:block;margin-top:5px;overflow-wrap:anywhere}
-#messages{display:flex;flex-direction:column;gap:9px;padding:5px 0 18px}
-.msg{width:fit-content;max-width:82%;padding:10px 13px;border-radius:16px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere}
-.mine{align-self:flex-end;background:#287bea;color:white;border-bottom-right-radius:5px}
-.theirs{align-self:flex-start;background:white;color:#24334a;border-bottom-left-radius:5px;box-shadow:0 1px 5px #e0e6ef}
-.composer{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;padding:9px;gap:8px;align-items:flex-end;box-shadow:0 -2px 10px #e4eaf2}
-.composer textarea{margin:0;min-height:44px;max-height:120px;resize:none;border-radius:22px;padding:12px 15px;line-height:20px}
-.send{flex-shrink:0;width:44px;height:44px;border:0;border-radius:50%;background:#287bea;color:white;font-size:22px;display:flex;align-items:center;justify-content:center}
-.floating{position:fixed;right:14px;bottom:15px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.floating button{background:white;color:#287bea;border:0;border-radius:20px;padding:9px 13px;box-shadow:0 2px 8px #dce5ef;font-weight:bold}
-.floating .dots{width:44px;height:44px;border-radius:50%;font-size:22px;padding:0}
-#menuOptions{display:none;flex-direction:column;align-items:flex-end;gap:8px}
+h2{text-align:center;margin:12px 0 22px}
+input,textarea,button{font:inherit}
+input,textarea{width:100%;padding:13px;border:1px solid #d8e0ec;border-radius:10px;background:white;margin:7px 0;outline:none}
+input[readonly]{background:#eaf0f8;color:#52627a}
+button{border:0;border-radius:10px;padding:12px;background:#3478f6;color:white;cursor:pointer}
+button:disabled{opacity:.6}
+.primary{width:100%;margin-top:10px}
+.back{background:#e4ecf8;color:#24334a;margin-bottom:15px}
+.card{background:white;border-radius:13px;padding:14px;margin:9px 0;box-shadow:0 2px 8px #2030500a}
+.small{font-size:13px;color:#748198}
+.error{color:#d33;font-size:13px;margin-top:10px;overflow-wrap:anywhere}
+#friendList{padding-bottom:110px}
+.friend{display:flex;align-items:center;gap:12px;cursor:pointer}
+.avatar{width:43px;height:43px;border-radius:50%;background:#e5efff;color:#3478f6;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0}
+.floating{position:fixed;bottom:20px;right:18px;display:none;flex-direction:column;align-items:flex-end;gap:9px}
+.floating.show{display:flex}
+.menu-items{display:none;flex-direction:column;gap:8px;align-items:flex-end}
+.menu-items.show{display:flex}
+.menu-items button{box-shadow:0 3px 10px #0002}
+.dots{width:52px;height:52px;border-radius:50%;font-size:24px;box-shadow:0 3px 12px #0002}
+#messages{padding-bottom:100px}
+.bubble{padding:10px 12px;border-radius:13px;margin:8px 0;max-width:82%;overflow-wrap:anywhere}
+.mine{background:#3478f6;color:white;margin-left:auto}
+.theirs{background:white;color:#24334a;margin-right:auto}
+.time{font-size:10px;opacity:.7;margin-top:5px}
+.composer{position:fixed;bottom:0;left:0;right:0;background:white;padding:10px;display:flex;gap:8px;align-items:center;border-top:1px solid #e1e7f0}
+.composer textarea{margin:0;resize:none;max-height:100px}
+.send{width:46px;height:46px;border-radius:50%;flex-shrink:0;font-size:20px}
 </style>
 </head>
 <body>
 
-<section id="register" class="page">
-<h3>Buat Akun</h3>
-<input id="regName" placeholder="Nama">
-<input id="regAddress" placeholder="Alamat">
-<input id="regPhone" placeholder="Nomor WhatsApp">
-<button class="primary" onclick="register()">Daftar Sekarang</button>
+<section id="registerPage" class="page active">
+  <h2>Buat Akun</h2>
+  <div class="card">
+    <input id="regName" placeholder="Nama lengkap" autocomplete="name">
+    <input id="regAddress" placeholder="Alamat">
+    <input id="regPhone" placeholder="Nomor WhatsApp" inputmode="tel">
+    <button class="primary" id="registerButton" onclick="register()">Daftar Sekarang</button>
+    <div id="registerError" class="error"></div>
+  </div>
 </section>
 
-<section id="home" class="page">
-<h3>Teman Chat</h3>
-<input id="searchHome" placeholder="Cari nama atau ID teman..." oninput="renderFriends()">
-<div id="friendList"></div>
-<div class="floating">
-<div id="menuOptions">
-<button onclick="show('edit')">Edit Akun</button>
-<button onclick="show('find')">Cari Teman</button>
+<section id="homePage" class="page">
+  <h2>Teman Chat</h2>
+  <input id="searchFriends" placeholder="Cari nama atau ID teman..." oninput="renderFriends()">
+  <div id="friendList"></div>
+</section>
+
+<section id="editPage" class="page">
+  <button class="back" onclick="showPage('homePage')">← Kembali</button>
+  <h2>Edit Akun</h2>
+  <div class="card">
+    <input id="editId" placeholder="ID Akun" readonly>
+    <input id="editName" placeholder="Nama lengkap">
+    <input id="editAddress" placeholder="Alamat">
+    <input id="editPhone" placeholder="Nomor WhatsApp" inputmode="tel">
+    <button class="primary" id="saveButton" onclick="saveAccount()">Simpan Perubahan</button>
+    <div id="editError" class="error"></div>
+  </div>
+</section>
+
+<section id="findPage" class="page">
+  <button class="back" onclick="showPage('homePage')">← Kembali</button>
+  <h2>Cari Teman</h2>
+  <div class="card">
+    <input id="findId" placeholder="Masukkan ID teman (5 digit)" inputmode="numeric" maxlength="5">
+    <button class="primary" onclick="findFriend()">Cari Teman</button>
+    <div id="findResult"></div>
+  </div>
+</section>
+
+<section id="chatPage" class="page">
+  <button class="back" onclick="showPage('homePage')">← Kembali</button>
+  <div class="card">
+    <strong id="chatName">Nama teman</strong>
+    <div id="chatId" class="small"></div>
+    <div id="chatPhone" class="small"></div>
+  </div>
+  <div id="messages"></div>
+  <div class="composer">
+    <textarea id="messageInput" rows="1" placeholder="Tulis pesan..."></textarea>
+    <button class="send" id="sendButton" onclick="sendMessage()">➤</button>
+  </div>
+</section>
+
+<div id="floating" class="floating">
+  <div id="menuItems" class="menu-items">
+    <button onclick="openEdit()">Edit Akun</button>
+    <button onclick="openFind()">Cari Teman</button>
+  </div>
+  <button class="dots" onclick="toggleMenu()">⋮</button>
 </div>
-<button class="dots" onclick="toggleMenu()">⋮</button>
-</div>
-</section>
 
-<section id="edit" class="page">
-<button class="back" onclick="show('home')">← Kembali</button>
-<h3>Edit Akun</h3>
-<input id="editName" placeholder="Nama">
-<input id="editAddress" placeholder="Alamat">
-<input id="editPhone" placeholder="Nomor WhatsApp">
-<button class="primary" onclick="saveAccount()">Simpan Perubahan</button>
-</section>
-
-<section id="find" class="page">
-<button class="back" onclick="show('home')">← Kembali</button>
-<h3>Cari Teman</h3>
-<input id="findId" maxlength="5" placeholder="Masukkan ID teman 5 digit">
-<button class="primary" onclick="findFriend()">Cari Teman</button>
-<div id="findResult"></div>
-</section>
-
-<section id="chat" class="page">
-<button class="back" onclick="show('home')">← Kembali</button>
-<div class="chat-heading">
-<div class="label">CHAT</div>
-<h3 id="chatName">Andi</h3>
-<small id="chatId">ID akun: 48217</small>
-<small id="chatPhone">WhatsApp: 081234567890</small>
-</div>
-<div id="messages"></div>
-</section>
-
-<div id="composer" class="composer">
-<textarea id="messageInput" rows="1" placeholder="Tulis pesan..."></textarea>
-<button class="send" onclick="sendMessage()" aria-label="Kirim pesan">➤</button>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://ephyrxssmbutevwjwwmd.supabase.co';
 const SUPABASE_KEY='sb_publishable_sX4Gil8eofCFuKC4cXQMjw_UD5tlfVp';
@@ -101,268 +113,459 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let account=null;
 let friends=[];
 let activeFriend=null;
-let loadingMessages=false;
 let messageTimer=null;
+let loadingMessages=false;
+let sendingMessage=false;
 
-function show(id){
- document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
- document.getElementById(id).classList.add('active');
- composer.style.display=id==='chat'?'flex':'none';
- if(id==='home')renderFriends();
- if(id==='edit'&&account){
-  editName.value=account.display_name||'';
-  editAddress.value=account.address||'';
-  editPhone.value=account.whatsapp||'';
- }
- if(id!=='home')menuOptions.style.display='none';
- if(messageTimer){clearInterval(messageTimer);messageTimer=null;}
- if(id==='chat'&&activeFriend){
-  messageTimer=setInterval(loadMessages,5000);
- }
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('floating').classList.toggle('show',id==='homePage');
+  document.getElementById('menuItems').classList.remove('show');
+
+  if(messageTimer){
+    clearInterval(messageTimer);
+    messageTimer=null;
+  }
+  if(id==='chatPage'&&activeFriend){
+    loadMessages();
+    messageTimer=setInterval(loadMessages,5000);
+  }
 }
 
 function toggleMenu(){
- menuOptions.style.display=menuOptions.style.display==='flex'?'none':'flex';
+  document.getElementById('menuItems').classList.toggle('show');
 }
 
-async function ensureSession(){
- const {data,error}=await db.auth.getSession();
- if(error)throw error;
- if(!data.session){
-  const {error:signError}=await db.auth.signInAnonymously();
-  if(signError)throw signError;
- }
+function setError(id,message){
+  document.getElementById(id).textContent=message||'';
+}
+
+function makePublicId(){
+  return String(Math.floor(10000+Math.random()*90000));
 }
 
 async function startApp(){
- try{
-  await ensureSession();
-  const {data:auth,error:authError}=await db.auth.getUser();
-  if(authError)throw authError;
-  if(!auth.user){show('register');return;}
+  try{
+    const {data,error}=await db.auth.getSession();
+    if(error)throw error;
 
-  const {data,error}=await db.from('profiles')
-   .select('id,public_id,display_name,whatsapp,address')
-   .eq('id',auth.user.id).maybeSingle();
-  if(error)throw error;
+    const session=data.session;
+    if(!session){
+      account=null;
+      showPage('registerPage');
+      return;
+    }
 
-  if(!data){show('register');return;}
-  account=data;
-  await loadFriends();
-  show('home');
- }catch(e){
-  console.error(e);
-  show('register');
-  alert('Koneksi Supabase gagal: '+e.message);
- }
+    const {data:profile,error:profileError}=await db
+      .from('profiles')
+      .select('id,public_id,display_name,address,whatsapp')
+      .eq('id',session.user.id)
+      .maybeSingle();
+
+    if(profileError)throw profileError;
+
+    if(!profile){
+      account=null;
+      showPage('registerPage');
+      return;
+    }
+
+    account=profile;
+    await loadFriends();
+    showPage('homePage');
+  }catch(error){
+    console.error(error);
+    account=null;
+    showPage('registerPage');
+    setError('registerError',
+      'Akun gagal diperiksa. Periksa koneksi, tabel profiles, dan kebijakan Supabase.');
+  }
 }
 
 async function register(){
- const name=regName.value.trim();
- const address=regAddress.value.trim();
- const phone=regPhone.value.trim();
- if(!name||!address||!phone)return alert('Lengkapi semua data.');
+  const name=document.getElementById('regName').value.trim();
+  const address=document.getElementById('regAddress').value.trim();
+  const phone=document.getElementById('regPhone').value.trim();
+  const button=document.getElementById('registerButton');
 
- try{
-  await ensureSession();
-  const {data:auth,error:authError}=await db.auth.getUser();
-  if(authError)throw authError;
-  if(!auth.user)throw new Error('Sesi akun tidak tersedia.');
+  setError('registerError','');
 
-  const {data:old,error:oldError}=await db.from('profiles')
-   .select('id,public_id,display_name,whatsapp,address')
-   .eq('id',auth.user.id).maybeSingle();
-  if(oldError)throw oldError;
-
-  if(old){account=old;await loadFriends();show('home');return;}
-
-  let result=null;
-  for(let i=0;i<10;i++){
-   const publicId=String(Math.floor(10000+Math.random()*90000));
-   const {data,error}=await db.from('profiles').insert({
-    id:auth.user.id,
-    public_id:publicId,
-    display_name:name,
-    whatsapp:phone,
-    address:address
-   }).select('id,public_id,display_name,whatsapp,address').single();
-
-   if(!error){result=data;break;}
-   if(error.code!=='23505')throw error;
+  if(!name||!address||!phone){
+    setError('registerError','Lengkapi nama, alamat, dan nomor WhatsApp.');
+    return;
   }
 
-  if(!result)throw new Error('Gagal membuat ID akun. Coba lagi.');
-  account=result;
-  friends=[];
-  show('home');
- }catch(e){
-  alert('Pendaftaran gagal: '+e.message);
- }
+  button.disabled=true;
+  button.textContent='Mendaftarkan...';
+
+  try{
+    let {data:{session},error:sessionError}=await db.auth.getSession();
+    if(sessionError)throw sessionError;
+
+    if(session){
+      const {data:existing,error}=await db.from('profiles')
+        .select('id,public_id,display_name,address,whatsapp')
+        .eq('id',session.user.id).maybeSingle();
+
+      if(error)throw error;
+
+      if(existing){
+        account=existing;
+        await loadFriends();
+        showPage('homePage');
+        return;
+      }
+    }else{
+      const {data,error}=await db.auth.signInAnonymously();
+      if(error)throw error;
+      session=data.session;
+      if(!session)throw new Error('Sesi pengguna tidak tersedia.');
+    }
+
+    let created=null;
+
+    for(let attempt=0;attempt<20;attempt++){
+      const publicId=makePublicId();
+
+      const {data,error}=await db.from('profiles').insert({
+        id:session.user.id,
+        public_id:publicId,
+        display_name:name,
+        address:address,
+        whatsapp:phone
+      }).select('id,public_id,display_name,address,whatsapp').maybeSingle();
+
+      if(!error){
+        created=data;
+        break;
+      }
+
+      if(error.code==='23505'){
+        const {data:existing}=await db.from('profiles')
+          .select('id,public_id,display_name,address,whatsapp')
+          .eq('id',session.user.id).maybeSingle();
+
+        if(existing){
+          created=existing;
+          break;
+        }
+        continue;
+      }
+
+      throw error;
+    }
+
+    if(!created)throw new Error('Tidak berhasil membuat ID unik. Silakan coba lagi.');
+
+    account=created;
+    await loadFriends();
+    showPage('homePage');
+  }catch(error){
+    console.error(error);
+    setError('registerError',
+      'Pendaftaran gagal. Periksa Auth, tabel profiles, dan RLS Supabase. '+(error.message||''));
+  }finally{
+    button.disabled=false;
+    button.textContent='Daftar Sekarang';
+  }
 }
 
 async function loadFriends(){
- if(!account)return;
- const {data,error}=await db.rpc('get_chat_contacts');
- if(error)throw error;
- friends=(data||[]).map(f=>({
-  id:f.id,
-  public_id:f.public_id,
-  name:f.display_name,
-  phone:f.whatsapp||'',
-  address:f.address||''
- }));
- renderFriends();
+  if(!account)return;
+
+  const {data,error}=await db.rpc('get_chat_contacts');
+
+  if(error){
+    console.error(error);
+    friends=[];
+    renderFriends();
+    return;
+  }
+
+  friends=(data||[]).filter(friend=>friend.id!==account.id);
+  renderFriends();
 }
 
 function renderFriends(){
- const q=(searchHome.value||'').toLowerCase();
- friendList.innerHTML='';
- friends.filter(f=>(f.name+' '+f.public_id+' '+f.phone).toLowerCase().includes(q))
- .forEach(f=>{
-  const el=document.createElement('div');el.className='friend';
-  const n=document.createElement('strong');n.textContent=f.name;
-  const i=document.createElement('small');i.textContent='ID: '+f.public_id;
-  const p=document.createElement('small');p.textContent='WhatsApp: '+f.phone;
-  el.append(n,i,p);el.onclick=()=>openChat(f);
-  friendList.appendChild(el);
- });
- if(!friendList.children.length){
-  friendList.textContent=q?'Teman tidak ditemukan.':'Belum ada teman.';
- }
+  const query=(document.getElementById('searchFriends').value||'').trim().toLowerCase();
+  const list=document.getElementById('friendList');
+  list.replaceChildren();
+
+  const matches=friends.filter(friend=>
+    (friend.display_name||'').toLowerCase().includes(query)||
+    String(friend.public_id||'').includes(query)
+  );
+
+  if(!matches.length){
+    const empty=document.createElement('div');
+    empty.className='card small';
+    empty.textContent='Belum ada teman. Gunakan Cari Teman untuk menemukan pengguna.';
+    list.append(empty);
+    return;
+  }
+
+  matches.forEach(friend=>{
+    const card=document.createElement('div');
+    card.className='card friend';
+
+    const avatar=document.createElement('div');
+    avatar.className='avatar';
+    avatar.textContent=(friend.display_name||'?').charAt(0).toUpperCase();
+
+    const info=document.createElement('div');
+    info.style.flex='1';
+
+    const name=document.createElement('strong');
+    name.textContent=friend.display_name||'Pengguna';
+
+    const id=document.createElement('div');
+    id.className='small';
+    id.textContent='ID: '+friend.public_id;
+
+    info.append(name,id);
+    card.append(avatar,info);
+    card.onclick=()=>openChat(friend);
+    list.append(card);
+  });
+}
+
+function openEdit(){
+  if(!account)return;
+
+  document.getElementById('editId').value=account.public_id||'';
+  document.getElementById('editName').value=account.display_name||'';
+  document.getElementById('editAddress').value=account.address||'';
+  document.getElementById('editPhone').value=account.whatsapp||'';
+
+  setError('editError','');
+  showPage('editPage');
 }
 
 async function saveAccount(){
- if(!account)return alert('Akun belum tersedia.');
- const name=editName.value.trim();
- const address=editAddress.value.trim();
- const phone=editPhone.value.trim();
- if(!name||!address||!phone)return alert('Lengkapi semua data.');
+  if(!account)return;
 
- const {data,error}=await db.from('profiles').update({
-  display_name:name,address:address,whatsapp:phone
- }).eq('id',account.id)
- .select('id,public_id,display_name,whatsapp,address').single();
+  const display_name=document.getElementById('editName').value.trim();
+  const address=document.getElementById('editAddress').value.trim();
+  const whatsapp=document.getElementById('editPhone').value.trim();
+  const button=document.getElementById('saveButton');
 
- if(error)return alert('Gagal menyimpan: '+error.message);
- account=data;
- show('home');
+  setError('editError','');
+
+  if(!display_name||!address||!whatsapp){
+    setError('editError','Semua kolom harus diisi.');
+    return;
+  }
+
+  button.disabled=true;
+
+  try{
+    const {data,error}=await db.from('profiles')
+      .update({display_name,address,whatsapp})
+      .eq('id',account.id)
+      .select('id,public_id,display_name,address,whatsapp')
+      .maybeSingle();
+
+    if(error)throw error;
+    if(!data)throw new Error('Profil tidak ditemukan atau perubahan tidak diizinkan.');
+
+    account=data;
+    await loadFriends();
+    showPage('homePage');
+  }catch(error){
+    console.error(error);
+    setError('editError','Gagal menyimpan perubahan. Periksa izin update profiles.');
+  }finally{
+    button.disabled=false;
+  }
+}
+
+function openFind(){
+  document.getElementById('findId').value='';
+  document.getElementById('findResult').replaceChildren();
+  showPage('findPage');
 }
 
 async function findFriend(){
- const id=findId.value.trim();
- findResult.innerHTML='';
- if(!/^\d{5}$/.test(id)){
-  findResult.textContent='Masukkan ID yang terdiri dari 5 angka.';
-  return;
- }
- if(!account)return alert('Akun belum tersedia.');
+  const id=document.getElementById('findId').value.trim();
+  const result=document.getElementById('findResult');
+  result.replaceChildren();
 
- try{
-  const {data,error}=await db.rpc('find_chat_profile',{search_id:id});
-  if(error)throw error;
-  const f=(data||[]).find(x=>x.id!==account.id);
-  if(!f){findResult.textContent='Teman tidak ditemukan.';return;}
+  if(!/^\d{5}$/.test(id)){
+    result.textContent='Masukkan ID yang terdiri dari 5 angka.';
+    return;
+  }
 
-  const already=friends.some(x=>x.id===f.id);
-  const el=document.createElement('div');el.className='friend';
-  const n=document.createElement('strong');n.textContent=f.display_name;
-  const i=document.createElement('small');i.textContent='ID: '+f.public_id;
-  const p=document.createElement('small');p.textContent='WhatsApp: '+(f.whatsapp||'');
-  const b=document.createElement('button');b.className='primary';
-  b.textContent=already?'Buka Chat':'Tambahkan Teman';
+  if(!account)return;
 
-  b.onclick=async()=>{
-   try{
-    if(!already){
-     const {error:addError}=await db.from('contacts').upsert({
-      owner_id:account.id,contact_id:f.id
-     },{onConflict:'owner_id,contact_id',ignoreDuplicates:true});
-     if(addError)throw addError;
-     await loadFriends();
+  if(id===account.public_id){
+    result.textContent='Itu ID akun kamu sendiri.';
+    return;
+  }
+
+  result.textContent='Mencari pengguna...';
+
+  try{
+    const {data,error}=await db.rpc('find_chat_profile',{search_id:id});
+    if(error)throw error;
+
+    const profile=Array.isArray(data)?data[0]:data;
+    result.replaceChildren();
+
+    if(!profile){
+      result.textContent='Pengguna dengan ID tersebut tidak ditemukan.';
+      return;
     }
-    openChat(friends.find(x=>x.id===f.id)||{
-     id:f.id,public_id:f.public_id,name:f.display_name,
-     phone:f.whatsapp||'',address:f.address||''
-    });
-   }catch(e){alert('Gagal menambahkan teman: '+e.message);}
-  };
 
-  el.append(n,i,p,b);findResult.appendChild(el);
- }catch(e){
-  findResult.textContent='Pencarian gagal: '+e.message;
- }
+    const card=document.createElement('div');
+    card.className='card';
+
+    const name=document.createElement('strong');
+    name.textContent=profile.display_name||'Pengguna';
+
+    const publicId=document.createElement('div');
+    publicId.className='small';
+    publicId.textContent='ID: '+profile.public_id;
+
+    const start=document.createElement('button');
+    start.className='primary';
+    start.textContent='Mulai Chat';
+
+    start.onclick=async()=>{
+      start.disabled=true;
+      try{
+        const {error:contactError}=await db.from('contacts').upsert({
+          owner_id:account.id,
+          contact_id:profile.id
+        },{onConflict:'owner_id,contact_id'});
+
+        if(contactError)throw contactError;
+
+        await loadFriends();
+        openChat(profile);
+      }catch(error){
+        console.error(error);
+        start.disabled=false;
+        const message=document.createElement('div');
+        message.className='error';
+        message.textContent='Gagal menambahkan teman. Periksa tabel contacts dan RLS.';
+        card.append(message);
+      }
+    };
+
+    card.append(name,publicId,start);
+    result.append(card);
+  }catch(error){
+    console.error(error);
+    result.replaceChildren();
+    result.textContent='Pencarian gagal. Periksa fungsi find_chat_profile di Supabase.';
+  }
 }
 
-function openChat(f){
- activeFriend=f;
- chatName.textContent=f.name;
- chatId.textContent='ID akun: '+f.public_id;
- chatPhone.textContent='WhatsApp: '+(f.phone||'-');
- show('chat');
- loadMessages();
+function openChat(friend){
+  activeFriend=friend;
+  document.getElementById('chatName').textContent=friend.display_name||'Pengguna';
+  document.getElementById('chatId').textContent='ID akun: '+friend.public_id;
+  document.getElementById('chatPhone').textContent=friend.whatsapp||'';
+  document.getElementById('messages').replaceChildren();
+  document.getElementById('messages').dataset.count='';
+  document.getElementById('messages').dataset.last='';
+  document.getElementById('messageInput').value='';
+  showPage('chatPage');
 }
 
 async function loadMessages(){
- if(!account||!activeFriend||loadingMessages)return;
- loadingMessages=true;
- try{
-  const {data,error}=await db.from('messages')
-   .select('id,sender_id,recipient_id,content,created_at')
-   .or('and(sender_id.eq.'+account.id+',recipient_id.eq.'+activeFriend.id+
-       '),and(sender_id.eq.'+activeFriend.id+',recipient_id.eq.'+account.id+')')
-   .order('created_at',{ascending:true}).limit(300);
-  if(error)throw error;
+  if(!account||!activeFriend||loadingMessages)return;
+  loadingMessages=true;
 
-  messages.innerHTML='';
-  (data||[]).forEach(m=>{
-   const b=document.createElement('div');
-   b.className='msg '+(m.sender_id===account.id?'mine':'theirs');
-   b.textContent=m.content;
-   messages.appendChild(b);
-  });
-  window.scrollTo(0,document.body.scrollHeight);
- }catch(e){
-  console.error('Gagal memuat pesan:',e.message);
- }finally{
-  loadingMessages=false;
- }
+  try{
+    const {data,error}=await db.from('messages')
+      .select('id,sender_id,recipient_id,content,created_at')
+      .or(
+        'and(sender_id.eq.'+account.id+',recipient_id.eq.'+activeFriend.id+'),'+
+        'and(sender_id.eq.'+activeFriend.id+',recipient_id.eq.'+account.id+')'
+      )
+      .order('created_at',{ascending:true})
+      .limit(300);
+
+    if(error)throw error;
+
+    const messages=data||[];
+    const box=document.getElementById('messages');
+    const lastId=messages.length?messages[messages.length-1].id:'';
+
+    if(box.dataset.count===String(messages.length)&&box.dataset.last===lastId)return;
+
+    box.replaceChildren();
+
+    messages.forEach(msg=>{
+      const bubble=document.createElement('div');
+      bubble.className='bubble '+(msg.sender_id===account.id?'mine':'theirs');
+
+      const content=document.createElement('div');
+      content.textContent=msg.content;
+
+      const time=document.createElement('div');
+      time.className='time';
+      time.textContent=new Date(msg.created_at).toLocaleString('id-ID');
+
+      bubble.append(content,time);
+      box.append(bubble);
+    });
+
+    box.dataset.count=String(messages.length);
+    box.dataset.last=lastId;
+    box.scrollTop=box.scrollHeight;
+  }catch(error){
+    console.error(error);
+  }finally{
+    loadingMessages=false;
+  }
 }
 
 async function sendMessage(){
- if(!account||!activeFriend)return;
- const content=messageInput.value.trim();
- if(!content)return;
+  if(sendingMessage||!account||!activeFriend)return;
 
- const btn=document.querySelector('.send');
- btn.disabled=true;
- try{
-  const {error}=await db.from('messages').insert({
-   sender_id:account.id,
-   recipient_id:activeFriend.id,
-   content:content
-  });
-  if(error)throw error;
+  const input=document.getElementById('messageInput');
+  const content=input.value.trim();
+  if(!content)return;
 
-  messageInput.value='';
-  messageInput.style.height='44px';
-  await loadMessages();
-  messageInput.focus();
- }catch(e){
-  alert('Pesan gagal dikirim: '+e.message);
- }finally{
-  btn.disabled=false;
- }
+  sendingMessage=true;
+  const button=document.getElementById('sendButton');
+  button.disabled=true;
+
+  try{
+    const {error}=await db.from('messages').insert({
+      sender_id:account.id,
+      recipient_id:activeFriend.id,
+      content:content
+    });
+
+    if(error)throw error;
+
+    input.value='';
+    await loadMessages();
+  }catch(error){
+    console.error(error);
+    alert('Pesan gagal dikirim. Periksa tabel messages dan kebijakan RLS.');
+  }finally{
+    sendingMessage=false;
+    button.disabled=false;
+  }
 }
 
-messageInput.addEventListener('input',()=>{
- messageInput.style.height='44px';
- messageInput.style.height=Math.min(messageInput.scrollHeight,120)+'px';
+document.getElementById('messageInput').addEventListener('keydown',event=>{
+  if(event.key==='Enter'&&!event.shiftKey){
+    event.preventDefault();
+    sendMessage();
+  }
 });
-messageInput.addEventListener('keydown',e=>{
- if(e.key==='Enter'&&!e.shiftKey){
-  e.preventDefault();
-  sendMessage();
- }
+
+db.auth.onAuthStateChange((event,session)=>{
+  if(event==='SIGNED_OUT'){
+    account=null;
+    showPage('registerPage');
+  }
 });
 
 startApp();
