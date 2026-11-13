@@ -161,842 +161,18 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
   <button class="primary" onclick="openPage('create','BUAT POSTINGAN')">＋ Buat Postingan</button>
 </section>
 
-<section class="page" id="editAccount">
-  <div class="card">
-    <label>Nama</label><input id="editName" type="text" style="margin:7px 0 13px">
-    <label>Bio</label><textarea id="editBio" class="profile-input" rows="3" style="margin:7px 0 13px"></textarea>
-    <label>Nomor WhatsApp</label><input id="editWa" type="text" style="margin:7px 0 13px">
-    <label>ID akun (tidak dapat diubah)</label><input id="editAccountId" type="text" disabled style="margin-top:7px">
-    <button class="primary" style="margin-top:14px" onclick="saveProfile()">Simpan Perubahan</button>
-  </div>
-</section>
-
-<section class="page" id="create">
-  <div class="card">
-    <textarea id="postCaption" class="profile-input" rows="4" placeholder="Apa yang ingin kamu bagikan?"></textarea>
-    <p><label>Tambahkan gambar (opsional)</label></p>
-    <input id="postImage" type="file" accept="image/*">
-    <button class="primary" style="margin-top:14px" onclick="createPost()">Terbitkan Postingan</button>
-  </div>
-</section>
-
-<section class="page" id="comments">
-  <div class="card" id="commentPostPreview"></div>
-  <div id="commentList"></div>
-  <input id="commentInput" type="text" placeholder="Tulis komentar...">
-  <button class="primary" style="margin-top:9px" onclick="addComment()">Kirim Komentar</button>
-</section>
-
-<section class="page" id="history">
-  <div id="historyContent"></div>
-</section>
-
-<section class="page" id="aboutAccount"><div class="card">Informasi akun pengguna.</div></section>
-<section class="page" id="business"><div class="card">Pengaturan usaha.</div></section>
-<section class="page" id="aboutApp">
-  <button class="setting" onclick="openPage('aboutUsers','ORANG YANG SUDAH BERGABUNG');renderAboutUsers()">
-    <span class="setting-icon">♙</span><span style="flex:1"><b>Orang yang sudah bergabung</b><div class="muted">Lihat dan chat semua akun yang terdaftar</div></span><b id="joinedCount">0</b>
-  </button>
-  <button class="setting" onclick="openPage('aboutGroups','GRUP YANG SUDAH DIBUAT');renderAboutGroups()">
-    <span class="setting-icon">♧</span><span style="flex:1"><b>Grup yang sudah dibuat</b><div class="muted">Lihat grup yang dibuat di aplikasi</div></span><b id="groupCount">0</b>
-  </button>
-  <div class="card">
-    <b>Link Aplikasi</b>
-    <p class="muted">Salin link ini untuk membagikan aplikasi.</p>
-    <button class="primary" onclick="copyAppLink()">Salin Link Aplikasi</button>
-    <div class="muted" id="appLinkStatus" style="margin-top:9px"></div>
-  </div>
-</section>
-
-<section class="page" id="aboutUsers"><div id="allUsersDirectory"></div></section>
-<section class="page" id="aboutGroups"><div id="allGroupsDirectory"></div></section>
-
-<section class="page" id="groups">
-  <div id="groupDirectory"></div>
-  <div id="groupDetails" class="hidden"></div>
-  <div class="card hidden" id="groupCreateCard">
-    <b>Buat Grup</b>
-    <label style="display:block;margin-top:10px">Nama grup</label>
-    <input id="newGroupName" placeholder="Masukkan nama grup" style="margin-top:6px">
-    <label style="display:block;margin-top:10px">Alasan / tujuan pembuatan grup</label>
-    <textarea id="newGroupReason" rows="3" placeholder="Jelaskan tujuan grup" style="margin-top:6px"></textarea>
-    <p><b>Tambahkan teman ke grup</b></p><p class="muted">Tekan Tambahkan pada teman yang ingin dimasukkan.</p>
-    <div id="groupFriendPicker"></div>
-    <button class="primary" style="margin-top:10px" onclick="createGroup()">Simpan Grup</button>
-    <button class="soft" style="margin-top:10px" onclick="cancelCreateGroup()">Batal</button>
-  </div>
-  <button class="primary" id="addGroupButton" style="width:100%;font-size:20px" onclick="showCreateGroup()">＋</button>
-</section>
-
-<section class="page" id="chatList">
-  <div id="chatRequests"></div>
-  <div id="chatFriends"></div>
-</section>
-
-</main>
-
-<section id="chatScreen" class="hidden">
-  <header>
-    <button class="back" onclick="leaveChat()">← Kembali</button>
-    <div><b>CHAT</b><div id="chatFriendName" class="muted">Andi</div></div>
-  </header>
-  <div class="chat-layout">
-    <div class="chat-profile">
-      <div class="chat-profile-info">
-        <div class="chat-profile-name" id="chatProfileName">Andi</div>
-        <div class="chat-profile-details">
-          <div id="chatProfileId">ID akun: CS-10012</div>
-          <div id="chatProfileWa">WhatsApp: belum ditambahkan</div>
-        </div>
-      </div>
-      <button class="sales-button" onclick="viewSales()">Lihat Jualan</button>
-    </div>
-    <div class="messages" id="messages"></div>
-    <div class="composer">
-      <textarea id="messageInput" rows="1" placeholder="Tulis pesan..." oninput="resizeInput(this)" onkeydown="handleEnter(event)"></textarea>
-      <button class="send" onclick="sendMessage()" aria-label="Kirim pesan">➤</button>
-    </div>
-  </div>
-</section>
-
-<nav class="bottom" id="bottomNav">
-  <button class="active" data-page="home" onclick="navTo('home','BERANDA',this)"><span>⌂</span>Beranda</button>
-  <button data-page="chatList" onclick="navTo('chatList','CHAT',this)"><span>☏</span>Chat</button>
-  <button data-page="groups" onclick="navTo('groups','GRUP',this)"><span>♧</span>Grup</button>
-  <button data-page="account" onclick="navTo('account','AKUN',this)"><span>♙</span>Akun</button>
-</nav>
-
-<script>
-const $=id=>document.getElementById(id);
-
-const userDirectory=[
- {name:'Andi',id:'CS-10012',wa:''},
- {name:'Budi',id:'CS-10034',wa:''},
- {name:'Siti',id:'CS-10023',wa:''},
- {name:'Rina',id:'CS-10045',wa:''},
- {name:'Dimas',id:'CS-10056',wa:''}
-];
-let friends=readStore('cs_friends',[]);
-if(!friends.length){friends=[{name:'Andi',id:'CS-10012',wa:''},{name:'Budi',id:'CS-10034',wa:''}];saveStore('cs_friends',friends);}
-let friendSearchQuery='';
-let groupsData=readStore('cs_groups',[]);
-let activeGroupId='';
-let pendingGroupMembers=[];
-
-let currentChat='';
-let currentCommentPost='';
-let messagesByFriend=readStore('cs_messages',{});
-let historyData=readStore('cs_history',{like:[],save:[],comment:[]});
-let activeHistoryType='like';
-let blockedFriends=readStore('cs_blocked',[]);
-let comments=readStore('cs_comments',[]);
-let posts=readStore('cs_posts',[]);
-let profile=readStore('cs_profile',{name:'Pengguna',bio:'',wa:''});
-const OWNER_ACCOUNT_CODE='RUSDI-150710';
-const wasRegistered=localStorage.getItem('cs_registered')==='true';
-const isOwnerAccount=String(profile.id||'').toUpperCase()===OWNER_ACCOUNT_CODE || (wasRegistered && String(profile.name||'').trim().toLocaleLowerCase('id-ID')==='rusdi');
-function makeAccountId(name){
- const prefix=String(name||'Pengguna').trim().replace(/\s+/g,' ');
- const used=readStore('cs_used_account_codes',[]);
- const localIds=[profile.id,...friends.map(f=>f.id),...userDirectory.map(u=>u.id)].filter(Boolean);
- const normalizedUsed=new Set([...used,...localIds].map(x=>String(x).toLocaleLowerCase('id-ID')));
- for(let attempt=0;attempt<1000000;attempt++){
-  const digits=String(Math.floor(Math.random()*1000000)).padStart(6,'0');
-  const id=prefix+'-'+digits;
-  if(id.toUpperCase()!==OWNER_ACCOUNT_CODE && !normalizedUsed.has(id.toLocaleLowerCase('id-ID'))){
-   used.push(id);saveStore('cs_used_account_codes',used);return id;
-  }
- }
- throw new Error('Kode akun unik tidak berhasil dibuat. Silakan coba lagi.');
-}
-let CURRENT_USER_ID=profile.id||'';
-if(wasRegistered){
- if(isOwnerAccount) CURRENT_USER_ID=OWNER_ACCOUNT_CODE;
- else if(!CURRENT_USER_ID||!/^.+-\d{6}$/.test(CURRENT_USER_ID)||String(CURRENT_USER_ID).toUpperCase()===OWNER_ACCOUNT_CODE) CURRENT_USER_ID=makeAccountId(profile.name||'Pengguna');
- profile.id=CURRENT_USER_ID;saveStore('cs_profile',profile);
-}
-pendingGroupMembers=[CURRENT_USER_ID];
-if(profile.name && profile.name!=='Pengguna' || profile.wa) localStorage.setItem('cs_registered','true');
-function completeRegistration(){
- const name=$('registerName').value.trim();
- const wa=$('registerWa').value.trim();
- if(!name || !wa){alert('Nama dan nomor WhatsApp wajib diisi.');return;}
- if(!CURRENT_USER_ID || !wasRegistered){
-  CURRENT_USER_ID=name.trim().toLocaleLowerCase('id-ID')==='rusdi'?OWNER_ACCOUNT_CODE:makeAccountId(name);
- }else if(isOwnerAccount){
-  CURRENT_USER_ID=OWNER_ACCOUNT_CODE;
- }
- profile.name=name; profile.wa=wa; profile.bio=profile.bio||''; profile.id=CURRENT_USER_ID;
- saveStore('cs_profile',profile); localStorage.setItem('cs_registered','true');
- $('normalHeader').classList.remove('hidden'); $('bottomNav').classList.remove('hidden');
- openPage('home','BERANDA'); renderAccount();
-}
-let approval=localStorage.getItem('cs_approval')==='true';
-let chatRequests=readStore('cs_chat_requests',{});
-let chatStates=readStore('cs_chat_states',{});
-
-function readStore(key,fallback){
- try{
-  const value=localStorage.getItem(key);
-  return value===null?fallback:JSON.parse(value);
- }catch(e){return fallback}
-}
-function saveStore(key,value){
- try{localStorage.setItem(key,JSON.stringify(value))}
- catch(e){alert('Penyimpanan perangkat penuh. Coba gunakan gambar yang lebih kecil.')}
-}
-function makeId(){return 'p'+Date.now()+Math.random().toString(16).slice(2,7)}
-function toggleMenu(){$('dropdown').classList.toggle('show')}
-
-document.addEventListener('click',e=>{
- if(!$('menuWrap').contains(e.target))$('dropdown').classList.remove('show')
-});
-
-let pageHistory=[];
-let currentPageId='home';
-const pageTitles={home:'BERANDA',settings:'PENGATURAN AKUN',privacy:'PRIVASI',search:'CARI TEMAN',account:'AKUN',editAccount:'EDIT AKUN',create:'BUAT POSTINGAN',comments:'KOMENTAR',history:'RIWAYAT',aboutAccount:'TENTANG AKUN',business:'ATUR USAHA',aboutApp:'TENTANG APLIKASI',aboutUsers:'ORANG YANG SUDAH BERGABUNG',aboutGroups:'GRUP YANG SUDAH DIBUAT',groups:'GRUP',chatList:'CHAT'};
-function syncBackButton(){ $('pageBackButton').classList.remove('hidden'); }
-function goBack(){
- if(!$('chatScreen').classList.contains('hidden')){
-  $('chatScreen').classList.add('hidden');$('normalHeader').classList.remove('hidden');$('normalMain').classList.remove('hidden');$('bottomNav').classList.remove('hidden');
- }
- const prev=pageHistory.pop();
- if(prev){openPage(prev.id,prev.title,true);document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page===prev.id));return;}
- // Tidak berpindah ke halaman lain jika memang tidak ada halaman sebelumnya.
-}
-function openPage(id,title,skipHistory=false){
- if(!skipHistory && id!==currentPageId && $(currentPageId)){pageHistory.push({id:currentPageId,title:pageTitles[currentPageId]||$('pageTitle').textContent});}
- currentPageId=id;
- $('chatScreen').classList.add('hidden');
- $('normalHeader').classList.remove('hidden');
- $('normalMain').classList.remove('hidden');
- $('bottomNav').classList.remove('hidden');
- $('bottomNav').style.display='flex';
- document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
- if($(id))$(id).classList.add('active');
- $('pageTitle').textContent=title;
- pageTitles[id]=title;syncBackButton();
- const navPage=({settings:'account',privacy:'account',editAccount:'account',business:'account',aboutAccount:'account',create:'home',comments:'home',history:'account',search:'home',aboutApp:'account',aboutUsers:'account',aboutGroups:'account'}[id]||id);
- document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page===navPage));
- $('dropdown').classList.remove('show');
- $('menuWrap').classList.toggle('hidden',
- ['settings','privacy','search','account','editAccount','create','comments','history','aboutAccount','business','aboutApp','aboutUsers','aboutGroups','groups','chatList'].includes(id));
- if(id==='privacy')renderPrivacy();
- if(id==='account')renderAccount();
- if(id==='editAccount')fillEdit();
- if(id==='search')searchFriends('');
- if(id==='chatList')renderChatList();
- if(id==='groups')renderGroups();
- if(id==='aboutApp')renderAboutApp();
- if(id==='aboutUsers')renderAboutUsers();
- if(id==='aboutGroups')renderAboutGroups();
-}
-
-function navTo(id,title,btn){
- openPage(id,title);
- $('bottomNav').classList.remove('hidden');$('bottomNav').style.display='flex';$('bottomNav').style.visibility='visible';$('bottomNav').style.opacity='1';$('bottomNav').style.pointerEvents='auto';
- document.querySelectorAll('.bottom button').forEach(b=>b.classList.remove('active'));
- btn.classList.add('active');
-}
-
-function saveApproval(v){
- approval=v;
- localStorage.setItem('cs_approval',v);
- $('approvalToggle').checked=v;
- $('approvalStatus').textContent=v
-  ?'Aktif — permintaan chat orang baru perlu disetujui.'
-  :'Nonaktif — chat langsung dibuka.';
-}
-
-$('approvalToggle').checked=approval;
-saveApproval(approval);
-
-function formatDateTime(value){
- const d=new Date(value);
- return d.toLocaleDateString('id-ID',{
-  weekday:'long',day:'2-digit',month:'long',year:'numeric'
- })+' · '+d.toLocaleTimeString('id-ID',{
-  hour:'2-digit',minute:'2-digit',hour12:false
- });
-}
-function formatTime(value){
- return new Date(value).toLocaleTimeString('id-ID',{
-  hour:'2-digit',minute:'2-digit',hour12:false
- });
-}
-
-function renderPrivacy(){
- $('privacyFriends').innerHTML=friends.map(f=>
-  `<label class="friend"><input type="checkbox" value="${f.name}" ${blockedFriends.includes(f.name)?'checked':''}> ${escapeHTML(f.name)}</label>`
- ).join('');
-}
-function savePrivacy(){
- blockedFriends=[...$('privacyFriends').querySelectorAll('input:checked')].map(x=>x.value);
- saveStore('cs_blocked',blockedFriends);
- alert('Pengaturan disimpan di perangkat ini.');
-}
-
-function seedPosts(){
- if(posts.length)return;
- posts=[
-  {id:'demo1',author:'Andi',caption:'Selamat datang di Chat Saya! 👋',image:'',createdAt:Date.now()-3600000},
-  {id:'demo2',author:'Budi',caption:'Semoga hari ini menyenangkan.',image:'',createdAt:Date.now()-1800000}
- ];
- saveStore('cs_posts',posts);
-}
-
-function renderPost(p,own=false){
- const liked=historyData.like.some(x=>x.id===p.id);
- const saved=historyData.save.some(x=>x.id===p.id);
- const author=p.author||'Pengguna';
- const date=formatDateTime(p.createdAt||Date.now());
- return `<article class="card post-card" data-post-id="${escapeHTML(p.id)}">
-  <div class="row">
-   <div class="avatar">${escapeHTML(author.charAt(0).toUpperCase())}</div>
-   <div style="min-width:0;flex:1">
-    <div class="row" style="gap:8px;flex-wrap:wrap"><b>${escapeHTML(author)}</b>${author!==(profile.name||'Pengguna')?`<button class="soft" style="padding:5px 9px;font-size:12px" onclick="chatFromPost('${escapeHTML(author)}')">Chat</button>`:''}</div>
-    <div class="post-date">${escapeHTML(date)}</div>
-   </div>
-  </div>
-  ${p.caption?`<p class="post-text" style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(p.caption)}</p>`:''}
-  ${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async">`:''}
-  <div class="post-actions">
-   <button class="save-action ${saved?'active':''}" title="Simpan" aria-label="Simpan postingan" onclick="toggleSave('${p.id}')">${saved?'▣':'▢'}</button>
-   <button class="like-action ${liked?'active':''}" onclick="toggleLike('${p.id}')">${liked?'♥ Suka':'♡ Suka'}</button>
-   <button class="comment-action" onclick="openComments('${p.id}')">Komentar</button>
-  </div>
-  ${own?`<button class="soft" style="margin-top:12px" onclick="deletePost('${p.id}')">Hapus Postingan</button>`:''}
- </article>`;
-}
-
-function renderFeed(){
- const visible=posts.filter(p=>p.author!==(profile.name||'Pengguna'));
- $('feedPosts').innerHTML=visible.map(p=>renderPost(p,false)).join('')
-  ||'<div class="card muted">Belum ada postingan teman.</div>';
-}
-function searchPosts(q){
- document.querySelectorAll('#feedPosts .post-card').forEach(card=>{
-  const txt=card.innerText.toLowerCase();
-  card.style.display=txt.includes(q.toLowerCase())?'':'none';
- });
-}
-function renderAccount(){
- $('profileName').textContent=profile.name||'Pengguna';
- $('profileId').textContent='ID akun: '+CURRENT_USER_ID;
- $('editAccountId').value=CURRENT_USER_ID;
- $('accountAvatar').textContent=(profile.name||'P').charAt(0).toUpperCase();
- $('profileBio').textContent=profile.bio||'Belum ada bio.';
- $('profileWa').textContent=profile.wa?'WhatsApp: '+profile.wa:'WhatsApp belum ditambahkan';
- $('myPosts').innerHTML=posts.filter(p=>p.author===(profile.name||'Pengguna')).map(p=>renderPost(p,true)).join('')
-  ||'<div class="card muted">Belum ada postingan.</div>';
- renderFeed();
-}
-function getHistoryPost(id){
- return posts.find(p=>p&&p.id===id)
-  ||['like','save','comment'].flatMap(type=>historyData[type]||[]).find(p=>p&&typeof p==='object'&&p.id===id)
-  ||null;
-}
-function makeHistoryEntry(post){
- return {id:post.id,author:post.author||'Pengguna',caption:post.caption||'',image:post.image||'',createdAt:post.createdAt||Date.now()};
-}
-function setHistoryEntry(type,post,enabled){
- const list=historyData[type]||(historyData[type]=[]);
- const index=list.findIndex(item=>item&&typeof item==='object'&&item.id===post.id);
- if(enabled){
-  if(index>=0)list[index]=makeHistoryEntry(post);
-  else list.unshift(makeHistoryEntry(post));
- }else if(index>=0){list.splice(index,1);}
-}
-function toggleLike(id){
- const post=getHistoryPost(id);if(!post)return;
- const wasLiked=(historyData.like||[]).some(x=>x&&x.id===id);
- setHistoryEntry('like',post,!wasLiked);
- saveStore('cs_history',historyData);
- renderAccount();
- if(currentPageId==='history'&&activeHistoryType==='like')renderHistoryItems('like');
-}
-function toggleSave(id){
- const post=getHistoryPost(id);if(!post)return;
- const wasSaved=(historyData.save||[]).some(x=>x&&x.id===id);
- setHistoryEntry('save',post,!wasSaved);
- saveStore('cs_history',historyData);
- renderAccount();
- if(currentPageId==='history'&&activeHistoryType==='save')renderHistoryItems('save');
-}
-function openHistory(type){
- if(!['like','save','comment'].includes(type))type='like';
- activeHistoryType=type;
- openPage('history','RIWAYAT '+({like:'SUKA',save:'SIMPAN',comment:'KOMEN'}[type]));
- renderHistoryItems(type);
-}
-function renderHistoryItems(type){
- activeHistoryType=type;
- const data=(historyData[type]||[]).filter(p=>typeof p==='string'||(p&&p.id));
- $('historyContent').innerHTML=data.map(item=>{
-  if(typeof item==='string')return `<div class="card">${escapeHTML(item)}</div>`;
-  const current=posts.find(p=>p&&p.id===item.id)||item;
-  return renderPost(current,false);
- }).join('')||'<div class="card muted">Belum ada riwayat.</div>';
-}
-function deletePost(id){
- if(!confirm('Hapus postingan ini?'))return;
- posts=posts.filter(p=>p.id!==id);
- ['like','save','comment'].forEach(type=>{
-  historyData[type]=(historyData[type]||[]).filter(x=>typeof x==='string'||x.id!==id);
- });
- saveStore('cs_posts',posts);
- saveStore('cs_history',historyData);
- renderAccount();
-}
-
-function openComments(id){
- currentCommentPost=id||'demo1';
- const p=posts.find(x=>x.id===currentCommentPost);
- openPage('comments','KOMENTAR');
- $('commentPostPreview').innerHTML=p
-  ?`<b>${escapeHTML(p.author)}</b><p style="white-space:pre-wrap">${escapeHTML(p.caption||'')}</p>${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async">`:''}`
-  :'<b>Postingan</b>';
- renderComments();
-}
-function renderComments(){
- const list=comments.filter(c=>c.postId===currentCommentPost);
- $('commentList').innerHTML=list.map(c=>
-  `<div class="comment-item"><b>${escapeHTML(c.author||'Pengguna')}</b><div>${escapeHTML(c.text||'')}</div><div class="muted" style="margin-top:5px">${escapeHTML(formatDateTime(c.createdAt||Date.now()))}</div></div>`
- ).join('')||'<p class="muted">Belum ada komentar.</p>';
-}
-function addComment(){
- const input=$('commentInput');
- const v=input.value.trim();
- if(!v)return;
- const post=getHistoryPost(currentCommentPost);
- comments.push({postId:currentCommentPost,author:profile.name||'Pengguna',text:v,createdAt:Date.now()});
- saveStore('cs_comments',comments);
- if(post){
-  const entry=makeHistoryEntry(post);entry.lastCommentAt=Date.now();
-  const list=historyData.comment||(historyData.comment=[]);
-  const existing=list.findIndex(x=>x&&typeof x==='object'&&x.id===post.id);
-  if(existing>=0)list.splice(existing,1);
-  list.unshift(entry);
-  saveStore('cs_history',historyData);
- }
- input.value='';
- renderComments();
- if(currentPageId==='history'&&activeHistoryType==='comment')renderHistoryItems('comment');
-}
-
-function createPost(){
- const caption=$('postCaption').value.trim();
- const file=$('postImage').files[0];
- if(!caption&&!file){alert('Tambahkan teks atau gambar.');return}
- const savePostData=imageData=>{
-  posts.unshift({
-   id:makeId(),author:profile.name||'Pengguna',caption,
-   image:imageData||'',createdAt:Date.now()
-  });
-  saveStore('cs_posts',posts);
-  $('postCaption').value='';
-  $('postImage').value='';
-  renderAccount();
-  openPage('account','AKUN');
-  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='account'));
- };
- if(file){
-  const reader=new FileReader();
-  reader.onload=()=>savePostData(reader.result);
-  reader.onerror=()=>alert('Gambar tidak dapat dibaca.');
-  reader.readAsDataURL(file);
- }else savePostData('');
-}
-
-function fillEdit(){
- $('editName').value=profile.name||'';
- $('editBio').value=profile.bio||'';
- $('editWa').value=profile.wa||'';
-}
-function saveProfile(){
- profile.id=CURRENT_USER_ID;
- profile={
-  name:$('editName').value.trim()||'Pengguna',
-  bio:$('editBio').value.trim(),
-  wa:$('editWa').value.trim(),
-  id:CURRENT_USER_ID
- };
- posts=posts.map(p=>p.author==='Pengguna'?{...p,author:profile.name}:p);
- saveStore('cs_profile',profile);
- saveStore('cs_posts',posts);
- renderAccount();
- openPage('account','AKUN');
- document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='account'));
-}
-
-function runHomeSearch(){
- const q=$('homeSearchInput').value.trim();
- friendSearchQuery=q;
- openPage('search','CARI TEMAN');
- $('friendSearchInput').value=q;
- searchFriends(q);
-}
-function searchFriends(q){
- friendSearchQuery=String(q||'').trim();
- const query=friendSearchQuery.toLowerCase();
- const all=[...friends,...userDirectory.filter(u=>!friends.some(f=>f.id===u.id))];
- const results=query?all.filter(f=>f.name.toLowerCase().includes(query)||f.id.toLowerCase().includes(query)):friends;
- $('friendResults').innerHTML=results.map(f=>{
-  const isFriend=friends.some(x=>x.id===f.id);
-  return `<div class="friend"><div class="avatar">${escapeHTML(f.name[0]||'?')}</div><div style="min-width:0"><b>${escapeHTML(f.name)}</b><div class="muted">ID akun: ${escapeHTML(f.id)}</div></div>${isFriend?`<button class="soft" style="margin-left:auto" onclick="openChatById('${escapeHTML(f.id)}')">Chat</button>`:`<button class="primary" style="margin-left:auto" onclick="addFriend('${escapeHTML(f.id)}')">Tambah jadi teman</button>`}</div>`;
- }).join('')||(query?'<p class="muted">Akun tidak ditemukan. Pastikan nama atau ID benar.</p>':'<p class="muted">Cari nama atau ID akun untuk menambahkan teman.</p>');
-}
-function addFriend(id){
- const person=allKnownUsers().find(f=>f.id===id);
- if(!person){alert('Akun tidak ditemukan di daftar pengguna yang tersedia pada perangkat ini. Pencarian semua pengguna memerlukan koneksi database.');return;}
- if(friends.some(f=>f.id===id)){alert('Akun ini sudah menjadi teman.');return;}
- friends.push({...person});
- saveStore('cs_friends',friends);
- renderChatList();
- searchFriends(friendSearchQuery);
- alert(person.name+' berhasil ditambahkan ke daftar teman.');
-}
-function openChatById(id){const f=allKnownUsers().find(x=>x.id===id);if(!f)return;if(!friends.some(x=>x.id===id)){friends.push({...f});saveStore('cs_friends',friends);renderChatList()}openChat(f.name)}
-function chatFromPost(name){
- const user=allKnownUsers().find(u=>u.name===name);
- if(!user){alert('Akun pembuat postingan belum tersedia di daftar akun.');return;}
- if(user.id!==CURRENT_USER_ID&&!friends.some(f=>f.id===user.id)){friends.push({...user});saveStore('cs_friends',friends);renderChatList();}
- openChat(user.name);
-}
-function allKnownUsers(){
- const all=[{name:profile.name||'Pengguna',id:CURRENT_USER_ID,wa:profile.wa||''},...userDirectory,...friends];
- const unique=new Map();
- all.forEach(u=>{if(u&&u.id)unique.set(u.id,{...unique.get(u.id),...u});});
- return [...unique.values()];
-}
-function renderAboutApp(){
- $('joinedCount').textContent=String(allKnownUsers().length);
- $('groupCount').textContent=String(readStore('cs_groups',[]).length);
-}
-function userRow(u, showChat=true){
- const isSelf=u.id===CURRENT_USER_ID;
- const isFriend=friends.some(f=>f.id===u.id);
- return `<div class="friend"><div class="avatar">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name)}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div>${isSelf?'':isFriend?`<button class="soft" onclick="openChatById('${escapeHTML(u.id)}')">Chat</button>`:`<button class="primary" onclick="addFriend('${escapeHTML(u.id)}')">Tambah jadi teman</button>`}</div>`;
-}
-function renderAboutUsers(){
- const users=allKnownUsers().filter(u=>u.id!==CURRENT_USER_ID);
- $('allUsersDirectory').innerHTML=`<div class="card"><b>Semua orang yang sudah bergabung</b><p class="muted">Pilih Chat atau Tambah jadi teman untuk memulai percakapan.</p>${users.map(u=>userRow(u)).join('')||'<p class="muted">Belum ada akun lain yang tercatat.</p>'}</div>`;
-}
-function renderAboutGroups(){
- const all=readStore('cs_groups',[]);
- $('allGroupsDirectory').innerHTML=`<div class="card"><b>Semua grup yang sudah dibuat</b>${all.map(g=>`<div class="friend" onclick="openGroupFromDirectory('${escapeHTML(g.id)}')" style="cursor:pointer"><div style="min-width:0;flex:1"><b>${escapeHTML(g.name)}</b><div class="muted">${escapeHTML(g.reason||'Belum ada tujuan grup')}</div><div class="muted">${(g.members||[]).length} anggota</div></div><button class="soft" onclick="event.stopPropagation();openGroupFromDirectory('${escapeHTML(g.id)}')">Lihat</button></div>`).join('')||'<p class="muted">Belum ada grup yang tercatat.</p>'}</div>`;
-}
-function openGroupFromDirectory(id){openPage('groups','GRUP');openGroup(id)}
-function renderGroups(){
- groupsData=readStore('cs_groups',[]).filter(g=>(g.ownerId||CURRENT_USER_ID)===CURRENT_USER_ID);
- $('groupDetails').classList.add('hidden');$('groupDirectory').classList.remove('hidden');
- $('groupCreateCard').classList.add('hidden');$('addGroupButton').classList.remove('hidden');
- $('groupDirectory').innerHTML=groupsData.length?`<div class="card"><b>Grup Saya</b>${groupsData.map(g=>`<div class="friend" style="cursor:pointer" onclick="openGroup('${escapeHTML(g.id)}')"><div style="min-width:0;flex:1"><b>${escapeHTML(g.name)}</b><div class="muted">${escapeHTML(g.reason||'Belum ada tujuan grup')}</div><div class="muted">${(g.members||[]).length} anggota</div></div><button class="soft" onclick="event.stopPropagation();openGroup('${escapeHTML(g.id)}')">Buka</button></div>`).join('')}</div>`:'<div class="card"><p class="muted">Belum ada grup. Tekan tombol + untuk membuat grup baru.</p></div>';
- renderAboutApp();
-}
-function showCreateGroup(){
- pendingGroupMembers=[CURRENT_USER_ID];
- $('groupDirectory').classList.add('hidden');$('addGroupButton').classList.add('hidden');$('groupCreateCard').classList.remove('hidden');
- $('newGroupName').value='';$('newGroupReason').value='';renderGroupFriendPicker();
-}
-function cancelCreateGroup(){ $('groupCreateCard').classList.add('hidden');$('addGroupButton').classList.remove('hidden');$('groupDirectory').classList.remove('hidden'); }
-function renderGroupFriendPicker(){
- $('groupFriendPicker').innerHTML=friends.filter(f=>f.id!==CURRENT_USER_ID).map(f=>{const added=pendingGroupMembers.includes(f.id);return `<div class="friend"><div class="avatar">${escapeHTML((f.name||'?')[0])}</div><div style="flex:1;min-width:0"><b>${escapeHTML(f.name)}</b><div class="muted">ID akun: ${escapeHTML(f.id)}</div></div><button class="${added?'soft':'primary'}" onclick="toggleGroupMember('${escapeHTML(f.id)}')">${added?'Ditambahkan ✓':'Tambahkan'}</button></div>`}).join('')||'<p class="muted">Belum ada teman. Tambahkan teman melalui Tentang Aplikasi terlebih dahulu.</p>';
-}
-function toggleGroupMember(id){pendingGroupMembers=pendingGroupMembers.includes(id)?pendingGroupMembers.filter(x=>x!==id):[...pendingGroupMembers,id];renderGroupFriendPicker()}
-function createGroup(){
- const name=$('newGroupName').value.trim(),reason=$('newGroupReason').value.trim();
- if(!name){alert('Masukkan nama grup terlebih dahulu.');return;}
- groupsData=readStore('cs_groups',[]);groupsData.push({id:makeId(),name,reason,ownerId:CURRENT_USER_ID,members:[...pendingGroupMembers],createdAt:Date.now()});
- saveStore('cs_groups',groupsData);cancelCreateGroup();renderGroups();renderAboutApp();alert('Grup berhasil disimpan.');
-}
-function openGroup(id){
- $('bottomNav').classList.remove('hidden');$('bottomNav').style.display='flex';$('bottomNav').style.visibility='visible';$('bottomNav').style.opacity='1';$('bottomNav').style.pointerEvents='auto';
- document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='groups'));
- const g=readStore('cs_groups',[]).find(x=>x.id===id);if(!g)return;
- activeGroupId=id;const users=allKnownUsers();
- const isOwner=(g.ownerId||CURRENT_USER_ID)===CURRENT_USER_ID;
- $('groupDirectory').classList.add('hidden');$('groupCreateCard').classList.add('hidden');$('addGroupButton').classList.add('hidden');$('groupDetails').classList.remove('hidden');
- $('groupDetails').innerHTML=`<button class="soft" onclick="goBack()">← Kembali</button><div class="card"><h3 style="margin-top:0">${escapeHTML(g.name)}</h3><p class="muted">${escapeHTML(g.reason||'Belum ada alasan atau tujuan grup.')}</p><div class="row spread"><b>Anggota grup (${(g.members||[]).length})</b>${isOwner?`<button class="primary" onclick="openGroupChat('${escapeHTML(g.id)}')">Chat Grup</button>`:''}</div>${!isOwner?'<p class="muted">Kamu dapat melihat informasi dan anggota grup ini, tetapi hanya pemilik grup yang dapat membuka percakapan grup.</p>':''}${(g.members||[]).map(mid=>{const u=users.find(x=>x.id===mid)||friends.find(x=>x.id===mid)||{name:'Pengguna',id:mid};const isFriend=friends.some(f=>f.id===u.id);return `<div class="friend"><div class="avatar">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name)}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div>${u.id===CURRENT_USER_ID?'':isFriend?`<button class="soft" onclick="openChatById('${escapeHTML(u.id)}')">Chat</button>`:`<button class="primary" onclick="addFriend('${escapeHTML(u.id)}')">Tambah jadi teman</button>`}</div>`}).join('')||'<p class="muted">Belum ada anggota grup.</p>'}</div>`;
-}
-function openGroupChat(id){
- const g=readStore('cs_groups',[]).find(x=>x.id===id);if(!g)return;
- if($('chatScreen').classList.contains('hidden'))pageHistory.push({id:currentPageId,title:pageTitles[currentPageId]||$('pageTitle').textContent});
- currentChat='group:'+id;$('chatFriendName').textContent=g.name;$('chatProfileName').textContent=g.name;$('chatProfileId').textContent='Grup · '+(g.members||[]).length+' anggota';$('chatProfileWa').textContent=g.reason||'Percakapan grup';
- $('normalHeader').classList.add('hidden');$('normalMain').classList.add('hidden');$('bottomNav').classList.remove('hidden');$('bottomNav').style.display='flex';$('chatScreen').classList.remove('hidden');$('messageInput').value='';$('messageInput').style.height='auto';renderMessages();
-}
-async function copyAppLink(){
- const link=window.location.href.split('#')[0];
- try{await navigator.clipboard.writeText(link);$('appLinkStatus').textContent='Link aplikasi berhasil disalin.';}
- catch(e){const t=document.createElement('textarea');t.value=link;document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();$('appLinkStatus').textContent=ok?'Link aplikasi berhasil disalin.':'Salin link dari alamat halaman ini: '+link;}
-}
-function renderChatList(){
- $('chatFriends').innerHTML=friends.map(f=>
-  `<div class="card" onclick="openChat('${f.name}')" style="cursor:pointer">
-   <div class="row"><div class="avatar">${escapeHTML(f.name[0])}</div>
-   <div><b>${escapeHTML(f.name)}</b><div class="muted">ID akun: ${escapeHTML(f.id)}</div><div class="muted">Buka percakapan</div></div></div>
-  </div>`
- ).join('');
- renderRequests();
-}
-function renderRequests(){
- const pending=Object.keys(chatRequests).filter(name=>chatRequests[name]?.status==='pending');
- $('chatRequests').innerHTML=pending.map(name=>
-  `<div class="card"><b>Permintaan chat dari ${escapeHTML(name)}</b>
-  <p class="muted">${escapeHTML(chatRequests[name].text||'Meminta memulai percakapan.')}</p>
-  <button class="primary" onclick="acceptRequest('${name}')">Terima</button>
-  <button class="soft" onclick="rejectRequest('${name}')">Tolak</button></div>`
- ).join('');
-}
-function acceptRequest(name){
- chatRequests[name].status='accepted';
- chatStates[name]='accepted';
- saveStore('cs_chat_requests',chatRequests);
- saveStore('cs_chat_states',chatStates);
- renderChatList();
-}
-function rejectRequest(name){
- chatRequests[name].status='rejected';
- chatStates[name]='rejected';
- saveStore('cs_chat_requests',chatRequests);
- saveStore('cs_chat_states',chatStates);
- renderChatList();
-}
-
-function openChat(name){
- if($('chatScreen').classList.contains('hidden'))pageHistory.push({id:currentPageId,title:pageTitles[currentPageId]||$('pageTitle').textContent});
- currentChat=name;
- const friend=allKnownUsers().find(f=>f.name===name)||{name,id:'CS-10000',wa:''};
- $('chatFriendName').textContent=name;
- $('chatProfileName').textContent=name;
- $('chatProfileId').textContent='ID akun: '+friend.id;
- $('chatProfileWa').textContent='WhatsApp: '+(friend.wa||'belum ditambahkan');
- $('normalHeader').classList.add('hidden');
- $('normalMain').classList.add('hidden');
- $('bottomNav').classList.remove('hidden');
- $('bottomNav').style.display='flex';
- $('chatScreen').classList.remove('hidden');
- $('messageInput').value='';
- $('messageInput').style.height='auto';
- renderMessages();
-}
-function viewSales(){
- alert('Halaman jualan '+currentChat+' belum dihubungkan ke data usaha.');
-}
-function leaveChat(){goBack()}
-
-function renderMessages(){
- const arr=messagesByFriend[currentChat]||[];
- $('messages').innerHTML=arr.map(m=>
-  `<div class="bubble ${m.mine?'mine':''}">${currentChat.startsWith('group:')?`<b>${escapeHTML(m.author|| (m.mine?'Saya':'Anggota'))}</b><br>`:''}${escapeHTML(m.text)}<span class="message-time">${escapeHTML(formatTime(m.createdAt||Date.now()))}</span></div>`
- ).join('');
- $('messages').scrollTop=$('messages').scrollHeight;
-}
-function sendMessage(){
- const input=$('messageInput');
- const v=input.value.trim();
- if(!v||!currentChat)return;
- if(approval&&chatStates[currentChat]!=='accepted'&&!(messagesByFriend[currentChat]||[]).some(m=>m.mine)){
-  alert('Pengaturan persetujuan chat aktif. Percakapan dengan orang baru perlu disetujui terlebih dahulu.');
-  return;
- }
- (messagesByFriend[currentChat]||(messagesByFriend[currentChat]=[])).push({
-  text:v,mine:true,author:profile.name||'Saya',createdAt:Date.now()
- });
- saveStore('cs_messages',messagesByFriend);
- input.value='';
- resizeInput(input);
- renderMessages();
-}
-function handleEnter(e){
- if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}
-}
-function resizeInput(el){
- el.style.height='auto';
- el.style.height=Math.min(el.scrollHeight,110)+'px';
-}
-function escapeHTML(s){
- return String(s??'').replace(/[&<>"']/g,c=>({
-  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
- }[c]));
-}
-
-seedPosts();
-if(localStorage.getItem('cs_registered')!=='true'){
- document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
- $('register').classList.add('active');
- $('normalHeader').classList.add('hidden'); $('bottomNav').classList.add('hidden');
- currentPageId='register';
-}else{
- $('normalHeader').classList.remove('hidden'); $('bottomNav').classList.remove('hidden');
-}
-renderAccount();
-renderAboutApp();
-searchFriends('');
-renderChatList();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Chat Saya</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#edf5ff;color:#26364b}
-header{height:58px;background:#fff;border-bottom:1px solid #dce6f2;display:flex;align-items:center;padding:0 16px;gap:12px}
-h2{font-size:18px;margin:0}
-button,input,textarea{font:inherit}
-button{cursor:pointer;border:0}
-main{padding:14px;padding-bottom:95px;max-width:600px;margin:auto}
-.page{display:none}
-.page.active{display:block}
-.card{background:#fff;border:1px solid #e0e9f3;border-radius:14px;padding:14px;margin-bottom:12px}
-.muted{color:#7b8ba0;font-size:12px}
-.row{display:flex;align-items:center;gap:9px}
-.spread{justify-content:space-between}
-.avatar{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:#dceaff;color:#285ca8;display:grid;place-items:center;font-weight:bold}
-.post-actions{display:flex;align-items:center;gap:20px;margin-top:13px}
-.post-actions button{background:transparent;color:#426b9d;padding:3px 0;border:0;display:flex;align-items:center;gap:5px;font-size:14px}
-.post-actions button.active{color:#246bc1;font-weight:bold}
-.save-action{order:0;font-size:20px!important}
-.like-action{order:1}
-.comment-action{order:2}
-.soft{background:#edf4ff;color:#285ca8;padding:9px 12px;border-radius:9px}
-.primary{background:#3478d4;color:white;padding:10px 14px;border-radius:9px}
-.menu-wrap{position:relative}
-.dots{background:#edf4ff;border-radius:50%;width:34px;height:34px;font-size:21px;color:#315c95}
-.dropdown{display:none;position:absolute;right:0;top:40px;width:190px;background:white;border:1px solid #dce6f2;box-shadow:0 5px 18px #26364b18;border-radius:10px;z-index:15;padding:5px}
-.dropdown.show{display:block}
-.dropdown button{display:block;text-align:left;background:white;width:100%;padding:11px 9px;border-radius:7px;font-size:13px}
-.dropdown button:hover{background:#edf5ff}
-.setting{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;background:#fff;border:1px solid #dfe8f3;border-radius:12px;margin-bottom:9px;color:#26364b}
-.setting-icon{width:36px;height:36px;background:#e7f0ff;border-radius:10px;display:grid;place-items:center;color:#3268b5;font-size:18px;flex-shrink:0}
-.bottom,#bottomNav{position:fixed;bottom:0;left:0;right:0;height:67px;background:#fff;border-top:1px solid #dce6f2;display:flex!important;justify-content:space-around;align-items:center;z-index:10000;padding-bottom:env(safe-area-inset-bottom);visibility:visible;opacity:1;pointer-events:auto}
-.bottom button{background:none;color:#75859b;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:55px}
-.bottom button span{font-size:20px}
-.bottom button.active{color:#286bc1;font-weight:bold}
-.back{background:none;color:#3268b5;font-size:20px}
-.chat-layout{height:calc(100dvh - 125px);display:flex;flex-direction:column;background:#edf5ff}
-.chat-profile{margin:12px 12px 4px;padding:15px;background:#fff;border:1px solid #dce6f2;border-radius:13px;display:flex;align-items:center;gap:12px}
-.chat-profile-info{flex:1;min-width:0}
-.chat-profile-name{font-size:17px;font-weight:bold;margin-bottom:7px;overflow-wrap:anywhere}
-.chat-profile-details{font-size:13px;color:#687b90;line-height:1.8;overflow-wrap:anywhere}
-.sales-button{background:#e8f1ff;color:#2866b3;padding:9px 11px;border-radius:9px;font-size:12px;flex-shrink:0}
-.messages{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
-.bubble{display:block;width:fit-content;max-width:80%;padding:10px 12px;border-radius:14px;background:white;border:1px solid #e1e9f2;align-self:flex-start;overflow-wrap:anywhere;white-space:pre-wrap;word-break:break-word}
-.bubble.mine{align-self:flex-end;background:#dceaff;border-color:#dceaff}
-.message-time{display:block;text-align:right;font-size:10px;color:#71839a;margin-top:5px}
-.composer{display:flex;align-items:flex-end;gap:8px;padding:10px;background:white;border-top:1px solid #dce6f2;padding-bottom:max(10px,env(safe-area-inset-bottom))}
-.composer textarea{flex:1;min-width:0;max-height:110px;resize:none;border:1px solid #dce6f2;border-radius:20px;padding:11px 14px;outline:none}
-.send{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:#3478d4;color:white;font-size:20px}
-input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11px;border:1px solid #dce6f2;border-radius:9px;background:#fff}
-.friend{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #edf1f6}
-.hidden{display:none!important}
-.post-image{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:10px;margin-top:12px;background:#f4f7fb}
-.post-date{font-size:12px;color:#8794a5;margin-top:4px}
-.comment-item{background:#f4f8ff;padding:10px;border-radius:10px;margin-bottom:8px;overflow-wrap:anywhere}
-.profile-input{resize:vertical}
-@media(max-width:380px){
- .post-actions{gap:15px}
- .post-actions button{font-size:13px}
- .chat-profile{gap:8px;padding:11px}
- .sales-button{padding:8px;font-size:11px}
-}
-</style>
-</head>
-<body>
-
-<header id="normalHeader">
-  <button class="back" id="pageBackButton" onclick="goBack()" aria-label="Kembali ke halaman sebelumnya">←</button>
-  <h2 id="pageTitle">BERANDA</h2>
-  <div style="margin-left:auto" class="menu-wrap" id="menuWrap">
-    <button class="dots" onclick="toggleMenu()" aria-label="Menu">⋮</button>
-    <div class="dropdown" id="dropdown">
-      <button onclick="openPage('settings','PENGATURAN AKUN')">Pengaturan Akun</button>
-      <button onclick="openPage('aboutAccount','TENTANG AKUN')">Tentang Akun</button>
-      <button onclick="openPage('business','ATUR USAHA')">Atur Usaha</button>
-      <button id="aboutAppButton" onclick="openPage('aboutApp','TENTANG APLIKASI')">Tentang Aplikasi</button>
-    </div>
-  </div>
-</header>
-
-<main id="normalMain">
-
-<section class="page" id="register">
-  <div class="card">
-    <h3 style="margin-top:0">Pendaftaran Akun</h3>
-    <p class="muted">Buat akun Chat Saya sebelum masuk ke aplikasi.</p>
-    <label>Nama</label><input id="registerName" type="text" placeholder="Masukkan nama" style="margin:7px 0 13px" required>
-    <label>Nomor WhatsApp</label><input id="registerWa" type="tel" placeholder="Masukkan nomor WhatsApp" style="margin:7px 0 13px" required>
-    <button class="primary" style="margin-top:8px" onclick="completeRegistration()">Daftar dan Masuk</button>
-  </div>
-</section>
-
-<section class="page" id="home">
-  <div class="row spread" style="margin-bottom:12px">
-    <input type="search" id="homeSearchInput" placeholder="Cari nama atau ID teman..." onkeydown="if(event.key==='Enter'){event.preventDefault();runHomeSearch()}" style="flex:1">
-    <button class="soft" onclick="runHomeSearch()">Cari</button>
-  </div>
-  <div id="feedPosts"></div>
-  <button class="primary" onclick="openPage('create','BUAT POSTINGAN')">＋ Buat Postingan</button>
-</section>
-
-<section class="page" id="settings">
-  <button class="setting" onclick="openHistory('like')">
-    <span class="setting-icon">♡</span>
-    <span><b>Riwayat Suka</b><div class="muted">Postingan yang disukai</div></span>
-  </button>
-  <button class="setting" onclick="openHistory('save')">
-    <span class="setting-icon">▣</span>
-    <span><b>Riwayat Simpan</b><div class="muted">Postingan yang disimpan</div></span>
-  </button>
-  <button class="setting" onclick="openHistory('comment')">
-    <span class="setting-icon">☷</span>
-    <span><b>Riwayat Komen</b><div class="muted">Postingan yang dikomentari</div></span>
-  </button>
-  <button class="setting" onclick="openPage('privacy','PRIVASI')">
-    <span class="setting-icon">♙</span>
-    <span><b>Privasi</b><div class="muted">Atur siapa yang dapat melihat postingan</div></span>
-  </button>
-  <div class="card">
-    <div class="row spread">
-      <div><b>Setujui Chat dari Orang Baru</b><div class="muted" style="margin-top:5px">Tinjau permintaan pesan terlebih dahulu</div></div>
-      <input type="checkbox" id="approvalToggle" onchange="saveApproval(this.checked)">
-    </div>
-    <div class="muted" id="approvalStatus" style="margin-top:10px"></div>
-  </div>
-</section>
-
-<section class="page" id="privacy">
-  <div class="card">
-    <b>Teman yang tidak dapat melihat postingan</b>
-    <p class="muted">Pilih teman yang ingin dibatasi. Pertemanan tetap tersimpan.</p>
-    <div id="privacyFriends"></div>
-    <button class="primary" style="margin-top:12px" onclick="savePrivacy()">Simpan Pengaturan</button>
-  </div>
-</section>
-
-<section class="page" id="search">
-  <div class="row" style="margin-bottom:12px"><input id="friendSearchInput" type="search" placeholder="Masukkan nama atau ID teman..." onkeydown="if(event.key==='Enter'){event.preventDefault();searchFriends(this.value)}" style="flex:1"><button class="primary" onclick="searchFriends($('friendSearchInput').value)">Cari</button></div>
-  <div id="friendResults"></div>
-</section>
-
-<section class="page" id="account">
+<section class="page" id="userProfilePage">
   <div class="card">
     <div class="row">
-      <div class="avatar" id="accountAvatar">P</div>
-      <div><b id="profileName">Pengguna</b><div class="muted" id="profileId">ID akun</div></div>
+      <div class="avatar" id="viewUserAvatar">?</div>
+      <div style="min-width:0"><b id="viewUserName">Nama pengguna</b><div class="muted" id="viewUserId">ID akun</div></div>
     </div>
-    <p id="profileBio" class="muted">Belum ada bio.</p>
-    <p id="profileWa" class="muted">WhatsApp belum ditambahkan</p>
-    <button class="soft" onclick="openPage('editAccount','EDIT AKUN')">Edit Akun</button>
+    <p id="viewUserBio" class="muted">Belum ada bio.</p>
+    <p id="viewUserWa" class="muted">WhatsApp belum ditambahkan</p>
+    <button class="soft" id="viewUserChatButton" onclick="chatViewedUser()">Chat</button>
   </div>
-  <h3>Postingan Saya</h3>
-  <div id="myPosts"></div>
-  <button class="primary" onclick="openPage('create','BUAT POSTINGAN')">＋ Buat Postingan</button>
+  <h3>Postingan</h3>
+  <div id="viewUserPosts"></div>
 </section>
 
 <section class="page" id="editAccount">
@@ -1029,7 +205,7 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
   <div id="historyContent"></div>
 </section>
 
-<section class="page" id="aboutAccount"><div class="card">Informasi akun pengguna.</div></section>
+<section class="page" id="aboutAccount"><div class="card"><b>Informasi akun pengguna</b><p class="muted">Nama akun: <span id="aboutAccountName">Pengguna</span></p><p class="muted">ID akun: <span id="aboutAccountId">-</span></p></div></section>
 <section class="page" id="business"><div class="card">Pengaturan usaha.</div></section>
 <section class="page" id="aboutApp">
   <button class="setting" onclick="openPage('aboutUsers','ORANG YANG SUDAH BERGABUNG');renderAboutUsers()">
@@ -1098,7 +274,7 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
 </section>
 
 <nav class="bottom" id="bottomNav">
-  <button class="active" data-page="home" onclick="navTo('home','BERANDA',this)"><span>⌂</span>Beranda</button>
+  <button class="active" data-page="home" onclick="navTo('home','BERANDA',this)" aria-label="Beranda"><span>⌂</span></button>
   <button data-page="chatList" onclick="navTo('chatList','CHAT',this)"><span>☏</span>Chat</button>
   <button data-page="groups" onclick="navTo('groups','GRUP',this)"><span>♧</span>Grup</button>
   <button data-page="account" onclick="navTo('account','AKUN',this)"><span>♙</span>Akun</button>
@@ -1117,6 +293,7 @@ const userDirectory=[
 let friends=readStore('cs_friends',[]);
 if(!friends.length){friends=[{name:'Andi',id:'CS-10012',wa:''},{name:'Budi',id:'CS-10034',wa:''}];saveStore('cs_friends',friends);}
 let friendSearchQuery='';
+let viewedUserId='';
 let groupsData=readStore('cs_groups',[]);
 let activeGroupId='';
 let pendingGroupMembers=[];
@@ -1132,7 +309,8 @@ let posts=readStore('cs_posts',[]);
 let profile=readStore('cs_profile',{name:'Pengguna',bio:'',wa:''});
 const OWNER_ACCOUNT_CODE='RUSDI-150710';
 const wasRegistered=localStorage.getItem('cs_registered')==='true';
-const isOwnerAccount=String(profile.id||'').toUpperCase()===OWNER_ACCOUNT_CODE || (wasRegistered && String(profile.name||'').trim().toLocaleLowerCase('id-ID')==='rusdi');
+const normalizedOwnerName=String(profile.name||'').trim().toLocaleLowerCase('id-ID');
+const isOwnerAccount=String(profile.id||'').toUpperCase()===OWNER_ACCOUNT_CODE || normalizedOwnerName==='rusdi' || normalizedOwnerName.startsWith('rusdi ');
 function makeAccountId(name){
  const prefix=String(name||'Pengguna').trim().replace(/\s+/g,' ');
  const used=readStore('cs_used_account_codes',[]);
@@ -1148,22 +326,26 @@ function makeAccountId(name){
  throw new Error('Kode akun unik tidak berhasil dibuat. Silakan coba lagi.');
 }
 let CURRENT_USER_ID=profile.id||'';
-if(wasRegistered){
- if(isOwnerAccount) CURRENT_USER_ID=OWNER_ACCOUNT_CODE;
- else if(!CURRENT_USER_ID||!/^.+-\d{6}$/.test(CURRENT_USER_ID)||String(CURRENT_USER_ID).toUpperCase()===OWNER_ACCOUNT_CODE) CURRENT_USER_ID=makeAccountId(profile.name||'Pengguna');
+if(isOwnerAccount){
+ CURRENT_USER_ID=OWNER_ACCOUNT_CODE;
+ profile.id=CURRENT_USER_ID;
+ saveStore('cs_profile',profile);
+}else if(wasRegistered){
+ if(!CURRENT_USER_ID||!/^.+-\d{6}$/.test(CURRENT_USER_ID)||String(CURRENT_USER_ID).toUpperCase()===OWNER_ACCOUNT_CODE) CURRENT_USER_ID=makeAccountId(profile.name||'Pengguna');
  profile.id=CURRENT_USER_ID;saveStore('cs_profile',profile);
 }
 pendingGroupMembers=[CURRENT_USER_ID];
 if(profile.name && profile.name!=='Pengguna' || profile.wa) localStorage.setItem('cs_registered','true');
 function completeRegistration(){
+ if(localStorage.getItem('cs_registered')==='true'){
+  $('normalHeader').classList.remove('hidden'); $('bottomNav').classList.remove('hidden');
+  openPage('home','BERANDA'); renderAccount(); return;
+ }
  const name=$('registerName').value.trim();
  const wa=$('registerWa').value.trim();
  if(!name || !wa){alert('Nama dan nomor WhatsApp wajib diisi.');return;}
- if(!CURRENT_USER_ID || !wasRegistered){
-  CURRENT_USER_ID=name.trim().toLocaleLowerCase('id-ID')==='rusdi'?OWNER_ACCOUNT_CODE:makeAccountId(name);
- }else if(isOwnerAccount){
-  CURRENT_USER_ID=OWNER_ACCOUNT_CODE;
- }
+ const normalizedName=name.trim().toLocaleLowerCase('id-ID');
+ CURRENT_USER_ID=(normalizedName==='rusdi'||normalizedName.startsWith('rusdi '))?OWNER_ACCOUNT_CODE:makeAccountId(name);
  profile.name=name; profile.wa=wa; profile.bio=profile.bio||''; profile.id=CURRENT_USER_ID;
  saveStore('cs_profile',profile); localStorage.setItem('cs_registered','true');
  $('normalHeader').classList.remove('hidden'); $('bottomNav').classList.remove('hidden');
@@ -1193,7 +375,11 @@ document.addEventListener('click',e=>{
 let pageHistory=[];
 let currentPageId='home';
 const pageTitles={home:'BERANDA',settings:'PENGATURAN AKUN',privacy:'PRIVASI',search:'CARI TEMAN',account:'AKUN',editAccount:'EDIT AKUN',create:'BUAT POSTINGAN',comments:'KOMENTAR',history:'RIWAYAT',aboutAccount:'TENTANG AKUN',business:'ATUR USAHA',aboutApp:'TENTANG APLIKASI',aboutUsers:'ORANG YANG SUDAH BERGABUNG',aboutGroups:'GRUP YANG SUDAH DIBUAT',groups:'GRUP',chatList:'CHAT'};
-function syncBackButton(){ $('pageBackButton').classList.remove('hidden'); }
+function syncBackButton(){
+ const isHome=currentPageId==='home';
+ $('pageBackButton').classList.toggle('hidden',isHome);
+ $('pageTitle').classList.remove('hidden');
+}
 function goBack(){
  if(!$('chatScreen').classList.contains('hidden')){
   $('chatScreen').classList.add('hidden');$('normalHeader').classList.remove('hidden');$('normalMain').classList.remove('hidden');$('bottomNav').classList.remove('hidden');
@@ -1319,8 +505,11 @@ function searchPosts(q){
  });
 }
 function renderAccount(){
+ if(isOwnerAccount || String(profile.id||'').toUpperCase()===OWNER_ACCOUNT_CODE){CURRENT_USER_ID=OWNER_ACCOUNT_CODE;profile.id=OWNER_ACCOUNT_CODE;saveStore('cs_profile',profile);}
  $('profileName').textContent=profile.name||'Pengguna';
  $('profileId').textContent='ID akun: '+CURRENT_USER_ID;
+ if($('aboutAccountName')) $('aboutAccountName').textContent=profile.name||'Pengguna';
+ if($('aboutAccountId')) $('aboutAccountId').textContent=CURRENT_USER_ID||'Belum tersedia';
  $('editAccountId').value=CURRENT_USER_ID;
  $('accountAvatar').textContent=(profile.name||'P').charAt(0).toUpperCase();
  $('profileBio').textContent=profile.bio||'Belum ada bio.';
@@ -1481,9 +670,25 @@ function searchFriends(q){
  const results=query?all.filter(f=>f.name.toLowerCase().includes(query)||f.id.toLowerCase().includes(query)):friends;
  $('friendResults').innerHTML=results.map(f=>{
   const isFriend=friends.some(x=>x.id===f.id);
-  return `<div class="friend"><div class="avatar">${escapeHTML(f.name[0]||'?')}</div><div style="min-width:0"><b>${escapeHTML(f.name)}</b><div class="muted">ID akun: ${escapeHTML(f.id)}</div></div>${isFriend?`<button class="soft" style="margin-left:auto" onclick="openChatById('${escapeHTML(f.id)}')">Chat</button>`:`<button class="primary" style="margin-left:auto" onclick="addFriend('${escapeHTML(f.id)}')">Tambah jadi teman</button>`}</div>`;
+  return `<div class="friend"><div class="avatar" style="cursor:pointer" onclick="openUserProfile('${escapeHTML(f.id)}')">${escapeHTML((f.name||'?')[0])}</div><div style="min-width:0;flex:1;cursor:pointer" onclick="openUserProfile('${escapeHTML(f.id)}')"><b>${escapeHTML(f.name)}</b><div class="muted">ID akun: ${escapeHTML(f.id)}</div><div class="muted" style="font-size:12px">Lihat profil dan postingan</div></div>${isFriend?`<button class="soft" style="margin-left:auto" onclick="openChatById('${escapeHTML(f.id)}')">Chat</button>`:`<button class="primary" style="margin-left:auto" onclick="addFriend('${escapeHTML(f.id)}')">Tambah jadi teman</button>`}</div>`;
  }).join('')||(query?'<p class="muted">Akun tidak ditemukan. Pastikan nama atau ID benar.</p>':'<p class="muted">Cari nama atau ID akun untuk menambahkan teman.</p>');
 }
+function openUserProfile(id){
+ const person=allKnownUsers().find(u=>String(u.id)===String(id));
+ if(!person){alert('Profil akun tidak ditemukan di daftar pengguna pada perangkat ini.');return;}
+ viewedUserId=person.id;
+ $('viewUserName').textContent=person.name||'Pengguna';
+ $('viewUserId').textContent='ID akun: '+(person.id||'Belum tersedia');
+ $('viewUserAvatar').textContent=(person.name||'?').charAt(0).toUpperCase();
+ $('viewUserBio').textContent=person.bio||'Belum ada bio.';
+ $('viewUserWa').textContent=person.wa?'WhatsApp: '+person.wa:'WhatsApp belum ditambahkan';
+ $('viewUserChatButton').style.display=String(person.id)===String(CURRENT_USER_ID)?'none':'inline-flex';
+ const userPosts=posts.filter(p=>String(p.author||'').trim().toLocaleLowerCase('id-ID')===String(person.name||'').trim().toLocaleLowerCase('id-ID'));
+ $('viewUserPosts').innerHTML=userPosts.map(p=>renderPost(p,false)).join('')||'<div class="card muted">Pengguna ini belum memiliki postingan.</div>';
+ openPage('userProfilePage','PROFIL PENGGUNA');
+}
+function chatViewedUser(){if(viewedUserId)openChatById(viewedUserId)}
+
 function addFriend(id){
  const person=allKnownUsers().find(f=>f.id===id);
  if(!person){alert('Akun tidak ditemukan di daftar pengguna yang tersedia pada perangkat ini. Pencarian semua pengguna memerlukan koneksi database.');return;}
@@ -1514,7 +719,7 @@ function renderAboutApp(){
 function userRow(u, showChat=true){
  const isSelf=u.id===CURRENT_USER_ID;
  const isFriend=friends.some(f=>f.id===u.id);
- return `<div class="friend"><div class="avatar">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name)}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div>${isSelf?'':isFriend?`<button class="soft" onclick="openChatById('${escapeHTML(u.id)}')">Chat</button>`:`<button class="primary" onclick="addFriend('${escapeHTML(u.id)}')">Tambah jadi teman</button>`}</div>`;
+ return `<div class="friend"><div class="avatar" style="cursor:pointer" onclick="openUserProfile('${escapeHTML(u.id)}')">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1;cursor:pointer" onclick="openUserProfile('${escapeHTML(u.id)}')"><b>${escapeHTML(u.name)}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div><div class="muted" style="font-size:12px">Lihat profil dan postingan</div></div>${isSelf?'':isFriend?`<button class="soft" onclick="openChatById('${escapeHTML(u.id)}')">Chat</button>`:`<button class="primary" onclick="addFriend('${escapeHTML(u.id)}')">Tambah jadi teman</button>`}</div>`;
 }
 function renderAboutUsers(){
  const users=allKnownUsers().filter(u=>u.id!==CURRENT_USER_ID);
@@ -1666,7 +871,12 @@ if(localStorage.getItem('cs_registered')!=='true'){
  $('normalHeader').classList.add('hidden'); $('bottomNav').classList.add('hidden');
  currentPageId='register';
 }else{
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ $('home').classList.add('active');
  $('normalHeader').classList.remove('hidden'); $('bottomNav').classList.remove('hidden');
+ currentPageId='home';
+ syncBackButton();
+ document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='home'));
 }
 renderAccount();
 renderAboutApp();
