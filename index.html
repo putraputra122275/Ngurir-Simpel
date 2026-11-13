@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -78,7 +77,7 @@ button:disabled{opacity:.6}
   <h2>Cari Teman</h2>
   <div class="card">
     <input id="findId" placeholder="Masukkan ID teman (5 digit)" inputmode="numeric" maxlength="5">
-    <button class="primary" onclick="findFriend()">Cari Teman</button>
+    <button class="primary" id="findButton" onclick="findFriend()">Cari Teman</button>
     <div id="findResult"></div>
   </div>
 </section>
@@ -127,9 +126,10 @@ function showPage(id){
     clearInterval(messageTimer);
     messageTimer=null;
   }
+
   if(id==='chatPage'&&activeFriend){
     loadMessages();
-    messageTimer=setInterval(loadMessages,5000);
+    messageTimer=setInterval(loadMessages,4000);
   }
 }
 
@@ -175,11 +175,10 @@ async function startApp(){
     await loadFriends();
     showPage('homePage');
   }catch(error){
-    console.error(error);
+    console.error('startApp:',error);
     account=null;
     showPage('registerPage');
-    setError('registerError',
-      'Akun gagal diperiksa. Periksa koneksi, tabel profiles, dan kebijakan Supabase.');
+    setError('registerError','Gagal memeriksa akun: '+error.message);
   }
 }
 
@@ -262,33 +261,44 @@ async function register(){
     await loadFriends();
     showPage('homePage');
   }catch(error){
-    console.error(error);
-    setError('registerError',
-      'Pendaftaran gagal. Periksa Auth, tabel profiles, dan RLS Supabase. '+(error.message||''));
+    console.error('register:',error);
+    setError('registerError','Pendaftaran gagal: '+error.message);
   }finally{
     button.disabled=false;
     button.textContent='Daftar Sekarang';
   }
 }
 
+/* Memuat daftar teman melalui fungsi database yang sudah digunakan aplikasi. */
 async function loadFriends(){
   if(!account)return;
 
-  const {data,error}=await db.rpc('get_chat_contacts');
+  try{
+    const {data,error}=await db.rpc('get_chat_contacts');
+    if(error)throw error;
 
-  if(error){
-    console.error(error);
+    friends=(data||[])
+      .filter(friend=>friend.id!==account.id)
+      .filter((friend,index,arr)=>
+        arr.findIndex(other=>other.id===friend.id)===index
+      );
+
+    renderFriends();
+  }catch(error){
+    console.error('loadFriends:',error);
     friends=[];
     renderFriends();
-    return;
+    const list=document.getElementById('friendList');
+    const notice=document.createElement('div');
+    notice.className='card error';
+    notice.textContent='Daftar teman gagal dimuat: '+error.message;
+    list.prepend(notice);
   }
-
-  friends=(data||[]).filter(friend=>friend.id!==account.id);
-  renderFriends();
 }
 
 function renderFriends(){
-  const query=(document.getElementById('searchFriends').value||'').trim().toLowerCase();
+  const search=document.getElementById('searchFriends');
+  const query=(search.value||'').trim().toLowerCase();
   const list=document.getElementById('friendList');
   list.replaceChildren();
 
@@ -373,8 +383,8 @@ async function saveAccount(){
     await loadFriends();
     showPage('homePage');
   }catch(error){
-    console.error(error);
-    setError('editError','Gagal menyimpan perubahan. Periksa izin update profiles.');
+    console.error('saveAccount:',error);
+    setError('editError','Gagal menyimpan: '+error.message);
   }finally{
     button.disabled=false;
   }
@@ -383,12 +393,14 @@ async function saveAccount(){
 function openFind(){
   document.getElementById('findId').value='';
   document.getElementById('findResult').replaceChildren();
+  setError('findResult','');
   showPage('findPage');
 }
 
 async function findFriend(){
   const id=document.getElementById('findId').value.trim();
   const result=document.getElementById('findResult');
+  const button=document.getElementById('findButton');
   result.replaceChildren();
 
   if(!/^\d{5}$/.test(id)){
@@ -396,13 +408,17 @@ async function findFriend(){
     return;
   }
 
-  if(!account)return;
+  if(!account){
+    result.textContent='Akun belum aktif. Silakan masuk kembali.';
+    return;
+  }
 
   if(id===account.public_id){
     result.textContent='Itu ID akun kamu sendiri.';
     return;
   }
 
+  button.disabled=true;
   result.textContent='Mencari pengguna...';
 
   try{
@@ -414,6 +430,11 @@ async function findFriend(){
 
     if(!profile){
       result.textContent='Pengguna dengan ID tersebut tidak ditemukan.';
+      return;
+    }
+
+    if(profile.id===account.id){
+      result.textContent='Itu ID akun kamu sendiri.';
       return;
     }
 
@@ -433,6 +454,9 @@ async function findFriend(){
 
     start.onclick=async()=>{
       start.disabled=true;
+      const oldText=start.textContent;
+      start.textContent='Membuka chat...';
+
       try{
         const {error:contactError}=await db.from('contacts').upsert({
           owner_id:account.id,
@@ -442,30 +466,44 @@ async function findFriend(){
         if(contactError)throw contactError;
 
         await loadFriends();
+
+        /* Buka percakapan langsung dengan UUID profil yang ditemukan. */
         openChat(profile);
       }catch(error){
-        console.error(error);
+        console.error('add contact:',error);
         start.disabled=false;
-        const message=document.createElement('div');
-        message.className='error';
-        message.textContent='Gagal menambahkan teman. Periksa tabel contacts dan RLS.';
-        card.append(message);
+        start.textContent=oldText;
+
+        let message=card.querySelector('.error');
+        if(!message){
+          message=document.createElement('div');
+          message.className='error';
+          card.append(message);
+        }
+        message.textContent='Gagal menambahkan teman: '+error.message;
       }
     };
 
     card.append(name,publicId,start);
     result.append(card);
   }catch(error){
-    console.error(error);
+    console.error('findFriend:',error);
     result.replaceChildren();
-    result.textContent='Pencarian gagal. Periksa fungsi find_chat_profile di Supabase.';
+    result.textContent='Pencarian gagal: '+error.message;
+  }finally{
+    button.disabled=false;
   }
 }
 
 function openChat(friend){
+  if(!friend||!friend.id){
+    alert('Profil teman tidak memiliki UUID yang valid.');
+    return;
+  }
+
   activeFriend=friend;
   document.getElementById('chatName').textContent=friend.display_name||'Pengguna';
-  document.getElementById('chatId').textContent='ID akun: '+friend.public_id;
+  document.getElementById('chatId').textContent='ID akun: '+(friend.public_id||'');
   document.getElementById('chatPhone').textContent=friend.whatsapp||'';
   document.getElementById('messages').replaceChildren();
   document.getElementById('messages').dataset.count='';
@@ -474,50 +512,93 @@ function openChat(friend){
   showPage('chatPage');
 }
 
+/*
+ * Ambil pesan dari dua arah dengan dua query terpisah.
+ * Ini menghindari kesalahan parsing filter .or() dan memastikan
+ * pesan masuk maupun keluar digabung berdasarkan UUID.
+ */
 async function loadMessages(){
   if(!account||!activeFriend||loadingMessages)return;
+  if(!document.getElementById('chatPage').classList.contains('active'))return;
+
   loadingMessages=true;
 
   try{
-    const {data,error}=await db.from('messages')
+    const outgoingPromise=db.from('messages')
       .select('id,sender_id,recipient_id,content,created_at')
-      .or(
-        'and(sender_id.eq.'+account.id+',recipient_id.eq.'+activeFriend.id+'),'+
-        'and(sender_id.eq.'+activeFriend.id+',recipient_id.eq.'+account.id+')'
-      )
+      .eq('sender_id',account.id)
+      .eq('recipient_id',activeFriend.id)
       .order('created_at',{ascending:true})
       .limit(300);
 
-    if(error)throw error;
+    const incomingPromise=db.from('messages')
+      .select('id,sender_id,recipient_id,content,created_at')
+      .eq('sender_id',activeFriend.id)
+      .eq('recipient_id',account.id)
+      .order('created_at',{ascending:true})
+      .limit(300);
 
-    const messages=data||[];
+    const [outgoing,incoming]=await Promise.all([
+      outgoingPromise,incomingPromise
+    ]);
+
+    if(outgoing.error)throw outgoing.error;
+    if(incoming.error)throw incoming.error;
+
+    const messages=[
+      ...(outgoing.data||[]),
+      ...(incoming.data||[])
+    ].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+
     const box=document.getElementById('messages');
     const lastId=messages.length?messages[messages.length-1].id:'';
+    const signature=messages.map(m=>m.id+':'+m.content).join('|');
 
-    if(box.dataset.count===String(messages.length)&&box.dataset.last===lastId)return;
+    if(box.dataset.signature===signature)return;
 
     box.replaceChildren();
 
-    messages.forEach(msg=>{
-      const bubble=document.createElement('div');
-      bubble.className='bubble '+(msg.sender_id===account.id?'mine':'theirs');
+    if(!messages.length){
+      const empty=document.createElement('div');
+      empty.className='small';
+      empty.style.textAlign='center';
+      empty.style.padding='18px 0';
+      empty.textContent='Belum ada pesan. Mulai percakapan sekarang.';
+      box.append(empty);
+    }else{
+      messages.forEach(msg=>{
+        const bubble=document.createElement('div');
+        bubble.className='bubble '+(msg.sender_id===account.id?'mine':'theirs');
 
-      const content=document.createElement('div');
-      content.textContent=msg.content;
+        const content=document.createElement('div');
+        content.textContent=msg.content;
 
-      const time=document.createElement('div');
-      time.className='time';
-      time.textContent=new Date(msg.created_at).toLocaleString('id-ID');
+        const time=document.createElement('div');
+        time.className='time';
+        time.textContent=new Date(msg.created_at).toLocaleString('id-ID');
 
-      bubble.append(content,time);
-      box.append(bubble);
-    });
+        bubble.append(content,time);
+        box.append(bubble);
+      });
+    }
 
     box.dataset.count=String(messages.length);
     box.dataset.last=lastId;
+    box.dataset.signature=signature;
     box.scrollTop=box.scrollHeight;
   }catch(error){
-    console.error(error);
+    console.error('loadMessages:',error);
+    const box=document.getElementById('messages');
+    let notice=document.getElementById('messageLoadError');
+
+    if(!notice){
+      notice=document.createElement('div');
+      notice.id='messageLoadError';
+      notice.className='card error';
+      box.prepend(notice);
+    }
+
+    notice.textContent='Gagal memuat pesan: '+error.message;
   }finally{
     loadingMessages=false;
   }
@@ -535,6 +616,17 @@ async function sendMessage(){
   button.disabled=true;
 
   try{
+    const {data:sessionData,error:sessionError}=await db.auth.getSession();
+    if(sessionError)throw sessionError;
+
+    if(!sessionData.session){
+      throw new Error('Sesi login tidak tersedia. Silakan masuk kembali.');
+    }
+
+    if(sessionData.session.user.id!==account.id){
+      throw new Error('Sesi login tidak cocok dengan akun yang aktif. Muat ulang aplikasi.');
+    }
+
     const {error}=await db.from('messages').insert({
       sender_id:account.id,
       recipient_id:activeFriend.id,
@@ -546,8 +638,8 @@ async function sendMessage(){
     input.value='';
     await loadMessages();
   }catch(error){
-    console.error(error);
-    alert('Pesan gagal dikirim. Periksa tabel messages dan kebijakan RLS.');
+    console.error('sendMessage:',error);
+    alert('Pesan gagal dikirim atau dimuat: '+error.message);
   }finally{
     sendingMessage=false;
     button.disabled=false;
@@ -564,6 +656,11 @@ document.getElementById('messageInput').addEventListener('keydown',event=>{
 db.auth.onAuthStateChange((event,session)=>{
   if(event==='SIGNED_OUT'){
     account=null;
+    activeFriend=null;
+    if(messageTimer){
+      clearInterval(messageTimer);
+      messageTimer=null;
+    }
     showPage('registerPage');
   }
 });
