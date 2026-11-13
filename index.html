@@ -6,996 +6,415 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="theme-color" content="#edf5ff">
 <title>Chat Saya</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{box-sizing:border-box}
-:root{
-  --bg:#edf5ff;
-  --blue:#347cf5;
-  --blue-dark:#286ce8;
-  --ink:#304766;
-  --muted:#8393aa;
-  --line:#e7edf7;
-  --white:#fff;
-}
-html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
-body{
-  background:var(--bg);
-  font-size:13px;
-  -webkit-tap-highlight-color:transparent;
-}
+:root{--bg:#edf5ff;--blue:#2878e8;--ink:#26364d;--muted:#8794a7;--line:#e6edf6}
+body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--ink)}
 button,input,textarea{font:inherit}
-button{cursor:pointer;border:0}
-button:disabled{opacity:.55;cursor:default}
-.page{
-  display:none;
-  position:relative;
-  isolation:isolate;
-  min-height:100dvh;
-  padding:0 12px 24px;
-  overflow:hidden;
-  background:linear-gradient(155deg,#f1f7ff 0%,#edf5ff 58%,#e6f0ff 100%);
-}
-.page.active{display:block}
-.page::before{
-  content:"";
-  position:absolute;
-  z-index:-1;
-  left:-8%;
-  bottom:-2px;
-  width:116%;
-  height:115px;
-  background:#dceaff;
-  border-radius:48% 52% 0 0/35% 43% 0 0;
-  clip-path:polygon(0 35%,10% 28%,21% 50%,32% 70%,43% 58%,53% 36%,65% 23%,77% 50%,88% 62%,100% 37%,100% 100%,0 100%);
-}
-.page::after{
-  content:"";
-  position:absolute;
-  z-index:-1;
-  left:-5%;
-  bottom:-28px;
-  width:110%;
-  height:100px;
-  background:#e5efff;
-  border-radius:50% 50% 0 0;
-}
-.statusbar{
-  height:35px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 10px;
-  color:#172337;
-  font-size:10px;
-  font-weight:bold;
-}
-.status-icons{display:flex;align-items:center;gap:4px}
-.signal{display:inline-flex;align-items:flex-end;gap:1px;height:9px}
-.signal i{display:block;width:2px;background:#172337;border-radius:1px}
-.signal i:nth-child(1){height:3px}
-.signal i:nth-child(2){height:5px}
-.signal i:nth-child(3){height:7px}
-.signal i:nth-child(4){height:9px}
-.wifi{font-size:10px}
-.battery{width:13px;height:7px;border:1px solid #172337;border-radius:2px;position:relative}
-.battery:before{content:"";position:absolute;inset:1px 2px;background:#172337}
-.battery:after{content:"";position:absolute;right:-3px;top:1px;width:2px;height:3px;background:#172337;border-radius:0 1px 1px 0}
-h2{
-  font-size:17px;
-  font-weight:700;
-  text-align:center;
-  margin:27px 0 20px;
-  color:#304e79;
-}
-input,textarea{
-  width:100%;
-  min-width:0;
-  border:1px solid #edf0f6;
-  border-radius:12px;
-  background:#f8faff;
-  color:#334966;
-  outline:none;
-  padding:12px 13px;
-  margin:0;
-  box-shadow:inset 0 1px 2px #263d5b05;
-}
-input::placeholder,textarea::placeholder{color:#9aa7ba}
-input:focus,textarea:focus{
-  border-color:#a9c9ff;
-  background:#fff;
-}
-input[readonly]{background:#f1f4f9;color:#75849a}
-.card{
-  background:rgba(255,255,255,.88);
-  border:1px solid #edf1f8;
-  border-radius:13px;
-  padding:11px;
-  margin:9px 0;
-  box-shadow:0 2px 8px #35517b06;
-}
-.primary{
-  display:block;
-  width:100%;
-  min-height:36px;
-  padding:10px 12px;
-  margin-top:9px;
-  border-radius:9px;
-  color:#fff;
-  background:linear-gradient(100deg,#3785fa,#3475ef);
-  box-shadow:0 2px 3px #286ce818;
-}
-.primary:active,.send:active{filter:brightness(.96)}
-.back{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  color:#42638e;
-  background:transparent;
-  padding:5px 0;
-  margin:5px 0 0;
-  font-size:14px;
-}
-.back .arrow{font-size:25px;line-height:1}
-.small{font-size:10px;color:#8593a8;line-height:1.5}
-.error{font-size:12px;color:#d75e70;margin-top:8px;overflow-wrap:anywhere}
-.hint{font-size:11px;color:#cf7482;margin:10px 1px 2px}
-.field{position:relative;margin:7px 0}
-.field input{padding-left:35px}
-.field-icon{
-  position:absolute;left:12px;top:50%;
-  transform:translateY(-50%);
-  font-size:15px;color:#6b85ad;
-  pointer-events:none;
-}
-#registerPage .card{padding:11px}
-#registerPage .field{margin:8px 0}
-#registerPage h2{margin-top:27px;margin-bottom:18px}
-#homePage h2{margin:20px 0 13px}
-.searchbox{position:relative;margin-bottom:9px}
-.searchbox .field-icon{left:13px}
-.searchbox input{padding-left:34px;border-radius:13px;background:#f8faff}
-#friendList{padding-bottom:115px}
-.friend{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  cursor:pointer;
-  padding:10px;
-  min-height:59px;
-  margin:5px 0;
-}
-.avatar{
-  width:39px;height:39px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:50%;
-  background:#dceaff;
-  color:#3376d8;
-  font-size:14px;font-weight:500;
-}
+button{border:0;cursor:pointer}
+header{position:sticky;top:0;z-index:10;background:#edf5fff2;backdrop-filter:blur(12px);padding:14px 15px 11px}
+.head{display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:23px;font-weight:800;color:#2169c8}
+.head-actions{display:flex;gap:8px}
+.iconbtn{width:39px;height:39px;border-radius:50%;background:#fff;color:#315579;font-size:22px}
+.sub{font-size:12px;color:var(--muted);margin-top:5px}
+main{max-width:650px;margin:auto;padding:7px 12px 105px}
+.page-title{font-size:21px;font-weight:800;margin:12px 3px 6px}
+.card{position:relative;background:white;border:1px solid #e7edf6;border-radius:17px;padding:14px;margin:12px 0;box-shadow:0 3px 12px #233c5c08}
+.row{display:flex;align-items:center;gap:10px}
+.avatar{width:42px;height:42px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:#dcecff;color:#2468bd;font-weight:800}
+.name{font-size:14px;font-weight:750}
+.meta{font-size:11px;color:var(--muted);margin-top:4px}
+.more{margin-left:auto;background:transparent;color:#53677f;font-size:23px;padding:2px 7px}
+.caption{font-size:14px;line-height:1.55;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.post-image{width:100%;max-height:430px;object-fit:contain;display:block;border-radius:12px;margin:10px 0;background:#f2f6fb}
+.post-actions{display:flex;align-items:center;border-top:1px solid var(--line);padding-top:9px;gap:2px}
+.action{background:transparent;color:#65758a;font-size:12px;display:flex;align-items:center;gap:5px;padding:8px;border-radius:9px}
+.action.active{color:#2176e8;font-weight:700}
+.bookmark{margin-left:auto;font-size:20px}
+.menu{position:absolute;right:7px;top:40px;z-index:7;background:white;border:1px solid var(--line);border-radius:12px;padding:5px;width:180px;box-shadow:0 8px 25px #19324d20}
+.menu button{display:block;text-align:left;background:white;width:100%;padding:11px;border-radius:8px;font-size:13px;color:var(--ink)}
+.menu button:hover{background:#edf5ff}
+.hidden{display:none!important}
+.search{width:100%;border:1px solid #dce6f2;border-radius:12px;padding:12px;background:white;margin:8px 0}
+.primary{background:var(--blue);color:white;border-radius:11px;padding:11px 14px;font-weight:700}
+.secondary{background:#eaf3ff;color:#236ac6;border-radius:10px;padding:9px 12px;font-weight:700}
+.full{width:100%}
+.bottom-nav{position:fixed;z-index:12;bottom:12px;left:50%;transform:translateX(-50%);width:min(94%,480px);background:#dcecffed;border:1px solid #c8def8;border-radius:28px;display:flex;justify-content:space-around;padding:7px;box-shadow:0 6px 24px #214d8020}
+.navbtn{background:transparent;color:#56708f;border-radius:20px;min-width:64px;padding:8px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.navbtn span:first-child{font-size:19px}
+.navbtn.active{background:white;color:#216fda;font-weight:800}
+.friend{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.friend:last-child{border-bottom:0}
 .friend-info{flex:1;min-width:0}
-.friend-name{display:block;font-size:12px;font-weight:600;color:#304766;margin-bottom:3px}
-.friend-arrow{color:#91a5c2;font-size:23px}
-.floating{
-  position:fixed;z-index:5;
-  right:18px;bottom:22px;
-  display:none;flex-direction:column;align-items:flex-end;gap:8px;
-}
-.floating.show{display:flex}
-.menu-items{display:none;flex-direction:column;gap:7px;align-items:flex-end}
-.menu-items.show{display:flex}
-.menu-items button{
-  display:flex;align-items:center;gap:7px;
-  min-width:105px;justify-content:flex-start;
-  border-radius:25px;padding:10px 14px;
-  color:#536c91;background:white;
-  box-shadow:0 2px 8px #233b5a10;
-  font-size:11px;
-}
-.dots{
-  width:43px;height:43px;border-radius:50%;
-  background:#2877ed;color:#fff;
-  font-size:22px;line-height:1;
-  box-shadow:0 3px 10px #286ce829;
-}
-#editPage h2,#findPage h2{margin:20px 0 22px}
-#editPage .card,#findPage .card{padding:11px}
-#editPage .field{margin:7px 0}
-#editPage input{font-size:12px;padding-top:12px;padding-bottom:12px}
-#editPage .primary{margin-top:14px}
-#findPage .card{background:transparent;border:0;box-shadow:none;padding:0}
-#findPage .field{margin:0 0 12px}
-#findResult{margin-top:22px}
-#findResult .card{background:rgba(255,255,255,.9);padding:13px}
-#findResult .primary{width:auto;min-width:100px;margin:10px auto 0}
-#chatPage{padding-left:0;padding-right:0;padding-bottom:78px}
-.chat-header{
-  display:flex;align-items:center;gap:10px;
-  min-height:62px;padding:4px 14px 10px;
-  border-bottom:1px solid #e4ecf7;
-}
-.chat-header .back{margin:0 1px 0 0;padding:0;width:20px;flex-shrink:0}
-.chat-header .avatar{width:36px;height:36px}
-.chat-heading{flex:1;min-width:0}
-.chat-heading strong{display:block;font-size:13px;margin-bottom:2px;color:#304766}
-.chat-heading .small{font-size:10px;line-height:1.4}
-.chat-options{
-  padding:6px;color:#6480a6;background:transparent;
-  font-size:21px;line-height:1;
-}
-#messages{
-  padding:5px 11px 15px;
-  overflow-y:auto;
-  height:calc(100dvh - 207px);
-  min-height:240px;
-  scrollbar-width:thin;
-  scrollbar-color:#d7e5fa transparent;
-}
-.date-separator{text-align:center;margin:11px 0 9px}
-.date-separator span{
-  display:inline-block;
-  background:#e1ebfb;
-  color:#5c7393;
-  font-size:10px;
-  padding:5px 11px;
-  border-radius:12px;
-}
-.bubble{
-  position:relative;
-  padding:9px 10px 7px;
-  border-radius:12px;
-  margin:7px 0;
-  max-width:84%;
-  width:fit-content;
-  min-width:62px;
-  overflow-wrap:anywhere;
-  font-size:12px;
-  line-height:1.35;
-  box-shadow:0 1px 2px #294b7b05;
-}
-.mine{
-  background:linear-gradient(110deg,#3e8afa,#3478f5);
-  color:white;margin-left:auto;
-  border-bottom-right-radius:5px;
-}
-.theirs{
-  background:#fff;color:#283b56;margin-right:auto;
-  border-bottom-left-radius:5px;
-}
-.time{
-  display:block;text-align:right;
-  font-size:8px;opacity:.8;
-  margin-top:4px;line-height:1;
-}
-.composer{
-  position:fixed;z-index:4;
-  bottom:0;left:0;right:0;
-  display:flex;align-items:center;gap:8px;
-  min-height:58px;padding:8px 11px;
-  background:rgba(247,250,255,.97);
-  border-top:1px solid #e3ebf7;
-}
-.attach{
-  flex-shrink:0;width:26px;height:35px;
-  color:#7288a8;background:transparent;
-  font-size:23px;padding:0;
-}
-.composer textarea{
-  flex:1;height:36px;min-height:36px;max-height:90px;
-  resize:none;padding:10px 12px;
-  border-radius:22px;background:#fff;
-  border:1px solid #e8edf5;font-size:12px;
-}
-.send{
-  display:flex;align-items:center;justify-content:center;
-  width:32px;height:32px;flex-shrink:0;
-  border-radius:50%;background:#2f7df5;color:white;
-  font-size:18px;padding:0;
-}
-#messageLoadError{margin:8px 0}
-.empty-state{
-  text-align:center;padding:20px 12px;
-  font-size:12px;color:#8797ad;
-}
-@media(min-width:600px){
-  .page{max-width:430px;margin:0 auto}
-  .composer{left:50%;right:auto;transform:translateX(-50%);width:min(430px,100%)}
-  .floating{right:calc((100vw - min(430px,100vw))/2 + 18px)}
-}
+.empty{text-align:center;padding:30px 12px;color:var(--muted);font-size:13px}
+textarea{width:100%;min-height:100px;border:1px solid #dce6f2;border-radius:12px;padding:12px;resize:vertical;outline:none}
+.section-label{font-size:14px;font-weight:800;margin:18px 3px 8px}
+.post-more-wrap{position:relative;margin-left:auto}
+.tag{font-size:10px;background:#e8f3ff;color:#2469be;border-radius:20px;padding:5px 8px}
+.comment-card{background:#f4f7fb;border-radius:13px;padding:12px;margin:10px 0}
+.comment-text{font-size:13px;line-height:1.55;overflow-wrap:anywhere;margin:9px 0}
+.comment-tools{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.text-btn{background:transparent;color:#3474c7;font-weight:700;font-size:12px;padding:4px 0}
+.reply-list{margin:10px 0 0 15px;padding-left:11px;border-left:2px solid #d5e5fa}
+.reply{background:white;border-radius:11px;padding:10px;margin:8px 0}
+.reply-form{display:flex;gap:7px;margin-top:9px}
+.reply-form input{min-width:0;flex:1;border:1px solid #dce6f2;border-radius:10px;padding:10px}
+.preview{width:100%;max-height:300px;object-fit:contain;border-radius:12px;margin-top:10px;background:#f2f6fb}
+.file-label{display:inline-flex;align-items:center;gap:7px;background:#eaf3ff;color:#246bc3;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
+<header>
+ <div class="head">
+  <div class="brand">Chat Saya</div>
+  <div class="head-actions">
+   <button class="iconbtn" onclick="toggleSearch()" aria-label="Cari">⌕</button>
+   <button class="iconbtn" onclick="toggleMainMenu()" aria-label="Menu">⋮</button>
+  </div>
+ </div>
+ <div class="sub" id="headerSub">Postingan terbaru dari teman-teman Anda</div>
+ <div id="mainMenu" class="menu hidden">
+  <button onclick="openHistory('like')">♥ Riwayat Suka</button>
+  <button onclick="openHistory('comment')">▤ Riwayat Komentar</button>
+  <button onclick="openHistory('save')">▣ Riwayat Simpan</button>
+  <button onclick="showPage('find')">Cari Teman</button>
+ </div>
+</header>
 
-<section id="registerPage" class="page active">
-  <div class="statusbar">
-    <span>9:41</span>
-    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
-  </div>
-  <h2>Buat Akun</h2>
-  <div class="card">
-    <div class="field"><span class="field-icon">♙</span><input id="regName" placeholder="Nama lengkap" autocomplete="name"></div>
-    <div class="field"><span class="field-icon">♙</span><input id="regAddress" placeholder="Alamat"></div>
-    <div class="field"><span class="field-icon">◉</span><input id="regPhone" placeholder="Nomor WhatsApp" inputmode="tel"></div>
-    <button class="primary" id="registerButton" onclick="register()">Daftar Sekarang</button>
-    <div class="hint">Lengkapi semua data dengan benar.</div>
-    <div id="registerError" class="error"></div>
-  </div>
+<main>
+<section id="homePage">
+ <div id="searchArea" class="hidden">
+  <input id="searchInput" class="search" placeholder="Cari teman..." oninput="searchFriends()">
+  <div id="searchResults"></div>
+ </div>
+ <div class="page-title">Beranda</div>
+ <div class="sub">Postingan terbaru dari teman-teman Anda</div>
+ <div id="feed"></div>
 </section>
 
-<section id="homePage" class="page">
-  <div class="statusbar">
-    <span>9:41</span>
-    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
-  </div>
-  <h2>Teman Chat</h2>
-  <div class="searchbox">
-    <span class="field-icon">⌕</span>
-    <input id="searchFriends" placeholder="Cari nama atau ID teman..." oninput="renderFriends()">
-  </div>
-  <div id="friendList"></div>
+<section id="chatPage" class="hidden">
+ <div class="page-title">Chat</div>
+ <input id="chatSearch" class="search" placeholder="Cari teman..." oninput="renderChatList()">
+ <div id="chatList"></div>
 </section>
 
-<section id="editPage" class="page">
-  <div class="statusbar">
-    <span>9:41</span>
-    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
-  </div>
-  <button class="back" onclick="showPage('homePage')"><span class="arrow">‹</span> Edit Akun</button>
-  <h2 style="display:none">Edit Akun</h2>
-  <div class="card">
-    <div class="field"><span class="field-icon">▣</span><input id="editId" placeholder="ID Akun" readonly></div>
-    <div class="field"><span class="field-icon">♙</span><input id="editName" placeholder="Nama lengkap"></div>
-    <div class="field"><span class="field-icon">⌖</span><input id="editAddress" placeholder="Alamat"></div>
-    <div class="field"><span class="field-icon">◉</span><input id="editPhone" placeholder="Nomor WhatsApp" inputmode="tel"></div>
-    <button class="primary" id="saveButton" onclick="saveAccount()">Simpan Perubahan</button>
-    <div id="editError" class="error"></div>
-  </div>
+<section id="groupsPage" class="hidden">
+ <div class="page-title">Grup</div>
+ <button class="primary full" onclick="createGroup()">＋ Tambah Grup</button>
+ <div id="groupList"></div>
 </section>
 
-<section id="findPage" class="page">
-  <div class="statusbar">
-    <span>9:41</span>
-    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
-  </div>
-  <button class="back" onclick="showPage('homePage')"><span class="arrow">‹</span> Cari Teman</button>
-  <h2 style="display:none">Cari Teman</h2>
-  <div class="card">
-    <div class="field"><span class="field-icon">▦</span><input id="findId" placeholder="Masukkan ID teman (5 digit)" inputmode="numeric" maxlength="5"></div>
-    <button class="primary" id="findButton" onclick="findFriend()">Cari Teman</button>
-    <div id="findResult"></div>
-  </div>
+<section id="accountPage" class="hidden">
+ <div class="page-title">Akun Saya</div>
+ <div id="myProfile"></div>
+ <div class="section-label">Postingan Saya</div>
+ <button class="primary full" onclick="showPage('post')">＋ Buat Postingan</button>
+ <div id="myPosts"></div>
 </section>
 
-<section id="chatPage" class="page">
-  <div class="statusbar">
-    <span>9:41</span>
-    <span class="status-icons"><span class="signal"><i></i><i></i><i></i><i></i></span><span class="wifi">◔</span><span class="battery"></span></span>
-  </div>
-  <header class="chat-header">
-    <button class="back" onclick="showPage('homePage')" aria-label="Kembali"><span class="arrow">‹</span></button>
-    <div class="avatar" id="chatAvatar">?</div>
-    <div class="chat-heading">
-      <strong id="chatName">Nama teman</strong>
-      <div id="chatId" class="small"></div>
-      <div id="chatPhone" class="small"></div>
-    </div>
-    <button class="chat-options" aria-label="Opsi">⋮</button>
-  </header>
-  <div id="messages"></div>
-  <div class="composer">
-    <button class="attach" aria-label="Lampiran" onclick="alert('Fitur lampiran belum diaktifkan.')">♧</button>
-    <textarea id="messageInput" rows="1" placeholder="Tulis pesan..."></textarea>
-    <button class="send" id="sendButton" onclick="sendMessage()" aria-label="Kirim">➤</button>
-  </div>
+<section id="profilePage" class="hidden">
+ <button class="secondary" onclick="showPage('home')">← Kembali</button>
+ <div id="friendProfile"></div>
+ <div class="section-label">Postingan</div>
+ <div id="friendPosts"></div>
 </section>
 
-<div id="floating" class="floating">
-  <div id="menuItems" class="menu-items">
-    <button onclick="openEdit()">♙ <span>Edit Akun</span></button>
-    <button onclick="openFind()">⌕ <span>Cari Teman</span></button>
+<section id="historyPage" class="hidden">
+ <button class="secondary" onclick="showPage('home')">← Kembali</button>
+ <div class="page-title" id="historyTitle">Riwayat</div>
+ <div id="historyPosts"></div>
+</section>
+
+<section id="commentsPage" class="hidden">
+ <button class="secondary" onclick="backFromComments()">← Kembali</button>
+ <div class="page-title">Komentar</div>
+ <div id="commentPostPreview"></div>
+ <div class="section-label">Semua komentar</div>
+ <div id="commentList"></div>
+ <div class="card">
+  <div class="name">Tulis komentar</div>
+  <textarea id="newCommentText" placeholder="Tulis komentar kamu..."></textarea>
+  <button class="primary full" style="margin-top:9px" onclick="submitComment()">Kirim Komentar</button>
+ </div>
+</section>
+
+<section id="findPage" class="hidden">
+ <button class="secondary" onclick="showPage('home')">← Kembali</button>
+ <div class="page-title">Cari Teman</div>
+ <input id="findInput" class="search" placeholder="Nama atau ID teman..." oninput="searchFindPage()">
+ <div id="findResults"></div>
+</section>
+
+<section id="editPage" class="hidden">
+ <button class="secondary" onclick="showPage('account')">← Kembali</button>
+ <div class="page-title">Edit Akun</div>
+ <div class="card">
+  <label class="sub">Nama</label>
+  <input id="editName" class="search">
+  <label class="sub">Bio</label>
+  <textarea id="editBio" placeholder="Ceritakan tentang dirimu"></textarea>
+  <p class="sub">ID pengguna: 10001 (demo)</p>
+  <button class="primary full" style="margin-top:12px" onclick="saveAccount()">Simpan Perubahan</button>
+ </div>
+</section>
+
+<section id="chatRoomPage" class="hidden">
+ <button class="secondary" onclick="showPage('chat')">← Daftar Chat</button>
+ <div id="chatRoomTitle" class="page-title">Chat</div>
+ <div class="sub" id="chatRoomSubtitle"></div>
+ <div id="messages"></div>
+ <div class="card" style="display:flex;gap:8px;padding:9px">
+  <input id="messageInput" class="search" style="margin:0" placeholder="Tulis pesan..." onkeydown="if(event.key==='Enter')sendMessage()">
+  <button class="primary" onclick="sendMessage()">Kirim</button>
+ </div>
+</section>
+
+<section id="postPage" class="hidden">
+ <button class="secondary" onclick="showPage('account')">← Kembali</button>
+ <div class="page-title">Buat Postingan</div>
+ <div class="card">
+  <textarea id="newCaption" placeholder="Tulis caption (opsional jika memakai gambar)..."></textarea>
+  <div style="margin-top:12px">
+   <label class="file-label">▧ Pilih Gambar
+    <input type="file" id="imageInput" accept="image/*" hidden onchange="previewImage(event)">
+   </label>
   </div>
-  <button class="dots" onclick="toggleMenu()" aria-label="Menu">⋮</button>
-</div>
+  <img id="imagePreview" class="preview hidden" alt="Pratinjau gambar">
+  <button id="removeImage" class="text-btn hidden" onclick="removePreview()">Hapus gambar</button>
+  <button class="primary full" style="margin-top:14px" onclick="createPost()">Publikasikan</button>
+ </div>
+</section>
+</main>
+
+<nav class="bottom-nav">
+ <button class="navbtn active" data-page="home" onclick="showPage('home')"><span>⌂</span><span>Beranda</span></button>
+ <button class="navbtn" data-page="chat" onclick="showPage('chat')"><span>▤</span><span>Chat</span></button>
+ <button class="navbtn" data-page="groups" onclick="showPage('groups')"><span>♧</span><span>Grup</span></button>
+ <button class="navbtn" data-page="account" onclick="showPage('account')"><span>◉</span><span>Akun</span></button>
+</nav>
 
 <script>
-const SUPABASE_URL='https://ephyrxssmbutevwjwwmd.supabase.co';
-const SUPABASE_KEY='sb_publishable_sX4Gil8eofCFuKC4cXQMjw_UD5tlfVp';
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+const me={id:'10001',name:'Kamu',bio:'Halo! Ini akun demo Chat Saya.'};
+const friends=[
+{id:'10012',name:'Andi Pratama',bio:'Suka jalan-jalan dan fotografi.',initial:'A'},
+{id:'10023',name:'Siti Aulia',bio:'Berbagi cerita setiap hari.',initial:'S'},
+{id:'10034',name:'Budi Santoso',bio:'Belajar hal baru.',initial:'B'},
+{id:'10045',name:'Rina Putri',bio:'Senang membaca dan menulis.',initial:'R'},
+{id:'10056',name:'Dimas Saputra',bio:'Selalu semangat.',initial:'D'}
+];
+const isoDaysAgo=n=>{let d=new Date();d.setDate(d.getDate()-n);d.setHours(12,0,0,0);return d.toISOString()};
+const fmtDate=s=>new Date(s).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+const fmtTime=s=>new Date(s).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let posts=[],likes=new Set(),saves=new Set(),comments=[],groups=['Teman Sekolah'],chats={};
+let currentFriend=null,currentPostId=null,commentReturnPage='home';
 
-let account=null;
-let friends=[];
-let activeFriend=null;
-let messageTimer=null;
-let loadingMessages=false;
-let sendingMessage=false;
-
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.getElementById('floating').classList.toggle('show',id==='homePage');
-  document.getElementById('menuItems').classList.remove('show');
-
-  if(messageTimer){
-    clearInterval(messageTimer);
-    messageTimer=null;
-  }
-
-  if(id==='chatPage'&&activeFriend){
-    loadMessages();
-    messageTimer=setInterval(loadMessages,4000);
-  }
+function seedPosts(){
+ posts=[];
+ const own=[
+ ['Mencoba aplikasi Chat Saya hari ini.','2026-11-13T08:15:00'],
+ ['Hari yang menyenangkan bersama teman-teman.','2026-11-10T16:20:00'],
+ ['Belajar hal baru setiap hari.','2026-11-07T19:05:00'],
+ ['Semoga semua rencana berjalan lancar.','2026-11-03T10:30:00'],
+ ['Selamat pagi, semangat menjalani hari!','2026-10-29T07:10:00']
+ ];
+ own.forEach((p,i)=>posts.push({id:'own'+i,userId:me.id,name:me.name,initial:'K',caption:p[0],image:'',createdAt:p[1]}));
+ const samples=[
+ ['Andi Pratama','Hari ini cuacanya cerah sekali!',0,1],
+ ['Siti Aulia','Jangan lupa tetap semangat belajar.',1,2],
+ ['Budi Santoso','Akhirnya selesai juga tugas hari ini.',2,3],
+ ['Rina Putri','Menikmati waktu santai sore ini.',3,4],
+ ['Dimas Saputra','Semoga besok menjadi hari yang lebih baik.',4,5],
+ ['Andi Pratama','Ada banyak hal baru yang ingin dicoba.',0,6],
+ ['Siti Aulia','Terima kasih untuk hari yang menyenangkan.',1,7],
+ ['Budi Santoso','Sedikit demi sedikit, lama-lama selesai.',2,8],
+ ['Rina Putri','Membaca buku favorit lagi.',3,9],
+ ['Dimas Saputra','Halo semuanya! Semoga sehat selalu.',4,10]
+ ];
+ samples.forEach((p,i)=>posts.push({id:'friend'+i,userId:friends[p[2]].id,name:p[0],initial:p[0][0],caption:p[1],image:'',createdAt:isoDaysAgo(p[3])}));
 }
-
-function toggleMenu(){
-  document.getElementById('menuItems').classList.toggle('show');
+function loadLocal(){
+ try{
+  const raw=localStorage.getItem('chatSayaDemoV3');if(!raw)return;
+  const d=JSON.parse(raw);
+  if(d.me){me.name=d.me.name||me.name;me.bio=d.me.bio||''}
+  if(Array.isArray(d.posts)&&d.posts.length)posts=d.posts;
+  likes=new Set(d.likes||[]);saves=new Set(d.saves||[]);
+  comments=d.comments||[];groups=d.groups||groups;chats=d.chats||{};
+ }catch(e){}
 }
-
-function setError(id,message){
-  document.getElementById(id).textContent=message||'';
+function persist(){
+ try{localStorage.setItem('chatSayaDemoV3',JSON.stringify({me:{name:me.name,bio:me.bio},posts,likes:[...likes],saves:[...saves],comments,groups,chats}))}
+ catch(e){alert('Penyimpanan lokal penuh. Coba gunakan gambar yang lebih kecil.')}
 }
-
-function makePublicId(){
-  return String(Math.floor(10000+Math.random()*90000));
+function showPage(p){
+ document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+ const el=$(p+'Page');if(el)el.classList.remove('hidden');
+ document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+ $('mainMenu').classList.add('hidden');
+ const subtitles={home:'Postingan terbaru dari teman-teman Anda',chat:'Percakapan dengan teman',groups:'Grup Anda',account:'Profil dan postingan pribadi',comments:'Komentar pada postingan'};
+ $('headerSub').textContent=subtitles[p]||'Chat Saya';
+ if(p==='home')renderFeed();
+ if(p==='chat')renderChatList();
+ if(p==='groups')renderGroups();
+ if(p==='account')renderAccount();
+ if(p==='find')searchFindPage();
+ if(p==='edit'){$('editName').value=me.name;$('editBio').value=me.bio}
+ if(p==='chatRoom')renderMessages();
+ window.scrollTo(0,0);
 }
-
-async function startApp(){
-  try{
-    const {data,error}=await db.auth.getSession();
-    if(error)throw error;
-
-    const session=data.session;
-    if(!session){
-      account=null;
-      showPage('registerPage');
-      return;
-    }
-
-    const {data:profile,error:profileError}=await db
-      .from('profiles')
-      .select('id,public_id,display_name,address,whatsapp')
-      .eq('id',session.user.id)
-      .maybeSingle();
-
-    if(profileError)throw profileError;
-
-    if(!profile){
-      account=null;
-      showPage('registerPage');
-      return;
-    }
-
-    account=profile;
-    await loadFriends();
-    showPage('homePage');
-  }catch(error){
-    console.error('startApp:',error);
-    account=null;
-    showPage('registerPage');
-    setError('registerError','Gagal memeriksa akun: '+error.message);
-  }
+function toggleMainMenu(){$('mainMenu').classList.toggle('hidden')}
+function toggleSearch(){
+ $('searchArea').classList.toggle('hidden');
+ if(!$('searchArea').classList.contains('hidden'))$('searchInput').focus();
 }
-
-async function register(){
-  const name=document.getElementById('regName').value.trim();
-  const address=document.getElementById('regAddress').value.trim();
-  const phone=document.getElementById('regPhone').value.trim();
-  const button=document.getElementById('registerButton');
-
-  setError('registerError','');
-
-  if(!name||!address||!phone){
-    setError('registerError','Lengkapi nama, alamat, dan nomor WhatsApp.');
-    return;
-  }
-
-  button.disabled=true;
-  button.textContent='Mendaftarkan...';
-
-  try{
-    let {data:{session},error:sessionError}=await db.auth.getSession();
-    if(sessionError)throw sessionError;
-
-    if(session){
-      const {data:existing,error}=await db.from('profiles')
-        .select('id,public_id,display_name,address,whatsapp')
-        .eq('id',session.user.id).maybeSingle();
-
-      if(error)throw error;
-
-      if(existing){
-        account=existing;
-        await loadFriends();
-        showPage('homePage');
-        return;
-      }
-    }else{
-      const {data,error}=await db.auth.signInAnonymously();
-      if(error)throw error;
-      session=data.session;
-      if(!session)throw new Error('Sesi pengguna tidak tersedia.');
-    }
-
-    let created=null;
-
-    for(let attempt=0;attempt<20;attempt++){
-      const publicId=makePublicId();
-
-      const {data,error}=await db.from('profiles').insert({
-        id:session.user.id,
-        public_id:publicId,
-        display_name:name,
-        address:address,
-        whatsapp:phone
-      }).select('id,public_id,display_name,address,whatsapp').maybeSingle();
-
-      if(!error){
-        created=data;
-        break;
-      }
-
-      if(error.code==='23505'){
-        const {data:existing}=await db.from('profiles')
-          .select('id,public_id,display_name,address,whatsapp')
-          .eq('id',session.user.id).maybeSingle();
-
-        if(existing){
-          created=existing;
-          break;
-        }
-        continue;
-      }
-
-      throw error;
-    }
-
-    if(!created)throw new Error('Tidak berhasil membuat ID unik. Silakan coba lagi.');
-
-    account=created;
-    await loadFriends();
-    showPage('homePage');
-  }catch(error){
-    console.error('register:',error);
-    setError('registerError','Pendaftaran gagal: '+error.message);
-  }finally{
-    button.disabled=false;
-    button.textContent='Daftar Sekarang';
-  }
-}
-
-async function loadFriends(){
-  if(!account)return;
-
-  try{
-    const {data,error}=await db.rpc('get_chat_contacts');
-    if(error)throw error;
-
-    friends=(data||[])
-      .filter(friend=>friend.id!==account.id)
-      .filter((friend,index,arr)=>
-        arr.findIndex(other=>other.id===friend.id)===index
-      );
-
-    renderFriends();
-  }catch(error){
-    console.error('loadFriends:',error);
-    friends=[];
-    renderFriends();
-    const list=document.getElementById('friendList');
-    const notice=document.createElement('div');
-    notice.className='card error';
-    notice.textContent='Daftar teman gagal dimuat: '+error.message;
-    list.prepend(notice);
-  }
-}
-
-function renderFriends(){
-  const query=(document.getElementById('searchFriends').value||'').trim().toLowerCase();
-  const list=document.getElementById('friendList');
-  list.replaceChildren();
-
-  const matches=friends.filter(friend=>
-    (friend.display_name||'').toLowerCase().includes(query)||
-    String(friend.public_id||'').includes(query)
-  );
-
-  if(!matches.length){
-    const empty=document.createElement('div');
-    empty.className='card empty-state';
-    empty.textContent='Belum ada teman. Gunakan Cari Teman untuk menemukan pengguna.';
-    list.append(empty);
-    return;
-  }
-
-  matches.forEach(friend=>{
-    const card=document.createElement('div');
-    card.className='card friend';
-
-    const avatar=document.createElement('div');
-    avatar.className='avatar';
-    avatar.textContent=(friend.display_name||'?').slice(0,2).toUpperCase();
-
-    const info=document.createElement('div');
-    info.className='friend-info';
-
-    const name=document.createElement('strong');
-    name.className='friend-name';
-    name.textContent=friend.display_name||'Pengguna';
-
-    const id=document.createElement('div');
-    id.className='small';
-    id.textContent='ID: '+friend.public_id;
-
-    const arrow=document.createElement('span');
-    arrow.className='friend-arrow';
-    arrow.textContent='›';
-
-    info.append(name,id);
-    card.append(avatar,info,arrow);
-    card.onclick=()=>openChat(friend);
-    list.append(card);
-  });
-}
-
-function openEdit(){
-  if(!account)return;
-
-  document.getElementById('editId').value=account.public_id||'';
-  document.getElementById('editName').value=account.display_name||'';
-  document.getElementById('editAddress').value=account.address||'';
-  document.getElementById('editPhone').value=account.whatsapp||'';
-
-  setError('editError','');
-  showPage('editPage');
-}
-
-async function saveAccount(){
-  if(!account)return;
-
-  const display_name=document.getElementById('editName').value.trim();
-  const address=document.getElementById('editAddress').value.trim();
-  const whatsapp=document.getElementById('editPhone').value.trim();
-  const button=document.getElementById('saveButton');
-
-  setError('editError','');
-
-  if(!display_name||!address||!whatsapp){
-    setError('editError','Semua kolom harus diisi.');
-    return;
-  }
-
-  button.disabled=true;
-
-  try{
-    const {data,error}=await db.from('profiles')
-      .update({display_name,address,whatsapp})
-      .eq('id',account.id)
-      .select('id,public_id,display_name,address,whatsapp')
-      .maybeSingle();
-
-    if(error)throw error;
-    if(!data)throw new Error('Profil tidak ditemukan atau perubahan tidak diizinkan.');
-
-    account=data;
-    await loadFriends();
-    showPage('homePage');
-  }catch(error){
-    console.error('saveAccount:',error);
-    setError('editError','Gagal menyimpan: '+error.message);
-  }finally{
-    button.disabled=false;
-  }
-}
-
-function openFind(){
-  document.getElementById('findId').value='';
-  document.getElementById('findResult').replaceChildren();
-  showPage('findPage');
-}
-
-async function findFriend(){
-  const id=document.getElementById('findId').value.trim();
-  const result=document.getElementById('findResult');
-  const button=document.getElementById('findButton');
-  result.replaceChildren();
-
-  if(!/^\d{5}$/.test(id)){
-    result.textContent='Masukkan ID yang terdiri dari 5 angka.';
-    return;
-  }
-
-  if(!account){
-    result.textContent='Akun belum aktif. Silakan masuk kembali.';
-    return;
-  }
-
-  if(id===account.public_id){
-    result.textContent='Itu ID akun kamu sendiri.';
-    return;
-  }
-
-  button.disabled=true;
-  result.textContent='Mencari pengguna...';
-
-  try{
-    const {data,error}=await db.rpc('find_chat_profile',{search_id:id});
-    if(error)throw error;
-
-    const profile=Array.isArray(data)?data[0]:data;
-    result.replaceChildren();
-
-    if(!profile){
-      result.textContent='Pengguna dengan ID tersebut tidak ditemukan.';
-      return;
-    }
-
-    const card=document.createElement('div');
-    card.className='card friend';
-
-    const avatar=document.createElement('div');
-    avatar.className='avatar';
-    avatar.textContent=(profile.display_name||'?').slice(0,2).toUpperCase();
-
-    const info=document.createElement('div');
-    info.className='friend-info';
-
-    const name=document.createElement('strong');
-    name.className='friend-name';
-    name.textContent=profile.display_name||'Pengguna';
-
-    const publicId=document.createElement('div');
-    publicId.className='small';
-    publicId.textContent='ID: '+profile.public_id;
-
-    info.append(name,publicId);
-    card.append(avatar,info);
-    result.append(card);
-
-    const start=document.createElement('button');
-    start.className='primary';
-    start.textContent='Mulai Chat';
-
-    start.onclick=async()=>{
-      start.disabled=true;
-
-      try{
-        const {error:contactError}=await db.from('contacts').upsert({
-          owner_id:account.id,
-          contact_id:profile.id
-        },{onConflict:'owner_id,contact_id'});
-
-        if(contactError)throw contactError;
-
-        await loadFriends();
-        openChat(profile);
-      }catch(error){
-        console.error('add contact:',error);
-        start.disabled=false;
-        const message=document.createElement('div');
-        message.className='error';
-        message.textContent='Gagal menambahkan teman: '+error.message;
-        result.append(message);
-      }
-    };
-
-    result.append(start);
-  }catch(error){
-    console.error('findFriend:',error);
-    result.replaceChildren();
-    result.textContent='Pencarian gagal: '+error.message;
-  }finally{
-    button.disabled=false;
-  }
-}
-
-function openChat(friend){
-  if(!friend||!friend.id){
-    alert('Profil teman tidak memiliki UUID yang valid.');
-    return;
-  }
-
-  activeFriend=friend;
-  document.getElementById('chatName').textContent=friend.display_name||'Pengguna';
-  document.getElementById('chatId').textContent='ID akun: '+(friend.public_id||'');
-  document.getElementById('chatPhone').textContent=friend.whatsapp||'';
-  document.getElementById('chatAvatar').textContent=(friend.display_name||'?').slice(0,2).toUpperCase();
-
-  const box=document.getElementById('messages');
-  box.replaceChildren();
-  delete box.dataset.signature;
-  box.dataset.count='';
-  box.dataset.last='';
-
-  document.getElementById('messageInput').value='';
-  showPage('chatPage');
-}
-
-function getDateKey(date){
-  const d=new Date(date);
-  return d.getFullYear()+'-'+
-    String(d.getMonth()+1).padStart(2,'0')+'-'+
-    String(d.getDate()).padStart(2,'0');
-}
-
-function formatDateSeparator(date){
-  return new Date(date).toLocaleDateString('id-ID',{
-    weekday:'long',day:'numeric',month:'long',year:'numeric'
-  });
-}
-
-function formatMessageTime(date){
-  return new Date(date).toLocaleTimeString('id-ID',{
-    hour:'2-digit',minute:'2-digit',hour12:false
-  });
-}
-
-async function loadMessages(){
-  if(!account||!activeFriend||loadingMessages)return;
-  if(!document.getElementById('chatPage').classList.contains('active'))return;
-
-  loadingMessages=true;
-
-  try{
-    const [outgoing,incoming]=await Promise.all([
-      db.from('messages')
-        .select('id,sender_id,recipient_id,content,created_at')
-        .eq('sender_id',account.id)
-        .eq('recipient_id',activeFriend.id)
-        .order('created_at',{ascending:true})
-        .limit(300),
-
-      db.from('messages')
-        .select('id,sender_id,recipient_id,content,created_at')
-        .eq('sender_id',activeFriend.id)
-        .eq('recipient_id',account.id)
-        .order('created_at',{ascending:true})
-        .limit(300)
-    ]);
-
-    if(outgoing.error)throw outgoing.error;
-    if(incoming.error)throw incoming.error;
-
-    const messages=[
-      ...(outgoing.data||[]),
-      ...(incoming.data||[])
-    ].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
-
-    const box=document.getElementById('messages');
-    const signature=messages.map(m=>
-      m.id+':'+m.content+':'+m.created_at
-    ).join('|');
-
-    if(box.dataset.signature===signature)return;
-
-    box.replaceChildren();
-
-    if(!messages.length){
-      const empty=document.createElement('div');
-      empty.className='empty-state';
-      empty.textContent='Belum ada pesan. Mulai percakapan sekarang.';
-      box.append(empty);
-    }else{
-      let previousDate='';
-
-      messages.forEach(msg=>{
-        const currentDate=getDateKey(msg.created_at);
-
-        if(currentDate!==previousDate){
-          const separator=document.createElement('div');
-          separator.className='date-separator';
-
-          const label=document.createElement('span');
-          label.textContent=formatDateSeparator(msg.created_at);
-
-          separator.append(label);
-          box.append(separator);
-          previousDate=currentDate;
-        }
-
-        const bubble=document.createElement('div');
-        bubble.className='bubble '+
-          (msg.sender_id===account.id?'mine':'theirs');
-
-        const content=document.createElement('div');
-        content.textContent=msg.content;
-
-        const time=document.createElement('div');
-        time.className='time';
-        time.textContent=formatMessageTime(msg.created_at);
-
-        bubble.append(content,time);
-        box.append(bubble);
-      });
-    }
-
-    box.dataset.count=String(messages.length);
-    box.dataset.last=messages.length?messages[messages.length-1].id:'';
-    box.dataset.signature=signature;
-    box.scrollTop=box.scrollHeight;
-
-  }catch(error){
-    console.error('loadMessages:',error);
-
-    let notice=document.getElementById('messageLoadError');
-
-    if(!notice){
-      notice=document.createElement('div');
-      notice.id='messageLoadError';
-      notice.className='card error';
-      document.getElementById('messages').prepend(notice);
-    }
-
-    notice.textContent='Gagal memuat pesan: '+error.message;
-  }finally{
-    loadingMessages=false;
-  }
-}
-
-async function sendMessage(){
-  if(sendingMessage||!account||!activeFriend)return;
-
-  const input=document.getElementById('messageInput');
-  const content=input.value.trim();
-  if(!content)return;
-
-  sendingMessage=true;
-  const button=document.getElementById('sendButton');
-  button.disabled=true;
-
-  try{
-    const {data:sessionData,error:sessionError}=await db.auth.getSession();
-    if(sessionError)throw sessionError;
-
-    if(!sessionData.session){
-      throw new Error('Sesi login tidak tersedia. Silakan masuk kembali.');
-    }
-
-    if(sessionData.session.user.id!==account.id){
-      throw new Error('Sesi login tidak cocok dengan akun yang aktif. Muat ulang aplikasi.');
-    }
-
-    const {error}=await db.from('messages').insert({
-      sender_id:account.id,
-      recipient_id:activeFriend.id,
-      content:content
-    });
-
-    if(error)throw error;
-
-    input.value='';
-    await loadMessages();
-  }catch(error){
-    console.error('sendMessage:',error);
-    alert('Pesan gagal dikirim atau dimuat: '+error.message);
-  }finally{
-    sendingMessage=false;
-    button.disabled=false;
-  }
-}
-
-document.getElementById('messageInput').addEventListener('keydown',event=>{
-  if(event.key==='Enter'&&!event.shiftKey){
-    event.preventDefault();
-    sendMessage();
-  }
+document.addEventListener('click',e=>{
+ if(!e.target.closest('#mainMenu')&&!e.target.closest('.head-actions'))$('mainMenu').classList.add('hidden');
+ if(!e.target.closest('.post-more-wrap'))document.querySelectorAll('.post-menu').forEach(x=>x.classList.add('hidden'));
 });
-
-db.auth.onAuthStateChange((event,session)=>{
-  if(event==='SIGNED_OUT'){
-    account=null;
-    activeFriend=null;
-
-    if(messageTimer){
-      clearInterval(messageTimer);
-      messageTimer=null;
-    }
-
-    showPage('registerPage');
-  }
-});
-
-startApp();
+function postMenu(id){
+ document.querySelectorAll('.post-menu').forEach(x=>{if(x.id!=='menu-'+id)x.classList.add('hidden')});
+ $('menu-'+id).classList.toggle('hidden');
+}
+function postCard(p){
+ const liked=likes.has(p.id),saved=saves.has(p.id);
+ const count=comments.filter(c=>c.postId===p.id&&!c.parentId).length;
+ return `<article class="card">
+ <div class="row">
+ <div class="avatar">${esc(p.initial||p.name[0])}</div>
+ <div><div class="name">${esc(p.name)}</div><div class="meta">${fmtDate(p.createdAt)} · ${fmtTime(p.createdAt)}</div></div>
+ <div class="post-more-wrap"><button class="more" onclick="postMenu('${esc(p.id)}')">⋮</button>
+ <div class="menu post-menu hidden" id="menu-${esc(p.id)}">
+ <button onclick="viewProfile('${esc(p.userId)}')">Lihat Akun</button>
+ ${p.userId!==me.id?`<button onclick="openChat('${esc(p.userId)}')">Chat dengan Teman</button>`:`<button onclick="editPost('${esc(p.id)}')">Edit Postingan</button>`}
+ </div></div></div>
+ ${p.caption?`<div class="caption">${esc(p.caption)}</div>`:''}
+ ${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan">`:''}
+ <div class="post-actions">
+ <button class="action ${liked?'active':''}" onclick="toggleLike('${esc(p.id)}')">${liked?'♥':'♡'} <span>Suka</span></button>
+ <button class="action" onclick="openComments('${esc(p.id)}','${p.userId===me.id?'account':'home'}')">▤ <span>Komentar${count?' ('+count+')':''}</span></button>
+ <button class="action bookmark ${saved?'active':''}" onclick="toggleSave('${esc(p.id)}')">${saved?'▣':'♧'}</button>
+ </div></article>`;
+}
+function renderFeed(){
+ // Postingan sendiri sengaja tidak ditampilkan di Beranda.
+ $('feed').innerHTML=posts.filter(p=>p.userId!==me.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(postCard).join('')||'<div class="empty">Belum ada postingan teman.</div>';
+}
+function toggleLike(id){likes.has(id)?likes.delete(id):likes.add(id);persist();refreshViews()}
+function toggleSave(id){saves.has(id)?saves.delete(id):saves.add(id);persist();refreshViews()}
+function refreshViews(){renderFeed();renderAccount();if(!$('commentsPage').classList.contains('hidden'))renderCommentPage()}
+function openComments(id,returnPage){
+ currentPostId=id;commentReturnPage=returnPage||'home';renderCommentPage();showPage('comments');
+}
+function backFromComments(){showPage(commentReturnPage)}
+function renderCommentPage(){
+ const p=posts.find(x=>x.id===currentPostId);if(!p)return;
+ $('commentPostPreview').innerHTML=`<div class="card"><div class="row"><div class="avatar">${esc(p.initial||p.name[0])}</div><div><div class="name">${esc(p.name)}</div><div class="meta">${fmtDate(p.createdAt)} · ${fmtTime(p.createdAt)}</div></div></div>${p.caption?`<div class="caption">${esc(p.caption)}</div>`:''}${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan">`:''}</div>`;
+ const roots=comments.filter(c=>c.postId===currentPostId&&!c.parentId).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+ $('commentList').innerHTML=roots.map(renderComment).join('')||'<div class="empty">Belum ada komentar. Jadilah yang pertama berkomentar!</div>';
+}
+function commentAuthor(c){return c.userId===me.id?me.name:(friends.find(f=>f.id===c.userId)?.name||c.name||'Pengguna')}
+function renderComment(c){
+ const author=commentAuthor(c),replies=comments.filter(r=>r.parentId===c.id);
+ return `<div class="comment-card">
+ <div class="row"><div class="avatar" style="width:34px;height:34px;font-size:13px">${esc(author[0])}</div><div><div class="name">${esc(author)}</div><div class="meta">${fmtDate(c.createdAt)} · ${fmtTime(c.createdAt)}</div></div></div>
+ <div class="comment-text">${esc(c.text)}</div>
+ <div class="comment-tools"><button class="text-btn" onclick="toggleReplyForm('${esc(c.id)}')">↩ Balas</button><span class="meta">${replies.length} balasan</span></div>
+ <div id="reply-form-${esc(c.id)}" class="reply-form hidden"><input id="reply-input-${esc(c.id)}" placeholder="Tulis balasan..."><button class="primary" onclick="submitReply('${esc(c.id)}')">Kirim</button></div>
+ ${replies.length?`<div class="reply-list">${replies.map(r=>{const n=commentAuthor(r);return `<div class="reply"><div class="row"><div class="avatar" style="width:29px;height:29px;font-size:11px">${esc(n[0])}</div><div><div class="name">${esc(n)}</div><div class="meta">${fmtDate(r.createdAt)} · ${fmtTime(r.createdAt)}</div></div></div><div class="comment-text">${esc(r.text)}</div></div>`}).join('')}</div>`:''}
+ </div>`;
+}
+function toggleReplyForm(id){$('reply-form-'+id).classList.toggle('hidden');if(!$('reply-form-'+id).classList.contains('hidden'))$('reply-input-'+id).focus()}
+function submitComment(){
+ const input=$('newCommentText'),text=input.value.trim();if(!text)return;
+ comments.push({id:'c'+Date.now(),postId:currentPostId,parentId:null,userId:me.id,name:me.name,text,createdAt:new Date().toISOString()});
+ input.value='';persist();refreshViews();
+}
+function submitReply(parentId){
+ const input=$('reply-input-'+parentId),text=input.value.trim();if(!text)return;
+ comments.push({id:'r'+Date.now(),postId:currentPostId,parentId,userId:me.id,name:me.name,text,createdAt:new Date().toISOString()});
+ persist();refreshViews();
+}
+function openHistory(type){
+ $('historyTitle').textContent=type==='like'?'Riwayat Suka':type==='comment'?'Riwayat Komentar':'Riwayat Simpan';
+ const ids=type==='like'?[...likes]:type==='save'?[...saves]:[...new Set(comments.map(c=>c.postId))];
+ $('historyPosts').innerHTML=posts.filter(p=>ids.includes(p.id)).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(postCard).join('')||'<div class="empty">Belum ada riwayat.</div>';
+ showPage('history');
+}
+function renderAccount(){
+ $('myProfile').innerHTML=`<div class="card"><div class="row"><div class="avatar">${esc(me.name[0]||'K')}</div><div><div class="name">${esc(me.name)}</div><div class="meta">ID pengguna: ${me.id}</div></div></div><p class="caption">${esc(me.bio||'Belum ada bio.')}</p><button class="secondary" onclick="showPage('edit')">Edit Akun</button></div>`;
+ $('myPosts').innerHTML=posts.filter(p=>p.userId===me.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(postCard).join('')||'<div class="empty">Belum ada postingan.</div>';
+}
+function previewImage(e){
+ const file=e.target.files?.[0];if(!file)return;
+ if(!file.type.startsWith('image/')){alert('Pilih file gambar.');return}
+ if(file.size>3*1024*1024){alert('Ukuran gambar maksimal 3 MB.');e.target.value='';return}
+ const reader=new FileReader();
+ reader.onload=()=>{$('imagePreview').src=reader.result;$('imagePreview').classList.remove('hidden');$('removeImage').classList.remove('hidden')};
+ reader.readAsDataURL(file);
+}
+function removePreview(){
+ $('imageInput').value='';$('imagePreview').src='';$('imagePreview').classList.add('hidden');$('removeImage').classList.add('hidden');
+}
+function createPost(){
+ const caption=$('newCaption').value.trim(),image=$('imagePreview').classList.contains('hidden')?'':$('imagePreview').src;
+ if(!caption&&!image){alert('Tulis teks atau pilih gambar terlebih dahulu.');return}
+ posts.push({id:'own'+Date.now(),userId:me.id,name:me.name,initial:me.name[0],caption,image,createdAt:new Date().toISOString()});
+ $('newCaption').value='';removePreview();persist();showPage('account');
+}
+function editPost(id){
+ const p=posts.find(x=>x.id===id);if(!p||p.userId!==me.id)return;
+ const text=prompt('Ubah caption:',p.caption||'');if(text===null)return;
+ p.caption=text.trim();persist();refreshViews();
+}
+function saveAccount(){
+ const name=$('editName').value.trim();if(!name){alert('Nama tidak boleh kosong.');return}
+ me.name=name;me.bio=$('editBio').value.trim();
+ posts.filter(p=>p.userId===me.id).forEach(p=>{p.name=me.name;p.initial=me.name[0]});
+ persist();renderAccount();showPage('account');
+}
+function viewProfile(id){
+ const f=id===me.id?me:friends.find(x=>x.id===id);if(!f)return;
+ $('friendProfile').innerHTML=`<div class="card"><div class="row"><div class="avatar">${esc(f.initial||f.name[0])}</div><div><div class="name">${esc(f.name)}</div><div class="meta">ID: ${esc(f.id)}</div></div></div><p class="caption">${esc(f.bio||'')}</p>${id!==me.id?`<button class="primary" onclick="openChat('${id}')">Chat dengan Teman</button>`:''}</div>`;
+ $('friendPosts').innerHTML=posts.filter(p=>p.userId===id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(postCard).join('')||'<div class="empty">Belum ada postingan.</div>';
+ showPage('profile');
+}
+function searchFriends(){
+ const q=$('searchInput').value.toLowerCase();
+ $('searchResults').innerHTML=friends.filter(f=>(f.name+' '+f.id).toLowerCase().includes(q)).map(f=>`<div class="friend"><div class="avatar">${esc(f.initial)}</div><div class="friend-info"><div class="name">${esc(f.name)}</div><div class="meta">ID: ${esc(f.id)}</div></div><button class="secondary" onclick="viewProfile('${f.id}')">Lihat Akun</button></div>`).join('')||'<div class="empty">Teman tidak ditemukan.</div>';
+}
+function searchFindPage(){
+ const q=($('findInput')?.value||'').toLowerCase();
+ $('findResults').innerHTML=friends.filter(f=>(f.name+' '+f.id).toLowerCase().includes(q)).map(f=>`<div class="friend"><div class="avatar">${esc(f.initial)}</div><div class="friend-info"><div class="name">${esc(f.name)}</div><div class="meta">ID: ${esc(f.id)}</div></div><button class="secondary" onclick="alert('Teman demo sudah tersedia di Chat.')">Tambah</button></div>`).join('')||'<div class="empty">Tidak ada teman yang cocok.</div>';
+}
+function renderChatList(){
+ const q=($('chatSearch')?.value||'').toLowerCase();
+ $('chatList').innerHTML=friends.filter(f=>(f.name+' '+f.id).toLowerCase().includes(q)).map(f=>`<div class="friend"><div class="avatar">${esc(f.initial)}</div><div class="friend-info"><div class="name">${esc(f.name)}</div><div class="meta">ID: ${esc(f.id)}</div><div class="meta">${(chats[f.id]||[]).length?esc(chats[f.id].at(-1).text):'Mulai percakapan'}</div></div><button class="secondary" onclick="openChat('${f.id}')">Chat</button></div>`).join('')||'<div class="empty">Teman tidak ditemukan.</div>';
+}
+function openChat(id){
+ currentFriend=friends.find(f=>f.id===id);if(!currentFriend)return;
+ $('chatRoomTitle').textContent=currentFriend.name;$('chatRoomSubtitle').textContent='ID: '+id+' · Demo lokal';
+ showPage('chatRoom');
+}
+function renderMessages(){
+ if(!currentFriend)return;
+ const arr=chats[currentFriend.id]||[];
+ $('messages').innerHTML=arr.map(m=>`<div style="display:flex;justify-content:${m.mine?'flex-end':'flex-start'}"><div style="background:${m.mine?'#dcecff':'white'};padding:10px 12px;border-radius:14px;margin:5px 0;max-width:85%;overflow-wrap:anywhere">${esc(m.text)}<div class="meta" style="text-align:right">${fmtTime(m.createdAt)}</div></div></div>`).join('')||'<div class="empty">Belum ada pesan. Kirim pesan untuk mencoba.</div>';
+}
+function sendMessage(){
+ const input=$('messageInput'),text=input.value.trim();if(!text||!currentFriend)return;
+ chats[currentFriend.id]=chats[currentFriend.id]||[];
+ chats[currentFriend.id].push({text,mine:true,createdAt:new Date().toISOString()});
+ input.value='';persist();renderMessages();
+}
+function renderGroups(){$('groupList').innerHTML=groups.map((g,i)=>`<div class="friend"><div class="avatar">♧</div><div class="friend-info"><div class="name">${esc(g)}</div><div class="meta">Grup demo · ${i+2} anggota</div></div></div>`).join('')}
+function createGroup(){
+ const name=prompt('Nama grup baru:');if(!name||!name.trim())return;
+ groups.push(name.trim());persist();renderGroups();
+}
+seedPosts();loadLocal();renderFeed();renderChatList();renderGroups();renderAccount();
 </script>
 </body>
 </html>
-
