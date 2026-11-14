@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -57,6 +58,7 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
 .friend{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #edf1f6}
 .hidden{display:none!important}
 .post-image{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:10px;margin-top:12px;background:#f4f7fb}
+.post-image-fallback{display:none;margin-top:12px;padding:14px;border-radius:10px;background:#f4f7fb;color:#8794a5;font-size:14px;text-align:center}
 .post-date{font-size:12px;color:#8794a5;margin-top:4px}
 .comment-item{background:#f4f8ff;padding:10px;border-radius:10px;margin-bottom:8px;overflow-wrap:anywhere}
 .profile-input{resize:vertical}
@@ -207,16 +209,16 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
 <section class="page" id="aboutAccount"><div class="card"><b>Informasi akun pengguna</b><p class="muted">Nama akun: <span id="aboutAccountName">Pengguna</span></p><p class="muted">ID akun: <span id="aboutAccountId">-</span></p></div></section>
 <section class="page" id="business"><div class="card">Pengaturan usaha.</div></section>
 <section class="page" id="aboutApp">
-  <button class="setting" onclick="openPage('aboutUsers','ORANG YANG SUDAH BERGABUNG');renderAboutUsers()">
-    <span class="setting-icon">♙</span><span style="flex:1"><b>Orang yang sudah bergabung</b><div class="muted">Lihat dan chat semua akun yang terdaftar</div></span><b id="joinedCount">0</b>
+  <button class="setting" onclick="openPage('aboutGroups','GRUP YANG SUDAH BERGABUNG');renderAboutGroups()">
+    <span class="setting-icon">♧</span><span style="flex:1"><b>Grup yang sudah bergabung di aplikasi ini</b><div class="muted">Lihat grup dan anggota setiap grup</div></span><b id="groupCount">0</b>
   </button>
-  <button class="setting" onclick="openPage('aboutGroups','GRUP YANG SUDAH DIBUAT');renderAboutGroups()">
-    <span class="setting-icon">♧</span><span style="flex:1"><b>Grup yang sudah dibuat</b><div class="muted">Lihat grup yang dibuat di aplikasi</div></span><b id="groupCount">0</b>
+  <button class="setting" onclick="openPage('aboutUsers','AKUN YANG SUDAH BERGABUNG');renderAboutUsers()">
+    <span class="setting-icon">♙</span><span style="flex:1"><b>Akun yang sudah bergabung di aplikasi ini</b><div class="muted">Lihat akun dan mulai chat pribadi</div></span><b id="joinedCount">0</b>
   </button>
   <div class="card">
-    <b>Link Aplikasi</b>
-    <p class="muted">Salin link ini untuk membagikan aplikasi.</p>
-    <button class="primary" onclick="copyAppLink()">Salin Link Aplikasi</button>
+    <b>Salin Link Pelanggan</b>
+    <p class="muted">Bagikan aplikasi kepada pelanggan. Menu Tentang Aplikasi tidak ditampilkan pada tautan pelanggan.</p>
+    <button class="primary" onclick="copyAppLink()">Salin Link Pelanggan</button>
     <div class="muted" id="appLinkStatus" style="margin-top:9px"></div>
   </div>
 </section>
@@ -282,6 +284,56 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
 <script>
 const $=id=>document.getElementById(id);
 
+// Supabase project configuration (publishable key only; never put service_role here).
+const SUPABASE_URL='https://ephyrxssmbutevwjwwmd.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_sX4Gil8eofCFuKC4cXQMjw_UD5tlfVp';
+const SUPABASE_TABLES={users:'chat_saya_users',groups:'chat_saya_groups',messages:'chat_saya_messages'};
+let remoteUsers=[];
+let remoteGroups=[];
+let remoteSyncReady=false;
+async function supabaseRequest(table,method='GET',query='',body=null){
+ const url=SUPABASE_URL+'/rest/v1/'+table+(query?(query.startsWith('?')?query:'?'+query):'');
+ const headers={'apikey':SUPABASE_PUBLISHABLE_KEY,'Authorization':'Bearer '+SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
+ if(method==='POST'||method==='PATCH'||method==='DELETE')headers['Prefer']='return=representation,resolution=merge-duplicates';
+ const response=await fetch(url,{method,headers,body:body===null?undefined:JSON.stringify(body)});
+ const raw=await response.text();
+ let data=null;try{data=raw?JSON.parse(raw):null}catch(_){data=raw}
+ if(!response.ok)throw new Error((data&&data.message)||('Supabase '+response.status+': '+raw));
+ return data;
+}
+function supabaseStatus(message){const el=$('appLinkStatus');if(el)el.textContent=message;}
+async function syncProfileToSupabase(){
+ if(!CURRENT_USER_ID||!profile.name||profile.name==='Pengguna')return;
+ try{
+  await supabaseRequest(SUPABASE_TABLES.users,'POST','on_conflict=id',{id:CURRENT_USER_ID,name:profile.name,wa:profile.wa||'',bio:profile.bio||'',updated_at:new Date().toISOString()});
+ }catch(e){console.warn('Sinkronisasi profil Supabase belum berhasil:',e.message);}
+}
+async function refreshRemoteDirectories(){
+ try{
+  const [users,groups]=await Promise.all([
+   supabaseRequest(SUPABASE_TABLES.users,'GET','select=id,name,wa,bio,updated_at&order=name.asc'),
+   supabaseRequest(SUPABASE_TABLES.groups,'GET','select=id,name,reason,owner_id,members,created_at&order=created_at.desc')
+  ]);
+  remoteUsers=Array.isArray(users)?users.map(u=>({id:u.id,name:u.name||'Pengguna',wa:u.wa||'',bio:u.bio||''})):[];
+  remoteGroups=Array.isArray(groups)?groups.map(g=>({id:g.id,name:g.name||'Grup',reason:g.reason||'',ownerId:g.owner_id||'',members:Array.isArray(g.members)?g.members:[],createdAt:g.created_at?new Date(g.created_at).getTime():Date.now()})):[];
+  remoteSyncReady=true;
+  renderAboutApp();
+  if(currentPageId==='aboutUsers')renderAboutUsers();
+  if(currentPageId==='aboutGroups')renderAboutGroups();
+  if(currentPageId==='search')searchFriends(friendSearchQuery);
+ }catch(e){
+  console.warn('Direktori Supabase belum dapat dimuat:',e.message);
+  remoteSyncReady=false;
+ }
+}
+async function syncGroupToSupabase(group){
+ try{
+  await supabaseRequest(SUPABASE_TABLES.groups,'POST','on_conflict=id',{id:group.id,name:group.name,reason:group.reason||'',owner_id:group.ownerId,members:group.members||[],created_at:new Date(group.createdAt||Date.now()).toISOString()});
+  await refreshRemoteDirectories();
+ }catch(e){alert('Grup tersimpan di perangkat ini, tetapi belum tersinkron ke Supabase. Pastikan tabel dan kebijakan RLS sudah disiapkan.');console.warn(e);}
+}
+
+
 const userDirectory=[
  {name:'Andi',id:'CS-10012',wa:''},
  {name:'Budi',id:'CS-10034',wa:''},
@@ -295,6 +347,7 @@ let friendSearchQuery='';
 let viewedUserId='';
 let groupsData=readStore('cs_groups',[]);
 let activeGroupId='';
+let directoryGroupView=false;
 let pendingGroupMembers=[];
 
 let currentChat='';
@@ -310,14 +363,13 @@ const OWNER_ACCOUNT_CODE='RSI-150710';
 const LEGACY_OWNER_ACCOUNT_CODES=['RSD-150710','RUSDI-150710','RUSDI - 150710'];
 const wasRegistered=localStorage.getItem('cs_registered')==='true';
 const isSharedAppLink=new URLSearchParams(window.location.search).get('shared')==='1';
-const normalizedOwnerName=String(profile.name||'').trim().toLocaleLowerCase('id-ID');
-let isOwnerAccount=[OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(String(profile.id||'').trim().toUpperCase()) || normalizedOwnerName==='rusdi' || normalizedOwnerName.startsWith('rusdi ');
+let isOwnerAccount=!isSharedAppLink && ( [OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(String(profile.id||'').trim().toUpperCase()) || /^rusdi/i.test(String(profile.name||'').trim()) );
 if(isOwnerAccount){profile.id=OWNER_ACCOUNT_CODE;saveStore('cs_profile',profile);}
 function updateOwnerMenu(){
  const aboutButton=$('aboutAppButton');
  if(aboutButton){
-  aboutButton.style.display=isOwnerAccount?'':'none';
-  aboutButton.disabled=!isOwnerAccount;
+  aboutButton.style.display=(isOwnerAccount&&!isSharedAppLink)?'':'none';
+  aboutButton.disabled=!(isOwnerAccount&&!isSharedAppLink);
  }
 }
 function makeAccountId(){
@@ -326,7 +378,7 @@ function makeAccountId(){
  const normalizedUsed=new Set([...used,...localIds].map(x=>String(x).toUpperCase()));
  for(let attempt=0;attempt<1000000;attempt++){
   const digits=String(Math.floor(Math.random()*1000000)).padStart(6,'0');
-  const id='RSD-'+digits;
+  const id='RSI-'+digits;
   if(![OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(id.toUpperCase()) && !normalizedUsed.has(id.toUpperCase())){
    used.push(id);saveStore('cs_used_account_codes',used);return id;
   }
@@ -339,7 +391,7 @@ if(isOwnerAccount){
  profile.id=CURRENT_USER_ID;
  saveStore('cs_profile',profile);
 }else if(wasRegistered){
- if(!/^RSD-\d{6}$/.test(String(CURRENT_USER_ID).toUpperCase()) || [OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(String(CURRENT_USER_ID).trim().toUpperCase())) CURRENT_USER_ID=makeAccountId();
+ if(!/^RSI-\d{6}$/.test(String(CURRENT_USER_ID).toUpperCase()) || [OWNER_ACCOUNT_CODE,...LEGACY_OWNER_ACCOUNT_CODES].includes(String(CURRENT_USER_ID).trim().toUpperCase())) CURRENT_USER_ID=makeAccountId();
  else CURRENT_USER_ID=String(CURRENT_USER_ID).toUpperCase();
  profile.id=CURRENT_USER_ID;saveStore('cs_profile',profile);
 }
@@ -354,10 +406,12 @@ function completeRegistration(){
  const wa=$('registerWa').value.trim();
  if(!name || !wa){alert('Nama dan nomor WhatsApp wajib diisi.');return;}
  const normalizedName=name.trim().toLocaleLowerCase('id-ID');
- isOwnerAccount=!isSharedAppLink && (normalizedName==='rusdi'||normalizedName.startsWith('rusdi '));
+ // Pendaftaran langsung pemilik memakai nama pemilik; tautan berbagi tidak pernah memberikan hak owner.
+ isOwnerAccount=!isSharedAppLink && normalizedName.startsWith('rusdi');
  CURRENT_USER_ID=isOwnerAccount?OWNER_ACCOUNT_CODE:makeAccountId();
  profile.name=name; profile.wa=wa; profile.bio=profile.bio||''; profile.id=CURRENT_USER_ID;
  saveStore('cs_profile',profile); localStorage.setItem('cs_registered','true');
+ syncProfileToSupabase();refreshRemoteDirectories();
  updateOwnerMenu();
  $('normalHeader').classList.remove('hidden'); $('bottomNav').classList.remove('hidden');
  openPage('home','BERANDA'); renderAccount();
@@ -385,7 +439,7 @@ document.addEventListener('click',e=>{
 
 let pageHistory=[];
 let currentPageId='home';
-const pageTitles={home:'BERANDA',settings:'PENGATURAN AKUN',privacy:'PRIVASI',search:'CARI TEMAN',account:'AKUN',editAccount:'EDIT AKUN',create:'BUAT POSTINGAN',comments:'KOMENTAR',history:'RIWAYAT',aboutAccount:'TENTANG AKUN',business:'ATUR USAHA',aboutApp:'TENTANG APLIKASI',aboutUsers:'ORANG YANG SUDAH BERGABUNG',aboutGroups:'GRUP YANG SUDAH DIBUAT',groups:'GRUP',chatList:'CHAT'};
+const pageTitles={home:'BERANDA',settings:'PENGATURAN AKUN',privacy:'PRIVASI',search:'CARI TEMAN',account:'AKUN',editAccount:'EDIT AKUN',create:'BUAT POSTINGAN',comments:'KOMENTAR',history:'RIWAYAT',aboutAccount:'TENTANG AKUN',business:'ATUR USAHA',aboutApp:'TENTANG APLIKASI',aboutUsers:'AKUN YANG SUDAH BERGABUNG',aboutGroups:'GRUP YANG SUDAH BERGABUNG',groups:'GRUP',chatList:'CHAT'};
 function syncBackButton(){
  const isHome=currentPageId==='home';
  $('pageBackButton').classList.toggle('hidden',isHome);
@@ -400,7 +454,7 @@ function goBack(){
  // Tidak berpindah ke halaman lain jika memang tidak ada halaman sebelumnya.
 }
 function openPage(id,title,skipHistory=false){
- if(id==='aboutApp'&&!isOwnerAccount){alert('Fitur Tentang Aplikasi hanya tersedia untuk pemilik aplikasi.');return;}
+ if(id==='aboutApp'&&(!isOwnerAccount||isSharedAppLink)){alert('Fitur Tentang Aplikasi hanya tersedia untuk pemilik aplikasi.');return;}
  if(!skipHistory && id!==currentPageId && $(currentPageId)){pageHistory.push({id:currentPageId,title:pageTitles[currentPageId]||$('pageTitle').textContent});}
  currentPageId=id;
  $('chatScreen').classList.add('hidden');
@@ -426,6 +480,7 @@ function openPage(id,title,skipHistory=false){
  if(id==='aboutApp')renderAboutApp();
  if(id==='aboutUsers')renderAboutUsers();
  if(id==='aboutGroups')renderAboutGroups();
+ if(id==='aboutApp')refreshRemoteDirectories();
 }
 
 function navTo(id,title,btn){
@@ -495,7 +550,7 @@ function renderPost(p,own=false){
    </div>
   </div>
   ${p.caption?`<p class="post-text" style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(p.caption)}</p>`:''}
-  ${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async">`:''}
+  ${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'"><div class="post-image-fallback">Gambar tidak dapat dimuat pada perangkat ini.</div>`:''}
   <div class="post-actions">
    <button class="save-action ${saved?'active':''}" title="Simpan" aria-label="Simpan postingan" onclick="toggleSave('${p.id}')">${saved?'▣':'▢'}</button>
    <button class="like-action ${liked?'active':''}" onclick="toggleLike('${p.id}')">${liked?'♥ Suka':'♡ Suka'}</button>
@@ -593,7 +648,7 @@ function openComments(id){
  const p=posts.find(x=>x.id===currentCommentPost);
  openPage('comments','KOMENTAR');
  $('commentPostPreview').innerHTML=p
-  ?`<b>${escapeHTML(p.author)}</b><p style="white-space:pre-wrap">${escapeHTML(p.caption||'')}</p>${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async">`:''}`
+  ?`<b>${escapeHTML(p.author)}</b><p style="white-space:pre-wrap">${escapeHTML(p.caption||'')}</p>${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'"><div class="post-image-fallback">Gambar tidak dapat dimuat pada perangkat ini.</div>`:''}`
   :'<b>Postingan</b>';
  renderComments();
 }
@@ -623,27 +678,52 @@ function addComment(){
  if(currentPageId==='history'&&activeHistoryType==='comment')renderHistoryItems('comment');
 }
 
+function compressPostImage(file){
+ return new Promise((resolve,reject)=>{
+  if(!file||!file.type||!file.type.startsWith('image/')){reject(new Error('File yang dipilih bukan gambar.'));return;}
+  const reader=new FileReader();
+  reader.onerror=()=>reject(new Error('Gambar tidak dapat dibaca.'));
+  reader.onload=()=>{
+   const img=new Image();
+   img.onerror=()=>reject(new Error('Format gambar tidak dapat dibuka.'));
+   img.onload=()=>{
+    const maxSide=1280;
+    const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
+    canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    const ctx=canvas.getContext('2d');
+    if(!ctx){reject(new Error('Perangkat tidak mendukung pemrosesan gambar.'));return;}
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    // Mengurangi ukuran file agar gambar lebih mudah disimpan dan ditampilkan.
+    resolve(canvas.toDataURL('image/jpeg',0.78));
+   };
+   img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+ });
+}
 function createPost(){
  const caption=$('postCaption').value.trim();
  const file=$('postImage').files[0];
  if(!caption&&!file){alert('Tambahkan teks atau gambar.');return}
  const savePostData=imageData=>{
-  posts.unshift({
-   id:makeId(),author:profile.name||'Pengguna',caption,
-   image:imageData||'',createdAt:Date.now()
-  });
-  saveStore('cs_posts',posts);
+  const post={id:makeId(),author:profile.name||'Pengguna',caption,image:imageData||'',createdAt:Date.now()};
+  posts.unshift(post);
+  try{saveStore('cs_posts',posts);}catch(e){
+   posts=posts.filter(p=>p.id!==post.id);
+   alert('Postingan tidak dapat disimpan. Pilih gambar yang lebih kecil atau hapus beberapa data aplikasi lama.');
+   return;
+  }
   $('postCaption').value='';
   $('postImage').value='';
-  renderAccount();
-  openPage('account','AKUN');
-  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='account'));
+  renderFeed();renderAccount();
+  openPage('home','BERANDA');
+  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='home'));
  };
  if(file){
-  const reader=new FileReader();
-  reader.onload=()=>savePostData(reader.result);
-  reader.onerror=()=>alert('Gambar tidak dapat dibaca.');
-  reader.readAsDataURL(file);
+  compressPostImage(file).then(savePostData).catch(e=>alert(e.message||'Gambar tidak dapat diproses.'));
  }else savePostData('');
 }
 
@@ -663,6 +743,7 @@ function saveProfile(){
  posts=posts.map(p=>p.author==='Pengguna'?{...p,author:profile.name}:p);
  saveStore('cs_profile',profile);
  saveStore('cs_posts',posts);
+ syncProfileToSupabase();
  renderAccount();
  openPage('account','AKUN');
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='account'));
@@ -719,14 +800,14 @@ function chatFromPost(name){
  openChat(user.name);
 }
 function allKnownUsers(){
- const all=[{name:profile.name||'Pengguna',id:CURRENT_USER_ID,wa:profile.wa||''},...userDirectory,...friends];
+ const all=[{name:profile.name||'Pengguna',id:CURRENT_USER_ID,wa:profile.wa||'',bio:profile.bio||''},...remoteUsers,...userDirectory,...friends];
  const unique=new Map();
- all.forEach(u=>{if(u&&u.id)unique.set(u.id,{...unique.get(u.id),...u});});
+ all.forEach(u=>{if(u&&u.id)unique.set(String(u.id),{...unique.get(String(u.id)),...u});});
  return [...unique.values()];
 }
 function renderAboutApp(){
- $('joinedCount').textContent=String(allKnownUsers().length);
- $('groupCount').textContent=String(readStore('cs_groups',[]).length);
+ $('joinedCount').textContent=String(Math.max(allKnownUsers().length,remoteUsers.length));
+ $('groupCount').textContent=String(Math.max(readStore('cs_groups',[]).length,remoteGroups.length));
 }
 function userRow(u, showChat=true){
  const isSelf=u.id===CURRENT_USER_ID;
@@ -734,14 +815,17 @@ function userRow(u, showChat=true){
  return `<div class="friend"><div class="avatar" style="cursor:pointer" onclick="openUserProfile('${escapeHTML(u.id)}')">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1;cursor:pointer" onclick="openUserProfile('${escapeHTML(u.id)}')"><b>${escapeHTML(u.name)}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div><div class="muted" style="font-size:12px">Lihat profil dan postingan</div></div>${isSelf?'':isFriend?`<button class="soft" onclick="openChatById('${escapeHTML(u.id)}')">Chat</button>`:`<button class="primary" onclick="addFriend('${escapeHTML(u.id)}')">Tambah jadi teman</button>`}</div>`;
 }
 function renderAboutUsers(){
- const users=allKnownUsers().filter(u=>u.id!==CURRENT_USER_ID);
- $('allUsersDirectory').innerHTML=`<div class="card"><b>Semua orang yang sudah bergabung</b><p class="muted">Pilih Chat atau Tambah jadi teman untuk memulai percakapan.</p>${users.map(u=>userRow(u)).join('')||'<p class="muted">Belum ada akun lain yang tercatat.</p>'}</div>`;
+ const users=allKnownUsers();
+ $('allUsersDirectory').innerHTML=`<div class="card"><b>Semua akun yang sudah bergabung</b><p class="muted">Pilih Chat atau Tambah jadi teman untuk memulai percakapan. Akun sendiri ditandai sebagai akun Anda.</p>${users.map(u=>u.id===CURRENT_USER_ID?`<div class="friend"><div class="avatar">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name)} (Akun Anda)</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div></div>`:userRow(u)).join('')||'<p class="muted">Belum ada akun yang tercatat.</p>'}</div>`;
 }
 function renderAboutGroups(){
- const all=readStore('cs_groups',[]);
- $('allGroupsDirectory').innerHTML=`<div class="card"><b>Semua grup yang sudah dibuat</b>${all.map(g=>`<div class="friend" onclick="openGroupFromDirectory('${escapeHTML(g.id)}')" style="cursor:pointer"><div style="min-width:0;flex:1"><b>${escapeHTML(g.name)}</b><div class="muted">${escapeHTML(g.reason||'Belum ada tujuan grup')}</div><div class="muted">${(g.members||[]).length} anggota</div></div><button class="soft" onclick="event.stopPropagation();openGroupFromDirectory('${escapeHTML(g.id)}')">Lihat</button></div>`).join('')||'<p class="muted">Belum ada grup yang tercatat.</p>'}</div>`;
+ const local=readStore('cs_groups',[]);
+ const merged=new Map();
+ [...remoteGroups,...local].forEach(g=>merged.set(String(g.id),g));
+ const all=[...merged.values()];
+ $('allGroupsDirectory').innerHTML=`<div class="card"><b>Semua grup yang sudah bergabung di aplikasi ini</b>${all.map(g=>`<div class="friend" onclick="openGroupFromDirectory('${escapeHTML(g.id)}')" style="cursor:pointer"><div style="min-width:0;flex:1"><b>${escapeHTML(g.name)}</b><div class="muted">${escapeHTML(g.reason||'Belum ada tujuan grup')}</div><div class="muted">${(g.members||[]).length} anggota</div></div><button class="soft" onclick="event.stopPropagation();openGroupFromDirectory('${escapeHTML(g.id)}')">Lihat</button></div>`).join('')||'<p class="muted">Belum ada grup yang tercatat.</p>'}</div>`;
 }
-function openGroupFromDirectory(id){openPage('groups','GRUP');openGroup(id)}
+function openGroupFromDirectory(id){directoryGroupView=true;openPage('groups','GRUP');openGroup(id)}
 function renderGroups(){
  groupsData=readStore('cs_groups',[]).filter(g=>(g.ownerId||CURRENT_USER_ID)===CURRENT_USER_ID);
  $('groupDetails').classList.add('hidden');$('groupDirectory').classList.remove('hidden');
@@ -762,17 +846,19 @@ function toggleGroupMember(id){pendingGroupMembers=pendingGroupMembers.includes(
 function createGroup(){
  const name=$('newGroupName').value.trim(),reason=$('newGroupReason').value.trim();
  if(!name){alert('Masukkan nama grup terlebih dahulu.');return;}
- groupsData=readStore('cs_groups',[]);groupsData.push({id:makeId(),name,reason,ownerId:CURRENT_USER_ID,members:[...pendingGroupMembers],createdAt:Date.now()});
- saveStore('cs_groups',groupsData);cancelCreateGroup();renderGroups();renderAboutApp();alert('Grup berhasil disimpan.');
+ groupsData=readStore('cs_groups',[]);const newGroup={id:makeId(),name,reason,ownerId:CURRENT_USER_ID,members:[...pendingGroupMembers],createdAt:Date.now()};groupsData.push(newGroup);
+ saveStore('cs_groups',groupsData);cancelCreateGroup();renderGroups();renderAboutApp();syncGroupToSupabase(newGroup);alert('Grup berhasil disimpan.');
 }
 function openGroup(id){
+ const openedFromDirectory=directoryGroupView;
+ directoryGroupView=false;
  $('bottomNav').classList.remove('hidden');$('bottomNav').style.display='flex';$('bottomNav').style.visibility='visible';$('bottomNav').style.opacity='1';$('bottomNav').style.pointerEvents='auto';
  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='groups'));
- const g=readStore('cs_groups',[]).find(x=>x.id===id);if(!g)return;
+ const g=readStore('cs_groups',[]).find(x=>x.id===id)||remoteGroups.find(x=>x.id===id);if(!g)return;
  activeGroupId=id;const users=allKnownUsers();
  const isOwner=(g.ownerId||CURRENT_USER_ID)===CURRENT_USER_ID;
  $('groupDirectory').classList.add('hidden');$('groupCreateCard').classList.add('hidden');$('addGroupButton').classList.add('hidden');$('groupDetails').classList.remove('hidden');
- $('groupDetails').innerHTML=`<button class="soft" onclick="goBack()">← Kembali</button><div class="card"><h3 style="margin-top:0">${escapeHTML(g.name)}</h3><p class="muted">${escapeHTML(g.reason||'Belum ada alasan atau tujuan grup.')}</p><div class="row spread"><b>Anggota grup (${(g.members||[]).length})</b>${isOwner?`<button class="primary" onclick="openGroupChat('${escapeHTML(g.id)}')">Chat Grup</button>`:''}</div>${!isOwner?'<p class="muted">Kamu dapat melihat informasi dan anggota grup ini, tetapi hanya pemilik grup yang dapat membuka percakapan grup.</p>':''}${(g.members||[]).map(mid=>{const u=users.find(x=>x.id===mid)||friends.find(x=>x.id===mid)||{name:'Pengguna',id:mid};const isFriend=friends.some(f=>f.id===u.id);return `<div class="friend"><div class="avatar">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name)}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div>${u.id===CURRENT_USER_ID?'':isFriend?`<button class="soft" onclick="openChatById('${escapeHTML(u.id)}')">Chat</button>`:`<button class="primary" onclick="addFriend('${escapeHTML(u.id)}')">Tambah jadi teman</button>`}</div>`}).join('')||'<p class="muted">Belum ada anggota grup.</p>'}</div>`;
+ $('groupDetails').innerHTML=`<button class="soft" onclick="goBack()">← Kembali</button><div class="card"><h3 style="margin-top:0">${escapeHTML(g.name)}</h3><p class="muted">${escapeHTML(g.reason||'Belum ada alasan atau tujuan grup.')}</p><div class="row spread"><b>Anggota grup (${(g.members||[]).length})</b>${isOwner&&!openedFromDirectory?`<button class="primary" onclick="openGroupChat('${escapeHTML(g.id)}')">Chat Grup</button>`:''}</div>${!isOwner?'<p class="muted">Kamu dapat melihat informasi dan anggota grup ini, tetapi hanya pemilik grup yang dapat membuka percakapan grup.</p>':''}${(g.members||[]).map(mid=>{const u=users.find(x=>x.id===mid)||friends.find(x=>x.id===mid)||{name:'Pengguna',id:mid};const isFriend=friends.some(f=>f.id===u.id);return `<div class="friend"><div class="avatar">${escapeHTML((u.name||'?')[0])}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name)}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div>${u.id===CURRENT_USER_ID?'':isFriend?`<button class="soft" onclick="openChatById('${escapeHTML(u.id)}')">Chat</button>`:`<button class="primary" onclick="addFriend('${escapeHTML(u.id)}')">Tambah jadi teman</button>`}</div>`}).join('')||'<p class="muted">Belum ada anggota grup.</p>'}</div>`;
 }
 function openGroupChat(id){
  const g=readStore('cs_groups',[]).find(x=>x.id===id);if(!g)return;
@@ -783,8 +869,14 @@ function openGroupChat(id){
 async function copyAppLink(){
  const baseLink=window.location.href.split('#')[0].split('?')[0];
  const link=baseLink+'?shared=1';
- try{await navigator.clipboard.writeText(link);$('appLinkStatus').textContent='Link aplikasi berhasil disalin.';}
- catch(e){const t=document.createElement('textarea');t.value=link;document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();$('appLinkStatus').textContent=ok?'Link aplikasi berhasil disalin.':'Salin link dari alamat halaman ini: '+link;}
+ try{
+  await navigator.clipboard.writeText(link);
+  $('appLinkStatus').textContent='Link pelanggan berhasil disalin.';
+ }catch(e){
+  const t=document.createElement('textarea');t.value=link;document.body.appendChild(t);t.select();
+  const ok=document.execCommand('copy');t.remove();
+  $('appLinkStatus').textContent=ok?'Link pelanggan berhasil disalin.':'Salin link ini: '+link;
+ }
 }
 function renderChatList(){
  $('chatFriends').innerHTML=friends.map(f=>
@@ -847,6 +939,24 @@ function renderMessages(){
   `<div class="bubble ${m.mine?'mine':''}">${currentChat.startsWith('group:')?`<b>${escapeHTML(m.author|| (m.mine?'Saya':'Anggota'))}</b><br>`:''}${escapeHTML(m.text)}<span class="message-time">${escapeHTML(formatTime(m.createdAt||Date.now()))}</span></div>`
  ).join('');
  $('messages').scrollTop=$('messages').scrollHeight;
+ refreshRemoteMessages(currentChat);
+}
+async function refreshRemoteMessages(chatId){
+ if(!chatId)return;
+ try{
+  const rows=await supabaseRequest(SUPABASE_TABLES.messages,'GET','select=id,chat_id,sender_id,sender_name,text,created_at&chat_id=eq.'+encodeURIComponent(chatId)+'&order=created_at.asc');
+  if(!Array.isArray(rows))return;
+  const remote=rows.map(m=>({id:m.id,text:m.text||'',mine:String(m.sender_id)===String(CURRENT_USER_ID),author:m.sender_name||'Anggota',createdAt:m.created_at?new Date(m.created_at).getTime():Date.now(),remote:true}));
+  const local=messagesByFriend[chatId]||[];
+  const seen=new Set(local.map(m=>m.remoteId||m.id).filter(Boolean));
+  remote.forEach(m=>{if(!seen.has(m.id))local.push({...m,remoteId:m.id});});
+  local.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  messagesByFriend[chatId]=local;saveStore('cs_messages',messagesByFriend);
+  if(currentChat===chatId){
+   $('messages').innerHTML=local.map(m=>`<div class="bubble ${m.mine?'mine':''}">${chatId.startsWith('group:')?`<b>${escapeHTML(m.author||(m.mine?'Saya':'Anggota'))}</b><br>`:''}${escapeHTML(m.text)}<span class="message-time">${escapeHTML(formatTime(m.createdAt||Date.now()))}</span></div>`).join('');
+   $('messages').scrollTop=$('messages').scrollHeight;
+  }
+ }catch(e){console.warn('Pesan dari Supabase belum dapat dimuat:',e.message);}
 }
 function sendMessage(){
  const input=$('messageInput');
@@ -859,10 +969,16 @@ function sendMessage(){
  (messagesByFriend[currentChat]||(messagesByFriend[currentChat]=[])).push({
   text:v,mine:true,author:profile.name||'Saya',createdAt:Date.now()
  });
+ const outgoing=(messagesByFriend[currentChat]||[]).at(-1);
  saveStore('cs_messages',messagesByFriend);
  input.value='';
  resizeInput(input);
  renderMessages();
+ if(outgoing){
+  supabaseRequest(SUPABASE_TABLES.messages,'POST','',{chat_id:currentChat,sender_id:CURRENT_USER_ID,sender_name:profile.name||'Pengguna',text:outgoing.text,created_at:new Date(outgoing.createdAt||Date.now()).toISOString()})
+   .then(()=>refreshRemoteMessages(currentChat))
+   .catch(e=>console.warn('Pesan tersimpan di perangkat ini, tetapi belum terkirim ke Supabase:',e.message));
+ }
 }
 function handleEnter(e){
  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}
@@ -893,9 +1009,12 @@ if(localStorage.getItem('cs_registered')!=='true'){
 }
 renderAccount();
 updateOwnerMenu();
+if(isSharedAppLink){isOwnerAccount=false;updateOwnerMenu();}
 renderAboutApp();
 searchFriends('');
 renderChatList();
+refreshRemoteDirectories();
+if(localStorage.getItem('cs_registered')==='true')syncProfileToSupabase();
 </script>
 </body>
 </html>
