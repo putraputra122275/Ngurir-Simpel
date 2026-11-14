@@ -281,41 +281,80 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
   <button data-page="account" onclick="navTo('account','AKUN',this)"><span>♙</span>Akun</button>
 </nav>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $=id=>document.getElementById(id);
 
-// Supabase project configuration (publishable key only; never put service_role here).
+// Supabase setup: use the existing cs_* schema rather than chat_saya_* tables
+// which are not created by the SQL file used for this app.
 const SUPABASE_URL='https://ephyrxssmbutevwjwwmd.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_sX4Gil8eofCFuKC4cXQMjw_UD5tlfVp';
-const SUPABASE_TABLES={users:'chat_saya_users',groups:'chat_saya_groups',messages:'chat_saya_messages'};
+const SUPABASE_TABLES={profiles:'cs_profiles'};
+let supabaseClient=null;
+let supabaseAuthUser=null;
 let remoteUsers=[];
 let remoteGroups=[];
 let remoteSyncReady=false;
+let supabaseInitPromise=null;
+function initSupabase(){
+ if(supabaseInitPromise)return supabaseInitPromise;
+ supabaseInitPromise=(async()=>{
+  if(!window.supabase?.createClient)throw new Error('Pustaka Supabase belum berhasil dimuat. Periksa koneksi internet.');
+  supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  let {data:{session},error}=await supabaseClient.auth.getSession();
+  if(error)throw error;
+  if(!session){const result=await supabaseClient.auth.signInAnonymously();if(result.error)throw result.error;session=result.data.session;}
+  supabaseAuthUser=session?.user||null;
+  return supabaseAuthUser;
+ })();
+ return supabaseInitPromise;
+}
 async function supabaseRequest(table,method='GET',query='',body=null){
- const url=SUPABASE_URL+'/rest/v1/'+table+(query?(query.startsWith('?')?query:'?'+query):'');
- const headers={'apikey':SUPABASE_PUBLISHABLE_KEY,'Authorization':'Bearer '+SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
- if(method==='POST'||method==='PATCH'||method==='DELETE')headers['Prefer']='return=representation,resolution=merge-duplicates';
- const response=await fetch(url,{method,headers,body:body===null?undefined:JSON.stringify(body)});
- const raw=await response.text();
- let data=null;try{data=raw?JSON.parse(raw):null}catch(_){data=raw}
- if(!response.ok)throw new Error((data&&data.message)||('Supabase '+response.status+': '+raw));
+ const client=supabaseClient||((await initSupabase())&&supabaseClient);
+ let request=client.from(table);
+ if(method==='GET'){
+  const params=new URLSearchParams((query||'').replace(/^\?/,'').split('&').filter(Boolean).map(x=>x.split('=').map(decodeURIComponent)));
+  const select=params.get('select')||'*';request=request.select(select);
+  for(const [key,value] of params.entries()){
+   if(key==='select'||key==='order')continue;
+   const m=value.match(/^(eq|neq|gt|gte|lt|lte|like|ilike|is)\.(.*)$/);
+   if(m&&typeof request[m[1]]==='function')request=request[m[1]](key,m[2]);
+  }
+  if(params.has('order')){const [column,direction]=params.get('order').split('.');request=request.order(column,{ascending:direction!=='desc'});}
+ }else if(method==='POST'){
+  request=request.insert(body).select();
+ }else if(method==='UPSERT'){
+  request=request.upsert(body,{onConflict:'id'}).select();
+ }else if(method==='PATCH'){
+  request=request.update(body);
+ }else if(method==='DELETE'){
+  request=request.delete();
+ }else throw new Error('Metode Supabase tidak didukung: '+method);
+ const {data,error}=await request;
+ if(error)throw error;
  return data;
 }
 function supabaseStatus(message){const el=$('appLinkStatus');if(el)el.textContent=message;}
 async function syncProfileToSupabase(){
  if(!CURRENT_USER_ID||!profile.name||profile.name==='Pengguna')return;
  try{
-  await supabaseRequest(SUPABASE_TABLES.users,'POST','on_conflict=id',{id:CURRENT_USER_ID,name:profile.name,wa:profile.wa||'',bio:profile.bio||'',updated_at:new Date().toISOString()});
- }catch(e){console.warn('Sinkronisasi profil Supabase belum berhasil:',e.message);}
+  await initSupabase();
+  if(!supabaseAuthUser)throw new Error('Sesi Supabase belum tersedia.');
+  const row={id:supabaseAuthUser.id,display_name:profile.name,account_code:String(CURRENT_USER_ID),bio:profile.bio||'',whatsapp:profile.wa||''};
+  const {error}=await supabaseClient.from(SUPABASE_TABLES.profiles).upsert(row,{onConflict:'id'});
+  if(error)throw error;
+  await refreshRemoteDirectories();
+ }catch(e){console.warn('Sinkronisasi profil Supabase belum berhasil:',e.message);supabaseStatus('Profil tersimpan di perangkat ini. Sinkronisasi cloud belum berhasil: '+e.message);}
 }
 async function refreshRemoteDirectories(){
  try{
-  const [users,groups]=await Promise.all([
-   supabaseRequest(SUPABASE_TABLES.users,'GET','select=id,name,wa,bio,updated_at&order=name.asc'),
-   supabaseRequest(SUPABASE_TABLES.groups,'GET','select=id,name,reason,owner_id,members,created_at&order=created_at.desc')
-  ]);
-  remoteUsers=Array.isArray(users)?users.map(u=>({id:u.id,name:u.name||'Pengguna',wa:u.wa||'',bio:u.bio||''})):[];
-  remoteGroups=Array.isArray(groups)?groups.map(g=>({id:g.id,name:g.name||'Grup',reason:g.reason||'',ownerId:g.owner_id||'',members:Array.isArray(g.members)?g.members:[],createdAt:g.created_at?new Date(g.created_at).getTime():Date.now()})):[];
+  await initSupabase();
+  const {data:users,error}=await supabaseClient.from(SUPABASE_TABLES.profiles).select('id,display_name,account_code,whatsapp,bio').order('display_name',{ascending:true});
+  if(error)throw error;
+  remoteUsers=Array.isArray(users)?users.map(u=>({id:u.account_code||u.id,name:u.display_name||'Pengguna',wa:u.whatsapp||'',bio:u.bio||'',authId:u.id})) : [];
+  // The SQL schema stores groups as conversations + members, not a cs_groups table.
+  // Keep the existing group UI/data intact locally rather than sending invalid requests.
+  remoteGroups=[];
   remoteSyncReady=true;
   renderAboutApp();
   if(currentPageId==='aboutUsers')renderAboutUsers();
@@ -327,10 +366,9 @@ async function refreshRemoteDirectories(){
  }
 }
 async function syncGroupToSupabase(group){
- try{
-  await supabaseRequest(SUPABASE_TABLES.groups,'POST','on_conflict=id',{id:group.id,name:group.name,reason:group.reason||'',owner_id:group.ownerId,members:group.members||[],created_at:new Date(group.createdAt||Date.now()).toISOString()});
-  await refreshRemoteDirectories();
- }catch(e){alert('Grup tersimpan di perangkat ini, tetapi belum tersinkron ke Supabase. Pastikan tabel dan kebijakan RLS sudah disiapkan.');console.warn(e);}
+ // Groups need cs_conversations and cs_conversation_members with UUID membership.
+ // Do not write to the nonexistent chat_saya_groups table.
+ console.info('Grup tetap tersimpan di perangkat ini; sinkronisasi grup cloud belum diaktifkan untuk skema cs_*.',group?.id);
 }
 
 
@@ -550,7 +588,7 @@ function renderPost(p,own=false){
    </div>
   </div>
   ${p.caption?`<p class="post-text" style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(p.caption)}</p>`:''}
-  ${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'"><div class="post-image-fallback">Gambar tidak dapat dimuat pada perangkat ini.</div>`:''}
+  ${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="post-image-fallback">Gambar tidak dapat dimuat pada perangkat ini.</div>`:''}
   <div class="post-actions">
    <button class="save-action ${saved?'active':''}" title="Simpan" aria-label="Simpan postingan" onclick="toggleSave('${p.id}')">${saved?'▣':'▢'}</button>
    <button class="like-action ${liked?'active':''}" onclick="toggleLike('${p.id}')">${liked?'♥ Suka':'♡ Suka'}</button>
@@ -648,7 +686,7 @@ function openComments(id){
  const p=posts.find(x=>x.id===currentCommentPost);
  openPage('comments','KOMENTAR');
  $('commentPostPreview').innerHTML=p
-  ?`<b>${escapeHTML(p.author)}</b><p style="white-space:pre-wrap">${escapeHTML(p.caption||'')}</p>${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'"><div class="post-image-fallback">Gambar tidak dapat dimuat pada perangkat ini.</div>`:''}`
+  ?`<b>${escapeHTML(p.author)}</b><p style="white-space:pre-wrap">${escapeHTML(p.caption||'')}</p>${p.image?`<img class="post-image" src="${p.image}" alt="Gambar postingan" loading="eager" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="post-image-fallback">Gambar tidak dapat dimuat pada perangkat ini.</div>`:''}`
   :'<b>Postingan</b>';
  renderComments();
 }
@@ -678,52 +716,27 @@ function addComment(){
  if(currentPageId==='history'&&activeHistoryType==='comment')renderHistoryItems('comment');
 }
 
-function compressPostImage(file){
- return new Promise((resolve,reject)=>{
-  if(!file||!file.type||!file.type.startsWith('image/')){reject(new Error('File yang dipilih bukan gambar.'));return;}
-  const reader=new FileReader();
-  reader.onerror=()=>reject(new Error('Gambar tidak dapat dibaca.'));
-  reader.onload=()=>{
-   const img=new Image();
-   img.onerror=()=>reject(new Error('Format gambar tidak dapat dibuka.'));
-   img.onload=()=>{
-    const maxSide=1280;
-    const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
-    const canvas=document.createElement('canvas');
-    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
-    canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
-    const ctx=canvas.getContext('2d');
-    if(!ctx){reject(new Error('Perangkat tidak mendukung pemrosesan gambar.'));return;}
-    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(img,0,0,canvas.width,canvas.height);
-    // Mengurangi ukuran file agar gambar lebih mudah disimpan dan ditampilkan.
-    resolve(canvas.toDataURL('image/jpeg',0.78));
-   };
-   img.src=reader.result;
-  };
-  reader.readAsDataURL(file);
- });
-}
 function createPost(){
  const caption=$('postCaption').value.trim();
  const file=$('postImage').files[0];
  if(!caption&&!file){alert('Tambahkan teks atau gambar.');return}
  const savePostData=imageData=>{
-  const post={id:makeId(),author:profile.name||'Pengguna',caption,image:imageData||'',createdAt:Date.now()};
-  posts.unshift(post);
-  try{saveStore('cs_posts',posts);}catch(e){
-   posts=posts.filter(p=>p.id!==post.id);
-   alert('Postingan tidak dapat disimpan. Pilih gambar yang lebih kecil atau hapus beberapa data aplikasi lama.');
-   return;
-  }
+  posts.unshift({
+   id:makeId(),author:profile.name||'Pengguna',caption,
+   image:imageData||'',createdAt:Date.now()
+  });
+  saveStore('cs_posts',posts);
   $('postCaption').value='';
   $('postImage').value='';
-  renderFeed();renderAccount();
-  openPage('home','BERANDA');
-  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='home'));
+  renderAccount();
+  openPage('account','AKUN');
+  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page==='account'));
  };
  if(file){
-  compressPostImage(file).then(savePostData).catch(e=>alert(e.message||'Gambar tidak dapat diproses.'));
+  const reader=new FileReader();
+  reader.onload=()=>savePostData(reader.result);
+  reader.onerror=()=>alert('Gambar tidak dapat dibaca.');
+  reader.readAsDataURL(file);
  }else savePostData('');
 }
 
@@ -942,22 +955,12 @@ function renderMessages(){
  refreshRemoteMessages(currentChat);
 }
 async function refreshRemoteMessages(chatId){
+ // Chat UI currently identifies conversations by local account code/name, while
+ // cs_messages requires conversation UUIDs and authenticated UUID sender IDs.
+ // Avoid failed writes to the nonexistent chat_saya_messages table.
  if(!chatId)return;
- try{
-  const rows=await supabaseRequest(SUPABASE_TABLES.messages,'GET','select=id,chat_id,sender_id,sender_name,text,created_at&chat_id=eq.'+encodeURIComponent(chatId)+'&order=created_at.asc');
-  if(!Array.isArray(rows))return;
-  const remote=rows.map(m=>({id:m.id,text:m.text||'',mine:String(m.sender_id)===String(CURRENT_USER_ID),author:m.sender_name||'Anggota',createdAt:m.created_at?new Date(m.created_at).getTime():Date.now(),remote:true}));
-  const local=messagesByFriend[chatId]||[];
-  const seen=new Set(local.map(m=>m.remoteId||m.id).filter(Boolean));
-  remote.forEach(m=>{if(!seen.has(m.id))local.push({...m,remoteId:m.id});});
-  local.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
-  messagesByFriend[chatId]=local;saveStore('cs_messages',messagesByFriend);
-  if(currentChat===chatId){
-   $('messages').innerHTML=local.map(m=>`<div class="bubble ${m.mine?'mine':''}">${chatId.startsWith('group:')?`<b>${escapeHTML(m.author||(m.mine?'Saya':'Anggota'))}</b><br>`:''}${escapeHTML(m.text)}<span class="message-time">${escapeHTML(formatTime(m.createdAt||Date.now()))}</span></div>`).join('');
-   $('messages').scrollTop=$('messages').scrollHeight;
-  }
- }catch(e){console.warn('Pesan dari Supabase belum dapat dimuat:',e.message);}
 }
+
 function sendMessage(){
  const input=$('messageInput');
  const v=input.value.trim();
@@ -975,9 +978,7 @@ function sendMessage(){
  resizeInput(input);
  renderMessages();
  if(outgoing){
-  supabaseRequest(SUPABASE_TABLES.messages,'POST','',{chat_id:currentChat,sender_id:CURRENT_USER_ID,sender_name:profile.name||'Pengguna',text:outgoing.text,created_at:new Date(outgoing.createdAt||Date.now()).toISOString()})
-   .then(()=>refreshRemoteMessages(currentChat))
-   .catch(e=>console.warn('Pesan tersimpan di perangkat ini, tetapi belum terkirim ke Supabase:',e.message));
+  console.info('Pesan tersimpan lokal. Sinkronisasi chat lintas perangkat memerlukan pemetaan percakapan ke cs_conversations/cs_conversation_members.');
  }
 }
 function handleEnter(e){
@@ -1013,8 +1014,8 @@ if(isSharedAppLink){isOwnerAccount=false;updateOwnerMenu();}
 renderAboutApp();
 searchFriends('');
 renderChatList();
+initSupabase().then(()=>{if(localStorage.getItem('cs_registered')==='true')syncProfileToSupabase();}).catch(e=>{console.warn('Supabase belum siap:',e.message);supabaseStatus('Mode perangkat aktif; koneksi cloud belum siap.');});
 refreshRemoteDirectories();
-if(localStorage.getItem('cs_registered')==='true')syncProfileToSupabase();
 </script>
 </body>
 </html>
