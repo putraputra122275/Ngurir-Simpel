@@ -283,14 +283,14 @@ input[type=text],input[type=search],textarea.profile-input{width:100%;padding:11
 
 <button id="friendSearchFab" class="friend-search-fab hidden" onclick="openFriendSearch()" aria-label="Cari teman" title="Cari teman">⌕</button>
 <div id="friendSearchModal" class="friend-search-modal" role="dialog" aria-modal="true" aria-labelledby="friendSearchTitle">
-  <div class="friend-search-box">
+  <div class="friend-search-box" style="max-height:85vh;overflow:auto">
     <h3 id="friendSearchTitle">Cari Teman</h3>
-    <p class="muted">Masukkan ID akun teman yang ingin ditambahkan.</p>
-    <input id="friendIdToAdd" type="text" placeholder="Contoh: RSI-952813" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();findFriendById()}">
-    <div id="friendSearchStatus" class="muted" style="margin-bottom:12px"></div>
-    <div class="friend-search-actions">
-      <button class="soft" onclick="closeFriendSearch()">Batal</button>
-      <button class="primary" id="findFriendButton" onclick="findFriendById()">Cari dan Tambahkan</button>
+    <p class="muted">Masukkan ID atau nama akun teman. Hasil dicari dari Supabase dan akun yang sudah tersimpan di perangkat ini.</p>
+    <input id="friendIdToAdd" type="search" placeholder="Ketik ID atau nama teman..." autocomplete="off" oninput="searchFriendSuggestions(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();searchFriendSuggestions(this.value)}">
+    <div id="friendSearchStatus" class="muted" style="margin:8px 0 12px">Mulai ketik nama atau ID akun.</div>
+    <div id="friendSearchResults"></div>
+    <div class="friend-search-actions" style="margin-top:14px">
+      <button class="soft" onclick="closeFriendSearch()">Tutup</button>
     </div>
   </div>
 </div>
@@ -324,16 +324,13 @@ function initSupabase(){
   if(!supabaseClient){
    supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   }
-  let {data,error}=await supabaseClient.auth.getSession();
+  // Pencarian profil publik tidak boleh memaksa login anonim.
+  // Jika sesi sebelumnya ada, gunakan sesi itu; jika tidak, tetap lanjutkan
+  // dengan akses publishable key dan biarkan kebijakan SELECT Supabase menentukan akses.
+  const {data,error}=await supabaseClient.auth.getSession();
   if(error)throw error;
-  let session=data?.session||null;
-  if(!session){
-   const result=await supabaseClient.auth.signInAnonymously();
-   if(result.error)throw result.error;
-   session=result.data?.session||null;
-  }
-  if(!session?.user)throw new Error('Sesi Supabase belum tersedia setelah proses autentikasi.');
-  supabaseAuthUser=session.user;
+  const session=data?.session||null;
+  supabaseAuthUser=session?.user||null;
   return supabaseAuthUser;
  })().catch(error=>{
   // Izinkan percobaan ulang jika koneksi atau autentikasi gagal.
@@ -379,7 +376,7 @@ async function syncProfileToSupabase(){
   const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
   if(sessionError)throw sessionError;
   supabaseAuthUser=sessionData?.session?.user||supabaseAuthUser;
-  if(!supabaseAuthUser?.id)throw new Error('Sesi Supabase belum tersedia. Aktifkan Anonymous Sign-Ins di Supabase Authentication.');
+  if(!supabaseAuthUser?.id)throw new Error('Profil belum bisa disinkronkan karena belum ada sesi pengguna Supabase. Pencarian publik tetap dapat dicoba jika kebijakan SELECT tabel profiles mengizinkannya.');
   const row={
    id:supabaseAuthUser.id,
    public_id:String(CURRENT_USER_ID).trim().toUpperCase(),
@@ -844,63 +841,80 @@ function runHomeSearch(){
 function openFriendSearch(){
  $('friendSearchModal').classList.add('show');
  $('friendIdToAdd').value='';
- $('friendSearchStatus').textContent='';
+ $('friendSearchStatus').textContent='Mulai ketik nama atau ID akun.';
+ if($('friendSearchResults'))$('friendSearchResults').innerHTML='';
  setTimeout(()=> $('friendIdToAdd').focus(),50);
 }
 function closeFriendSearch(){
  $('friendSearchModal').classList.remove('show');
 }
-async function findFriendById(){
- const input=$('friendIdToAdd');
- const id=input.value.trim().toUpperCase();
+let friendSuggestionRequest=0;
+async function searchFriendSuggestions(value){
+ const q=String(value||'').trim();
  const status=$('friendSearchStatus');
- const button=$('findFriendButton');
- if(!id){status.textContent='Masukkan ID akun terlebih dahulu.';return;}
- if(id===String(CURRENT_USER_ID).trim().toUpperCase()){status.textContent='Itu adalah ID akun kamu sendiri.';return;}
- button.disabled=true;button.textContent='Mencari...';status.textContent='Sedang mencari akun di Supabase...';
+ const box=$('friendSearchResults');
+ const requestId=++friendSuggestionRequest;
+ if(!q){status.textContent='Mulai ketik nama atau ID akun.';box.innerHTML='';return;}
+ status.textContent='Mencari akun di Supabase...';
+ const needle=q.toLocaleLowerCase('id-ID');
+ const localUsers=[...remoteUsers,...friends,...userDirectory,{name:profile.name||'Pengguna',id:CURRENT_USER_ID,wa:profile.wa||'',bio:profile.bio||''}];
+ const unique=new Map();
+ localUsers.forEach(u=>{if(u&&u.id){const id=String(u.id).trim();unique.set(id,{...(unique.get(id)||{}),...u,id});}});
  try{
-  let person=allKnownUsers().find(u=>String(u.id||'').trim().toUpperCase()===id);
-  if(!person){
-   await initSupabase();
-   // Skema profil yang dipakai aplikasi ini adalah public.profiles:
-   // id = UUID pengguna Supabase, public_id = ID publik RSI-xxxxxx.
-   const {data,error}=await supabaseClient
-    .from(SUPABASE_TABLES.profiles)
-    .select('id,public_id,display_name,whatsapp')
-    .ilike('public_id',id)
-    .limit(1);
-   if(error)throw error;
-   if(Array.isArray(data)&&data.length){
-    const u=data[0];
-    person={id:String(u.public_id),name:u.display_name||'Pengguna',wa:u.whatsapp||'',bio:'',authId:u.id};
-    remoteUsers=[...remoteUsers.filter(x=>String(x.id||'').trim().toUpperCase()!==String(person.id).toUpperCase()),person];
-   }
+  await initSupabase();
+  // Pencarian baca tidak membutuhkan login anonim; SELECT harus diizinkan oleh RLS.
+  // Penting: public.profiles menggunakan public_id, display_name, dan whatsapp.
+  // Kolom id adalah UUID Supabase, bukan ID publik RSI-xxxxxx.
+  const safe=q.replace(/[%,()]/g,' ').trim();
+  if(safe){
+   const pattern='%'+safe+'%';
+   const [byName,byPublicId]=await Promise.all([
+    supabaseClient.from(SUPABASE_TABLES.profiles).select('id,public_id,display_name,whatsapp').ilike('display_name',pattern).limit(20),
+    supabaseClient.from(SUPABASE_TABLES.profiles).select('id,public_id,display_name,whatsapp').ilike('public_id',pattern).limit(20)
+   ]);
+   if(byName.error)throw byName.error;
+   if(byPublicId.error)throw byPublicId.error;
+   [...(byName.data||[]),...(byPublicId.data||[])].forEach(u=>{
+    if(!u||!u.public_id)return;
+    const person={id:String(u.public_id),name:u.display_name||'Pengguna',wa:u.whatsapp||'',bio:'',authId:u.id};
+    unique.set(person.id,{...(unique.get(person.id)||{}),...person});
+   });
   }
-  if(!person){
-   status.textContent='Akun tidak ditemukan. Pastikan ID benar dan profil teman sudah tersimpan di tabel profiles.';
-   return;
-  }
-  if(friends.some(f=>String(f.id).trim().toUpperCase()===String(person.id).trim().toUpperCase())){
-   status.textContent='Akun ini sudah ada di daftar Chat.';
-   closeFriendSearch();openPage('chatList','CHAT');renderChatList();return;
-  }
-  friends.push({...person});
-  saveStore('cs_friends',friends);
-  renderChatList();closeFriendSearch();openPage('chatList','CHAT');renderChatList();
-  alert((person.name||'Akun')+' berhasil ditambahkan ke daftar Chat.');
+  remoteUsers=[...remoteUsers.filter(u=>!unique.has(String(u.id))),...([...unique.values()].filter(u=>u.authId))];
+  if(requestId!==friendSuggestionRequest)return;
+  const results=[...unique.values()].filter(u=>String(u.id)!==String(CURRENT_USER_ID)&&(
+   String(u.name||'').toLocaleLowerCase('id-ID').includes(needle)||String(u.id||'').toLocaleLowerCase('id-ID').includes(needle)
+  )).slice(0,30);
+  if(!results.length){status.textContent='Akun belum ditemukan. Pastikan teman sudah menyelesaikan pendaftaran dan sinkronisasi Supabase.';box.innerHTML='';return;}
+  status.textContent='Ditemukan '+results.length+' akun';
+  box.innerHTML=results.map(u=>{
+   const already=friends.some(f=>String(f.id).toUpperCase()===String(u.id).toUpperCase());
+   return `<div class="friend"><div class="avatar">${escapeHTML((u.name||'?').charAt(0).toUpperCase())}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name||'Pengguna')}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div>${already?'<span class="muted">Sudah ditambahkan</span>':`<button class="primary" onclick="addSuggestedFriend('${escapeHTML(u.id)}')">Tambah</button>`}</div>`;
+  }).join('');
  }catch(e){
-  console.warn('Pencarian ID teman gagal:',e);
-  const detail=String(e?.message||'').toLowerCase();
-  if(detail.includes('permission')||detail.includes('row-level security')||detail.includes('rls')){
-   status.textContent='Supabase menolak akses ke tabel profiles. Periksa kebijakan SELECT (RLS) untuk pengguna yang masuk.';
-  }else if(detail.includes('relation')||detail.includes('does not exist')||detail.includes('schema cache')){
-   status.textContent='Tabel atau kolom profiles tidak ditemukan. Pastikan tabel profiles memiliki kolom id, public_id, display_name, dan whatsapp.';
-  }else{
-   status.textContent='Pencarian Supabase gagal: '+(e?.message||'Periksa koneksi, konfigurasi Supabase, dan kebijakan SELECT.');
-  }
- }finally{
-  button.disabled=false;button.textContent='Cari dan Tambahkan';
+  if(requestId!==friendSuggestionRequest)return;
+  console.warn('Pencarian teman Supabase gagal:',e);
+  status.textContent='Pencarian Supabase gagal: '+(e?.message||'Periksa koneksi, tabel profiles, dan kebijakan SELECT.');
+  const fallback=[...unique.values()].filter(u=>String(u.id)!==String(CURRENT_USER_ID)&&(String(u.name||'').toLocaleLowerCase('id-ID').includes(needle)||String(u.id||'').toLocaleLowerCase('id-ID').includes(needle)));
+  box.innerHTML=fallback.map(u=>`<div class="friend"><div class="avatar">${escapeHTML((u.name||'?').charAt(0).toUpperCase())}</div><div style="min-width:0;flex:1"><b>${escapeHTML(u.name||'Pengguna')}</b><div class="muted">ID akun: ${escapeHTML(u.id)}</div></div><button class="primary" onclick="addSuggestedFriend('${escapeHTML(u.id)}')">Tambah</button></div>`).join('');
  }
+}
+function addSuggestedFriend(id){
+ const person=allKnownUsers().find(u=>String(u.id)===String(id))||remoteUsers.find(u=>String(u.id)===String(id));
+ if(!person){alert('Data akun belum tersedia. Coba cari kembali.');return;}
+ if(String(person.id)===String(CURRENT_USER_ID)){alert('Itu adalah akun kamu sendiri.');return;}
+ if(friends.some(f=>String(f.id)===String(person.id))){alert('Akun ini sudah ada di daftar Chat.');return;}
+ friends.push({...person});
+ saveStore('cs_friends',friends);
+ renderChatList();
+ closeFriendSearch();
+ openPage('chatList','CHAT');
+ renderChatList();
+ alert((person.name||'Akun')+' berhasil ditambahkan ke daftar Chat.');
+}
+async function findFriendById(){
+ // Dipertahankan sebagai alias agar pemanggilan lama tidak merusak aplikasi.
+ return searchFriendSuggestions($('friendIdToAdd').value);
 }
 function searchFriends(q){
  friendSearchQuery=String(q||'').trim();
