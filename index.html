@@ -372,14 +372,34 @@ async function syncProfileToSupabase(){
  }
  try{
   await initSupabase();
-  // Ambil sesi terbaru agar ID profil selalu cocok dengan auth.uid() pada RLS.
-  const {data:sessionData,error:sessionError}=await supabaseClient.auth.getSession();
-  if(sessionError)throw sessionError;
-  supabaseAuthUser=sessionData?.session?.user||supabaseAuthUser;
-  if(!supabaseAuthUser?.id)throw new Error('Profil belum bisa disinkronkan karena belum ada sesi pengguna Supabase. Pencarian publik tetap dapat dicoba jika kebijakan SELECT tabel profiles mengizinkannya.');
+  // Aplikasi ini tidak menggunakan Supabase Auth untuk pendaftaran.
+  // Karena itu, jangan mensyaratkan auth.uid() atau login anonim.
+  // Simpan UUID profil yang stabil di perangkat agar sinkronisasi berikutnya
+  // memperbarui baris yang sama, bukan membuat profil baru setiap kali.
+  let profileRowId=localStorage.getItem('cs_supabase_profile_uuid');
+  const publicId=String(CURRENT_USER_ID).trim().toUpperCase();
+  // Jika profil lama sudah ada di database tetapi UUID-nya belum tersimpan
+  // di perangkat, gunakan baris yang cocok berdasarkan public_id.
+  if(!profileRowId){
+   const existing=await supabaseClient.from(SUPABASE_TABLES.profiles)
+    .select('id').eq('public_id',publicId).maybeSingle();
+   if(existing.error)throw existing.error;
+   profileRowId=existing.data?.id||'';
+  }
+  if(!profileRowId){
+   if(window.crypto&&typeof window.crypto.randomUUID==='function'){
+    profileRowId=window.crypto.randomUUID();
+   }else{
+    profileRowId='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+     const r=Math.random()*16|0;
+     return (c==='x'?r:(r&0x3|0x8)).toString(16);
+    });
+   }
+  }
+  localStorage.setItem('cs_supabase_profile_uuid',profileRowId);
   const row={
-   id:supabaseAuthUser.id,
-   public_id:String(CURRENT_USER_ID).trim().toUpperCase(),
+   id:profileRowId,
+   public_id:publicId,
    display_name:String(profile.name).trim(),
    whatsapp:String(profile.wa||'').trim()
   };
@@ -395,7 +415,13 @@ async function syncProfileToSupabase(){
  }catch(e){
   console.warn('Sinkronisasi profil Supabase belum berhasil:',e);
   const detail=e?.message||String(e);
-  supabaseStatus('Sinkronisasi Supabase gagal: '+detail);
+  let hint='';
+  if(/row-level security|permission denied|42501|401|403/i.test(detail)){
+   hint=' Periksa kebijakan RLS tabel profiles: akses INSERT/UPDATE untuk pendaftaran dan SELECT untuk pencarian harus diizinkan sesuai kebutuhan aplikasi.';
+  }else if(/duplicate key|unique constraint|conflict/i.test(detail)){
+   hint=' Periksa apakah public_id sudah dipakai akun lain; setiap ID akun harus unik.';
+  }
+  supabaseStatus('Sinkronisasi Supabase gagal: '+detail+hint);
   return false;
  }
 }
@@ -1192,4 +1218,4 @@ renderChatList();
 })();
 </script>
 </body>
-</html>
+   </html>
